@@ -5,4 +5,6 @@ Future<CompositionResult> compositeDependencies() async {
   return CompositionResult();
 }
 
-final class CompositionResult {}
+final class CompositionResult {
+  // TODO: Add implementation
+}
