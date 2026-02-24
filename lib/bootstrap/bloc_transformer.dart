@@ -1,0 +1,1 @@
+// Global event handling strategy (sequential, debounce, etc.)
