@@ -15,17 +15,17 @@ class MaterialContext extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Replace Settings with real Settings from settings domain package.
+    // TODO: Replace FakeSettings with real Settings from settings domain package.
     final settings = AppSettingsScope.of(context);
     final themeMode = settings.general.themeMode;
     final seedColor = settings.general.seedColor;
     final locale = settings.general.locale;
 
-    // TODO: Replace ThemeModeVO with real ThemeModeVO from settings domain package.
+    // TODO: Replace FakeThemeModeVO with real ThemeModeVO from settings domain package.
     final materialThemeMode = switch (themeMode) {
-      ThemeModeVO.system => ThemeMode.system,
-      ThemeModeVO.light => ThemeMode.light,
-      ThemeModeVO.dark => ThemeMode.dark,
+      FakeThemeModeVO.system => ThemeMode.system,
+      FakeThemeModeVO.light => ThemeMode.light,
+      FakeThemeModeVO.dark => ThemeMode.dark,
     };
 
     return MaterialApp(

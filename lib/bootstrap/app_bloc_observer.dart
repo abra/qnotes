@@ -11,7 +11,7 @@ class AppBlocObserver extends BlocObserver {
   const AppBlocObserver(this.logger);
 
   /// Logger used to log information during bloc transitions.
-  final Logger logger;
+  final FakeLogger logger;
 
   @override
   void onTransition(

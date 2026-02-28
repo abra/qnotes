@@ -23,8 +23,8 @@ Future<void> starter() async {
   // TODO: Replace Logger with real implementation from packages/monitoring.
   final logger = createAppLogger(
     observers: [
-      ErrorReporterLogObserver(errorReporter),
-      if (!kReleaseMode) const PrintingLogObserver(logLevel: LogLevel.trace),
+      FakeErrorReporterLogObserver(errorReporter),
+      if (!kReleaseMode) const FakePrintingLogObserver(logLevel: FakeLogLevel.trace),
     ],
   );
 

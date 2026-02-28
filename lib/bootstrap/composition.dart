@@ -13,8 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Composes dependencies and returns the result of composition.
 Future<CompositionResult> composeDependencies({
   required ApplicationConfig config,
-  required Logger logger,
-  required ErrorReporter errorReporter,
+  required FakeLogger logger,
+  required FakeErrorReporter errorReporter,
 }) async {
   final stopwatch = Stopwatch()..start();
 
@@ -57,14 +57,14 @@ final class CompositionResult {
 /// Creates the initialized [DependenciesContainer].
 Future<DependenciesContainer> createDependenciesContainer(
   ApplicationConfig config,
-  Logger logger,
-  ErrorReporter errorReporter,
+  FakeLogger logger,
+  FakeErrorReporter errorReporter,
 ) async {
   final sharedPreferences = SharedPreferencesAsync();
   final packageInfo = await PackageInfo.fromPlatform();
 
   // TODO: Replace with real SettingsContainer from settings feature package.
-  final settingsContainer = await SettingsContainer.create(
+  final settingsContainer = await FakeSettingsContainer.create(
     sharedPreferences: sharedPreferences,
   );
 
@@ -78,8 +78,8 @@ Future<DependenciesContainer> createDependenciesContainer(
 }
 
 /// TODO: Replace with real Logger creation using observers from packages/monitoring.
-Logger createAppLogger({List<LogObserver> observers = const []}) {
-  final logger = Logger();
+FakeLogger createAppLogger({List<FakeLogObserver> observers = const []}) {
+  final logger = FakeLogger();
 
   for (final observer in observers) {
     logger.addObserver(observer);
@@ -89,9 +89,9 @@ Logger createAppLogger({List<LogObserver> observers = const []}) {
 }
 
 /// TODO: Replace with real ErrorReporter initialization from packages/monitoring.
-Future<ErrorReporter> createErrorReporter(ApplicationConfig config) async {
-  // TODO: Replace NoopErrorReporter with SentryErrorReporter from packages/monitoring.
-  const errorReporter = NoopErrorReporter();
+Future<FakeErrorReporter> createErrorReporter(ApplicationConfig config) async {
+  // TODO: Replace FakeNoopErrorReporter with SentryErrorReporter from packages/monitoring.
+  const errorReporter = FakeNoopErrorReporter();
 
   if (config.enableSentry) {
     await errorReporter.initialize();

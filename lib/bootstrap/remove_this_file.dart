@@ -10,8 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 // ─── packages/monitoring (logger) ─────────────────────────────────────────────
 
 /// TODO: Replace with LogMessage from packages/monitoring package.
-class LogMessage {
-  const LogMessage({
+class FakeLogMessage {
+  const FakeLogMessage({
     required this.message,
     required this.level,
     required this.timestamp,
@@ -20,14 +20,14 @@ class LogMessage {
   });
 
   final String message;
-  final LogLevel level;
+  final FakeLogLevel level;
   final DateTime timestamp;
   final Object? error;
   final StackTrace? stackTrace;
 }
 
 /// TODO: Replace with LogLevel from packages/monitoring package.
-enum LogLevel implements Comparable<LogLevel> {
+enum FakeLogLevel implements Comparable<FakeLogLevel> {
   trace._(),
   debug._(),
   info._(),
@@ -35,25 +35,25 @@ enum LogLevel implements Comparable<LogLevel> {
   error._(),
   fatal._();
 
-  const LogLevel._();
+  const FakeLogLevel._();
 
   @override
-  int compareTo(LogLevel other) => index - other.index;
+  int compareTo(FakeLogLevel other) => index - other.index;
 }
 
 /// TODO: Replace with LogObserver from packages/monitoring package.
-mixin LogObserver {
-  void onLog(LogMessage logMessage);
+mixin FakeLogObserver {
+  void onLog(FakeLogMessage logMessage);
 }
 
 /// TODO: Replace with PrintingLogObserver from packages/monitoring package.
-final class PrintingLogObserver with LogObserver {
-  const PrintingLogObserver({required this.logLevel});
+final class FakePrintingLogObserver with FakeLogObserver {
+  const FakePrintingLogObserver({required this.logLevel});
 
-  final LogLevel logLevel;
+  final FakeLogLevel logLevel;
 
   @override
-  void onLog(LogMessage logMessage) {
+  void onLog(FakeLogMessage logMessage) {
     if (logMessage.level.index >= logLevel.index) {
       debugPrint(
         '[${logMessage.level.name.toUpperCase()}] ${logMessage.message}'
@@ -64,16 +64,16 @@ final class PrintingLogObserver with LogObserver {
 }
 
 /// TODO: Replace with ErrorReporterLogObserver from packages/monitoring package.
-final class ErrorReporterLogObserver with LogObserver {
-  const ErrorReporterLogObserver(this._errorReporter);
+final class FakeErrorReporterLogObserver with FakeLogObserver {
+  const FakeErrorReporterLogObserver(this._errorReporter);
 
-  final ErrorReporter _errorReporter;
+  final FakeErrorReporter _errorReporter;
 
   @override
-  void onLog(LogMessage logMessage) {
+  void onLog(FakeLogMessage logMessage) {
     if (!_errorReporter.isInitialized) return;
 
-    if (logMessage.level.index >= LogLevel.error.index) {
+    if (logMessage.level.index >= FakeLogLevel.error.index) {
       _errorReporter.captureException(
         throwable: logMessage.error ?? logMessage.message,
         stackTrace: logMessage.stackTrace,
@@ -83,42 +83,42 @@ final class ErrorReporterLogObserver with LogObserver {
 }
 
 /// TODO: Replace with Logger from packages/monitoring package.
-base class Logger {
-  Logger({List<LogObserver>? observers}) {
+base class FakeLogger {
+  FakeLogger({List<FakeLogObserver>? observers}) {
     _observers.addAll(observers ?? []);
   }
 
-  final _observers = <LogObserver>{};
+  final _observers = <FakeLogObserver>{};
 
-  void addObserver(LogObserver observer) => _observers.add(observer);
+  void addObserver(FakeLogObserver observer) => _observers.add(observer);
 
-  void removeObserver(LogObserver observer) => _observers.remove(observer);
+  void removeObserver(FakeLogObserver observer) => _observers.remove(observer);
 
   void trace(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.trace, error, stackTrace);
+      _log(message, FakeLogLevel.trace, error, stackTrace);
 
   void debug(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.debug, error, stackTrace);
+      _log(message, FakeLogLevel.debug, error, stackTrace);
 
   void info(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.info, error, stackTrace);
+      _log(message, FakeLogLevel.info, error, stackTrace);
 
   void warn(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.warn, error, stackTrace);
+      _log(message, FakeLogLevel.warn, error, stackTrace);
 
   void error(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.error, error, stackTrace);
+      _log(message, FakeLogLevel.error, error, stackTrace);
 
   void fatal(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.fatal, error, stackTrace);
+      _log(message, FakeLogLevel.fatal, error, stackTrace);
 
   void _log(
     String message,
-    LogLevel level,
+    FakeLogLevel level,
     Object? error,
     StackTrace? stackTrace,
   ) {
-    final logMessage = LogMessage(
+    final logMessage = FakeLogMessage(
       message: message,
       level: level,
       timestamp: DateTime.now(),
@@ -151,7 +151,7 @@ base class Logger {
 // ─── packages/monitoring (error_reporter) ─────────────────────────────────────
 
 /// TODO: Replace with ErrorReporter from packages/monitoring package.
-abstract interface class ErrorReporter {
+abstract interface class FakeErrorReporter {
   bool get isInitialized;
 
   /// TODO: Replace with real initialization (e.g. Sentry.init).
@@ -166,8 +166,8 @@ abstract interface class ErrorReporter {
 }
 
 /// TODO: Replace with concrete ErrorReporter implementation from packages/monitoring.
-final class NoopErrorReporter implements ErrorReporter {
-  const NoopErrorReporter();
+final class FakeNoopErrorReporter implements FakeErrorReporter {
+  const FakeNoopErrorReporter();
 
   @override
   bool get isInitialized => false;
@@ -188,25 +188,25 @@ final class NoopErrorReporter implements ErrorReporter {
 // ─── packages/features/settings ───────────────────────────────────────────────
 
 /// TODO: Replace with ThemeModeVO from packages/features/settings.
-enum ThemeModeVO { light, dark, system }
+enum FakeThemeModeVO { light, dark, system }
 
 /// TODO: Replace with GeneralSettings from packages/features/settings.
-final class GeneralSettings {
-  const GeneralSettings({
+final class FakeGeneralSettings {
+  const FakeGeneralSettings({
     this.locale = const Locale('en'),
-    this.themeMode = ThemeModeVO.system,
+    this.themeMode = FakeThemeModeVO.system,
     this.seedColor = const Color(0xFF6200EE),
   });
 
-  final ThemeModeVO themeMode;
+  final FakeThemeModeVO themeMode;
   final Color seedColor;
   final Locale locale;
 
-  GeneralSettings copyWith({
-    ThemeModeVO? themeMode,
+  FakeGeneralSettings copyWith({
+    FakeThemeModeVO? themeMode,
     Color? seedColor,
     Locale? locale,
-  }) => GeneralSettings(
+  }) => FakeGeneralSettings(
     themeMode: themeMode ?? this.themeMode,
     seedColor: seedColor ?? this.seedColor,
     locale: locale ?? this.locale,
@@ -215,7 +215,7 @@ final class GeneralSettings {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is GeneralSettings &&
+      other is FakeGeneralSettings &&
           seedColor == other.seedColor &&
           themeMode == other.themeMode &&
           locale == other.locale;
@@ -225,45 +225,47 @@ final class GeneralSettings {
 }
 
 /// TODO: Replace with Settings from packages/features/settings.
-class Settings {
-  const Settings({this.general = const GeneralSettings()});
+class FakeSettings {
+  const FakeSettings({this.general = const FakeGeneralSettings()});
 
-  final GeneralSettings general;
+  final FakeGeneralSettings general;
 
-  Settings copyWith({GeneralSettings? general}) =>
-      Settings(general: general ?? this.general);
+  FakeSettings copyWith({FakeGeneralSettings? general}) =>
+      FakeSettings(general: general ?? this.general);
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || (other is Settings && other.general == general);
+      identical(this, other) ||
+      (other is FakeSettings && other.general == general);
 
   @override
   int get hashCode => general.hashCode;
 }
 
 /// TODO: Replace with SettingsService from packages/features/settings.
-class SettingsService {
-  Settings _current = const Settings();
-  final _controller = StreamController<Settings>.broadcast();
+class FakeSettingsService {
+  FakeSettings _current = const FakeSettings();
+  final _controller = StreamController<FakeSettings>.broadcast();
 
-  Stream<Settings> get stream => _controller.stream;
+  Stream<FakeSettings> get stream => _controller.stream;
 
-  Settings get current => _current;
+  FakeSettings get current => _current;
 
-  Future<void> update(Settings Function(Settings) transform) async {
+  Future<void> update(FakeSettings Function(FakeSettings) transform) async {
     _current = transform(_current);
     _controller.add(_current);
   }
 }
 
 /// TODO: Replace with SettingsContainer from packages/features/settings.
-class SettingsContainer {
-  const SettingsContainer({required this.settingsService});
+class FakeSettingsContainer {
+  const FakeSettingsContainer({required this.settingsService});
 
-  final SettingsService settingsService;
+  final FakeSettingsService settingsService;
 
   /// TODO: Replace with real settings loading from SharedPreferences.
-  static Future<SettingsContainer> create({
+  static Future<FakeSettingsContainer> create({
     required SharedPreferencesAsync sharedPreferences,
-  }) async => SettingsContainer(settingsService: SettingsService());
+  }) async =>
+      FakeSettingsContainer(settingsService: FakeSettingsService());
 }

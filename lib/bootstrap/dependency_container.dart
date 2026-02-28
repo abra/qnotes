@@ -15,13 +15,13 @@ class DependenciesContainer {
     required this.settingsContainer,
   });
 
-  final Logger logger;
+  final FakeLogger logger;
   final ApplicationConfig config;
-  final ErrorReporter errorReporter;
+  final FakeErrorReporter errorReporter;
   final PackageInfo packageInfo;
 
   // TODO: Replace with real SettingsContainer from settings feature package.
-  final SettingsContainer settingsContainer;
+  final FakeSettingsContainer settingsContainer;
 }
 
 /// A special version of [DependenciesContainer] that is used in tests.

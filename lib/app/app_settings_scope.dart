@@ -5,25 +5,25 @@ import 'package:qnotes/app/dependency_scope.dart';
 import 'package:qnotes/bootstrap/remove_this_file.dart';
 import 'package:qnotes/utils/inherited_extension.dart';
 
-/// A scope that provides [Settings] to the application.
+/// A scope that provides [FakeSettings] to the application.
 ///
-/// Listens to [SettingsService.stream] and rebuilds descendant widgets
+/// Listens to [FakeSettingsService.stream] and rebuilds descendant widgets
 /// that depend on settings when theme, locale, or other preferences change.
 class AppSettingsScope extends StatelessWidget {
   const AppSettingsScope({required this.child, super.key});
 
   final Widget child;
 
-  /// Returns the current [Settings] from the nearest [AppSettingsScope] ancestor.
-  // TODO: Replace Settings with real Settings from settings domain package.
-  static Settings of(BuildContext context, {bool listen = true}) =>
+  /// Returns the current [FakeSettings] from the nearest [AppSettingsScope] ancestor.
+  // TODO: Replace FakeSettings with real Settings from settings domain package.
+  static FakeSettings of(BuildContext context, {bool listen = true}) =>
       context.inhOf<_SettingsInherited>(listen: listen).settings;
 
-  /// Updates settings via [SettingsService].
-  // TODO: Replace Settings with real Settings from settings domain package.
+  /// Updates settings via [FakeSettingsService].
+  // TODO: Replace FakeSettings with real Settings from settings domain package.
   static Future<void> update(
     BuildContext context,
-    Settings Function(Settings) transform,
+    FakeSettings Function(FakeSettings) transform,
   ) async {
     final settingsService = DependenciesScope.of(
       context,
@@ -38,7 +38,7 @@ class AppSettingsScope extends StatelessWidget {
       context,
     ).settingsContainer.settingsService;
 
-    return StreamBuilder<Settings>(
+    return StreamBuilder<FakeSettings>(
       stream: settingsService.stream,
       initialData: settingsService.current,
       builder: (context, snapshot) {
@@ -51,7 +51,7 @@ class AppSettingsScope extends StatelessWidget {
 class _SettingsInherited extends InheritedWidget {
   const _SettingsInherited({required super.child, required this.settings});
 
-  final Settings settings;
+  final FakeSettings settings;
 
   @override
   bool updateShouldNotify(_SettingsInherited oldWidget) =>
