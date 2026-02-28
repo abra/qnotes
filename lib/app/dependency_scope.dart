@@ -1,4 +1,8 @@
-// InheritedWidget — provides a DependencyContainer to the widget tree
+// InheritedWidget that exposes DependenciesContainer to the widget tree.
+//
+// Avoids prop-drilling: any widget in the tree can call
+// DependenciesScope.of(context) to access a dependency without
+// it being passed through every intermediate constructor.
 
 import 'package:flutter/widgets.dart';
 import 'package:qnotes/app/app_settings_scope.dart';

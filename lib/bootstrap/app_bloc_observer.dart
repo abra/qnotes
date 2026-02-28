@@ -1,4 +1,8 @@
-// Logging of events, transitions, and errors of all BLoC/Cubit
+// Global BLoC observer: logs every event, state transition and error
+// across all blocs and cubits in the application.
+//
+// Registered once in starter.dart via Bloc.observer so that individual
+// blocs do not need their own logging logic.
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qnotes/utils/string_extension.dart';

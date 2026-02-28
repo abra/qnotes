@@ -1,4 +1,9 @@
-// Flutter initialization, error zone setup, runApp launch
+// Application bootstrap: error zone, Flutter binding initialization, runApp.
+//
+// Sets up runZonedGuarded to catch all unhandled async errors.
+// Configures FlutterError.onError and platformDispatcher.onError so that
+// errors at every level are routed to the logger.
+// On initialization failure — shows a recovery screen instead of crashing.
 
 import 'dart:async';
 

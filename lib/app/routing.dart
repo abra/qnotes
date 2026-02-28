@@ -1,4 +1,7 @@
-// Routing and navigation configuration
+// Named route constants for the application.
+//
+// Centralizes route strings so that Navigator calls and deep-link handlers
+// reference the same values instead of raw string literals.
 
 /// Named route constants for the application.
 ///

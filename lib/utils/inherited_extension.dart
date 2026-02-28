@@ -1,6 +1,12 @@
+// BuildContext extensions for ergonomic InheritedWidget and InheritedModel access.
+//
+// inhOf / inhMaybeOf             — typed access to InheritedWidget with a clear
+//                                  error message when the widget is not in scope.
+// inheritFrom / maybeInheritFrom — typed access to a specific aspect of an
+//                                  InheritedModel for selective rebuilds.
+
 import 'package:flutter/material.dart';
 
-/// Extension methods on [BuildContext] for working with inherited widgets.
 extension InheritedExtension on BuildContext {
   /// Returns the nearest [T] or null if not found.
   T? inhMaybeOf<T extends InheritedWidget>({bool listen = true}) => listen

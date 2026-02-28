@@ -1,4 +1,8 @@
-// InheritedWidget — tracks style and theme changes, language, etc.
+// InheritedWidget that propagates Settings down the widget tree.
+//
+// Subscribes to FakeSettingsService.stream and rebuilds only the subtree
+// that depends on settings when theme, locale or other preferences change.
+// Widgets read settings via AppSettingsScope.of(context).
 
 import 'package:flutter/widgets.dart';
 import 'package:qnotes/app/dependency_scope.dart';

@@ -1,4 +1,7 @@
-// Scaffold with bottom navigation, common to all screens
+// App shell: bottom navigation bar shared across all top-level screens.
+//
+// Uses IndexedStack to preserve each screen's scroll position and local
+// state when the user switches between tabs.
 
 import 'package:flutter/material.dart';
 

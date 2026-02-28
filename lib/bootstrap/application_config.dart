@@ -1,4 +1,9 @@
-// Compile-time constants (dsn, api url, flags)
+// Compile-time configuration read from --dart-define flags.
+//
+// Centralizes all String.fromEnvironment() calls so that missing flags
+// are caught in one place rather than scattered across the codebase.
+// TestConfig uses noSuchMethod to fail loudly when a test accesses
+// a config value it did not provide.
 
 import 'package:qnotes/bootstrap/environment.dart';
 

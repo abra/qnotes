@@ -1,4 +1,8 @@
-// Widget tree root, collects app widgets together
+// Widget tree root: assembles the top-level widget hierarchy.
+//
+// Kept separate from starter.dart so that the bootstrap layer has no
+// knowledge of widgets, and the widget layer has no knowledge of
+// initialization logic.
 
 import 'package:flutter/widgets.dart';
 import 'package:qnotes/app/dependency_scope.dart';

@@ -1,4 +1,9 @@
-// Global event handling strategy (sequential, debounce, etc.)
+// Global event transformer: controls how events are processed across all blocs.
+//
+// BlocTransformer is the base for custom transformers (debounce, throttle, etc.)
+// that feature packages can define. SequentialBlocTransformer (asyncExpand)
+// processes events one at a time, preventing race conditions by default.
+// Applied globally in starter.dart via Bloc.transformer.
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 

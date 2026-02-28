@@ -1,4 +1,8 @@
-// Enum environments: dev/staging/prod
+// Application environment enum: dev, staging, prod.
+//
+// Eliminates raw string comparisons ("DEV", "PROD") across the codebase.
+// Falls back to prod in release mode and dev in debug mode when no
+// explicit ENVIRONMENT flag is passed at build time.
 
 import 'package:flutter/foundation.dart';
 

@@ -1,4 +1,8 @@
-// Assembly and initialization of all dependencies
+// Dependency assembly: creates and wires all application-wide dependencies.
+//
+// Separates "what to create" from "how to launch" (starter.dart).
+// composeDependencies() can be called independently in tests
+// with substituted implementations.
 
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:qnotes/bootstrap/application_config.dart';

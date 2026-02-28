@@ -1,4 +1,8 @@
-// Data class — DI graph form, list of all application dependencies
+// DI container: holds all application-wide dependencies as a plain data class.
+//
+// Passed down the widget tree via DependenciesScope instead of using global
+// singletons or a service locator. This keeps dependencies explicit and makes
+// them easy to substitute in tests via TestDependenciesContainer.
 
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:qnotes/bootstrap/application_config.dart';

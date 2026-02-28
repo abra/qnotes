@@ -1,4 +1,8 @@
-// Error screen if boot fails and initialization recovery function
+// Fallback screen shown when app initialization throws an error.
+//
+// Displayed instead of a blank screen or a crash when composeDependencies()
+// fails. The retry button re-invokes composeAndRun() without restarting
+// the process.
 
 import 'package:flutter/material.dart';
 

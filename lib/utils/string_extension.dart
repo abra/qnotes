@@ -1,4 +1,7 @@
-/// Extension methods on [String].
+// String utility extensions.
+//
+// limit(n) truncates a string to n characters. Used when logging bloc states
+// to prevent unreadable output from large serialized objects.
 extension StringExtension on String {
   /// Returns the first [length] characters of this string.
   ///
