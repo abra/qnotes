@@ -1,5 +1,6 @@
 // Data class — DI graph form, list of all application dependencies
 
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:qnotes/bootstrap/application_config.dart';
 import 'package:qnotes/bootstrap/remove_this_file.dart';
 
@@ -10,14 +11,17 @@ class DependenciesContainer {
     required this.config,
     required this.errorReporter,
     required this.packageInfo,
-    required this.settingsContainer,
+    // TODO: Add later
+    // required this.settingsContainer,
   });
 
   final Logger logger;
   final ApplicationConfig config;
   final ErrorReporter errorReporter;
   final PackageInfo packageInfo;
-  final SettingsContainer settingsContainer;
+
+  // TODO: Add later
+  // final SettingsContainer settingsContainer;
 }
 
 /// A special version of [DependenciesContainer] that is used in tests.

@@ -2,6 +2,8 @@
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'remove_this_file.dart';
+
 /// [BlocObserver] which logs all bloc state changes, errors and events.
 class AppBlocObserver extends BlocObserver {
   /// Creates an instance of [AppBlocObserver] with the provided [logger].
@@ -57,19 +59,5 @@ class AppBlocObserver extends BlocObserver {
 extension on String {
   String limit(int i) {
     return "$i";
-  }
-}
-
-class Logger {
-  void info(String temp) {
-    print("info: $temp");
-  }
-
-  void error(
-    String str, {
-    required Object error,
-    required StackTrace stackTrace,
-  }) {
-    print("error: $error, $stackTrace");
   }
 }
