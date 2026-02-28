@@ -1,6 +1,7 @@
 // Logging of events, transitions, and errors of all BLoC/Cubit
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:qnotes/utils/string_extension.dart';
 
 import 'remove_this_file.dart';
 
@@ -53,9 +54,4 @@ class AppBlocObserver extends BlocObserver {
     logger.error(logMessage.toString(), error: error, stackTrace: stackTrace);
     super.onError(bloc, error, stackTrace);
   }
-}
-
-// TODO: Delete everything below when the logger is actually implemented
-extension on String {
-  String limit(int maxLength) => length > maxLength ? substring(0, maxLength) : this;
 }

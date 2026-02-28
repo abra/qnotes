@@ -19,6 +19,7 @@ class DependenciesContainer {
   final ApplicationConfig config;
   final ErrorReporter errorReporter;
   final PackageInfo packageInfo;
+
   // TODO: Replace with real SettingsContainer from settings feature package.
   final SettingsContainer settingsContainer;
 }

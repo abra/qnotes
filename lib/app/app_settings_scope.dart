@@ -3,6 +3,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:qnotes/app/dependency_scope.dart';
 import 'package:qnotes/bootstrap/remove_this_file.dart';
+import 'package:qnotes/utils/inherited_extension.dart';
 
 /// A scope that provides [Settings] to the application.
 ///
@@ -15,7 +16,6 @@ class AppSettingsScope extends StatelessWidget {
 
   /// Returns the current [Settings] from the nearest [AppSettingsScope] ancestor.
   // TODO: Replace Settings with real Settings from settings domain package.
-  // TODO: Replace inhOf with real inhOf extension from common_utils package.
   static Settings of(BuildContext context, {bool listen = true}) =>
       context.inhOf<_SettingsInherited>(listen: listen).settings;
 
@@ -25,16 +25,18 @@ class AppSettingsScope extends StatelessWidget {
     BuildContext context,
     Settings Function(Settings) transform,
   ) async {
-    final settingsService =
-        DependenciesScope.of(context).settingsContainer.settingsService;
+    final settingsService = DependenciesScope.of(
+      context,
+    ).settingsContainer.settingsService;
     await settingsService.update(transform);
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: Replace with real SettingsService from settings feature package.
-    final settingsService =
-        DependenciesScope.of(context).settingsContainer.settingsService;
+    final settingsService = DependenciesScope.of(
+      context,
+    ).settingsContainer.settingsService;
 
     return StreamBuilder<Settings>(
       stream: settingsService.stream,

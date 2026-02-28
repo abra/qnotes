@@ -14,6 +14,8 @@ dependencies:
   flutter_bloc: ^9.1.1
   shared_preferences: ^2.5.4
   package_info_plus: ^9.0.0
+  core_utils:
+    path: packages/core_utils
 
 dev_dependencies:
   flutter_test:

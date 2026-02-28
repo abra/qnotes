@@ -10,13 +10,19 @@ extension type const WindowSize(Size _size) implements Size {
   static const _extraLarge = 1600.0;
 
   bool get isCompact => maybeMap(orElse: () => false, compact: () => true);
+
   bool get isMedium => maybeMap(orElse: () => false, medium: () => true);
+
   bool get isMediumOrLarger =>
       maybeMap(orElse: () => true, compact: () => false);
+
   bool get isExpanded => maybeMap(orElse: () => false, expanded: () => true);
+
   bool get isExpandedOrLarger =>
       maybeMap(orElse: () => true, compact: () => false, medium: () => false);
+
   bool get isLarge => maybeMap(orElse: () => false, large: () => true);
+
   bool get isExtraLarge =>
       maybeMap(orElse: () => false, extraLarge: () => true);
 

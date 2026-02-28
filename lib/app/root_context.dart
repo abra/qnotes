@@ -19,4 +19,3 @@ class RootContext extends StatelessWidget {
     );
   }
 }
-

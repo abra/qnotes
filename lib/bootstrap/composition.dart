@@ -90,7 +90,8 @@ Logger createAppLogger({List<LogObserver> observers = const []}) {
 
 /// TODO: Replace with real ErrorReporter initialization from packages/monitoring.
 Future<ErrorReporter> createErrorReporter(ApplicationConfig config) async {
-  final errorReporter = ErrorReporter();
+  // TODO: Replace NoopErrorReporter with SentryErrorReporter from packages/monitoring.
+  const errorReporter = NoopErrorReporter();
 
   if (config.enableSentry) {
     await errorReporter.initialize();
