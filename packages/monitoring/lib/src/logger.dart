@@ -1,34 +1,153 @@
-// Logger base class with observer pattern.
-//
-// Extend Logger to add custom behaviour (e.g. remote logging).
-// Attach LogObserver implementations to receive log messages.
-
+import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 
-/// A single log message produced by [Logger].
-class LogMessage {
-  const LogMessage({
-    required this.message,
-    required this.level,
-    required this.timestamp,
-    this.error,
-    this.stackTrace,
-  });
+/// {@template logger}
+/// Base class for logging.
+///
+/// By default, it doesn't log anything. To log messages, you can extend this class
+/// and override the [log] method. A better alternative would be to add a [PrintingLogObserver]
+/// to the logger, which will print all log messages to the console.
+///
+/// To log a message, use [trace], [debug], [info], [warn], [error], [fatal] methods.
+///
+/// To destroy the logger and release all resources, use the [destroy] method.
+/// {@endtemplate}
+base class Logger {
+  /// Constructs an instance of [Logger].
+  ///
+  /// {@macro logger}
+  Logger({List<LogObserver>? observers}) {
+    _observers.addAll(observers ?? []);
+  }
 
-  final String message;
-  final LogLevel level;
-  final DateTime timestamp;
-  final Object? error;
-  final StackTrace? stackTrace;
+  final _observers = <LogObserver>{};
+
+  /// Logs a [LogMessage].
+  ///
+  /// Must call super that notifies all observers about a new log message.
+  @mustCallSuper
+  void log(LogMessage logMessage) {
+    if (destroyed) return;
+
+    notifyObservers(logMessage);
+  }
+
+  /// Logs a message with [LogLevel.trace].
+  void trace(String message, {Object? error, StackTrace? stackTrace}) =>
+      _log(message: message, level: LogLevel.trace, error: error, stackTrace: stackTrace);
+
+  /// Logs a message with [LogLevel.debug].
+  void debug(String message, {Object? error, StackTrace? stackTrace}) =>
+      _log(message: message, level: LogLevel.debug, error: error, stackTrace: stackTrace);
+
+  /// Logs a message with [LogLevel.info].
+  void info(String message, {Object? error, StackTrace? stackTrace}) =>
+      _log(message: message, level: LogLevel.info, error: error, stackTrace: stackTrace);
+
+  /// Logs a message with [LogLevel.warn].
+  void warn(String message, {Object? error, StackTrace? stackTrace}) =>
+      _log(message: message, level: LogLevel.warn, error: error, stackTrace: stackTrace);
+
+  /// Logs a message with [LogLevel.error].
+  void error(String message, {Object? error, StackTrace? stackTrace}) =>
+      _log(message: message, level: LogLevel.error, error: error, stackTrace: stackTrace);
+
+  /// Logs a message with [LogLevel.fatal].
+  void fatal(String message, {Object? error, StackTrace? stackTrace}) =>
+      _log(message: message, level: LogLevel.fatal, error: error, stackTrace: stackTrace);
+
+  void _log({
+    required String message,
+    required LogLevel level,
+    Object? error,
+    StackTrace? stackTrace,
+  }) => log(
+    LogMessage(
+      message: message,
+      level: level,
+      error: error,
+      stackTrace: stackTrace,
+      timestamp: clock.now(),
+    ),
+  );
+
+  /// Logs a zone error with [LogLevel.error].
+  void logZoneError(Object error, StackTrace stackTrace) {
+    this.error('Zone error', error: error, stackTrace: stackTrace);
+  }
+
+  /// Logs a flutter error with [LogLevel.error].
+  void logFlutterError(FlutterErrorDetails details) {
+    error('Flutter Error', error: details.exception, stackTrace: details.stack);
+  }
+
+  /// Logs a platform dispatcher error with [LogLevel.error].
+  bool logPlatformDispatcherError(Object error, StackTrace stackTrace) {
+    this.error('Platform Error', error: error, stackTrace: stackTrace);
+    return true;
+  }
+
+  /// Adds an observer to the logger.
+  void addObserver(LogObserver observer) {
+    _observers.add(observer);
+  }
+
+  /// Removes an observer from the logger.
+  void removeObserver(LogObserver observer) {
+    _observers.remove(observer);
+  }
+
+  /// Notifies all observers about a new log message.
+  void notifyObservers(LogMessage logMessage) {
+    for (final observer in _observers) {
+      observer.onLog(logMessage);
+    }
+  }
+
+  /// Whether the logger has been destroyed.
+  bool get destroyed => _destroyed;
+  var _destroyed = false;
+
+  /// Destroys the logger and releases all resources.
+  ///
+  /// After calling this method, the logger should not be used anymore.
+  @mustCallSuper
+  Future<void> destroy() async {
+    if (_destroyed) return;
+
+    _destroyed = true;
+    _observers.clear();
+  }
 }
 
-/// Severity level of a [LogMessage].
+/// Log level that describes the severity of the log message.
+///
+/// Index of the log level is used to determine the severity of the log message.
 enum LogLevel implements Comparable<LogLevel> {
+  /// A log level describing events showing step by step execution of your code
+  /// that can be ignored during the standard operation,
+  /// but may be useful during extended debugging sessions.
   trace._(),
+
+  /// A log level used for events considered to be useful during software
+  /// debugging when more granular information is needed.
   debug._(),
+
+  /// An event happened, the event is purely informative
+  /// and can be ignored during normal operations.
   info._(),
+
+  /// Unexpected behavior happened inside the application, but it is continuing
+  /// its work and the key business features are operating as expected.
   warn._(),
+
+  /// One or more functionalities are not working,
+  /// preventing some functionalities from working correctly.
+  /// For example, a network request failed, a file is missing, etc.
   error._(),
+
+  /// One or more key business functionalities are not working
+  /// and the whole system doesn't fulfill the business functionalities.
   fatal._();
 
   const LogLevel._();
@@ -36,7 +155,7 @@ enum LogLevel implements Comparable<LogLevel> {
   @override
   int compareTo(LogLevel other) => index - other.index;
 
-  /// Short uppercase label used in log output (e.g. TRC, INF, ERR).
+  /// Return short name of the log level.
   String toShortName() => switch (this) {
     LogLevel.trace => 'TRC',
     LogLevel.debug => 'DBG',
@@ -47,76 +166,46 @@ enum LogLevel implements Comparable<LogLevel> {
   };
 }
 
-/// Observer notified on every [LogMessage] produced by a [Logger].
+/// {@template log_observer}
+/// Observer class, that is notified when a new log message is created.
+/// {@endtemplate}
 mixin LogObserver {
+  /// Called when a new log message is created.
   void onLog(LogMessage logMessage);
 }
 
-/// Base logger. Dispatches messages to attached [LogObserver]s.
-///
-/// Extend this class to customise behaviour (e.g. add context fields).
-/// Use [addObserver] / [removeObserver] to attach output sinks.
-base class Logger {
-  Logger({List<LogObserver>? observers}) {
-    _observers.addAll(observers ?? []);
-  }
+/// Represents a single log message with various details
+/// for debugging and information purposes.
+class LogMessage {
+  /// Constructs an instance of [LogMessage].
+  ///
+  /// - [message]: The main content of the log message.
+  /// - [level]: The severity level of the log message,
+  ///   represented by [LogLevel].
+  /// - [timestamp]: The date and time when the log message was created.
+  /// - [error]: Optional. Any error object associated with the log message.
+  /// - [stackTrace]: Optional. The stack trace associated with the log message,
+  ///   typically provided when logging errors.
+  const LogMessage({
+    required this.message,
+    required this.level,
+    required this.timestamp,
+    this.error,
+    this.stackTrace,
+  });
 
-  final _observers = <LogObserver>{};
+  /// The main content of the log message.
+  final String message;
 
-  void addObserver(LogObserver observer) => _observers.add(observer);
+  /// The severity level of the log message.
+  final LogLevel level;
 
-  void removeObserver(LogObserver observer) => _observers.remove(observer);
+  /// The date and time when the log message was created.
+  final DateTime timestamp;
 
-  void trace(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.trace, error, stackTrace);
+  /// Any error object associated with the log message.
+  final Object? error;
 
-  void debug(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.debug, error, stackTrace);
-
-  void info(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.info, error, stackTrace);
-
-  void warn(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.warn, error, stackTrace);
-
-  void error(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.error, error, stackTrace);
-
-  void fatal(String message, {Object? error, StackTrace? stackTrace}) =>
-      _log(message, LogLevel.fatal, error, stackTrace);
-
-  void _log(
-    String message,
-    LogLevel level,
-    Object? error,
-    StackTrace? stackTrace,
-  ) {
-    final logMessage = LogMessage(
-      message: message,
-      level: level,
-      timestamp: DateTime.now(),
-      error: error,
-      stackTrace: stackTrace,
-    );
-    for (final observer in _observers) {
-      observer.onLog(logMessage);
-    }
-  }
-
-  void logFlutterError(FlutterErrorDetails details) => error(
-    'Flutter Error',
-    error: details.exception,
-    stackTrace: details.stack,
-  );
-
-  bool logPlatformDispatcherError(Object error, StackTrace stackTrace) {
-    this.error('Platform Error', error: error, stackTrace: stackTrace);
-    return true;
-  }
-
-  void logZoneError(Object error, StackTrace stackTrace) =>
-      this.error('Zone Error', error: error, stackTrace: stackTrace);
-
-  /// Releases all observers. Call when the logger is no longer needed.
-  Future<void> destroy() async => _observers.clear();
+  /// The stack trace associated with the log message.
+  final StackTrace? stackTrace;
 }
