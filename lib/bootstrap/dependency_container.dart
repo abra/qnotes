@@ -6,7 +6,7 @@
 
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:qnotes/bootstrap/application_config.dart';
-import 'package:qnotes/bootstrap/remove_this_file.dart';
+import 'package:qnotes/bootstrap/fakes.dart';
 
 /// Container for global dependencies.
 class DependenciesContainer {

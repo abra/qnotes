@@ -6,7 +6,7 @@
 
 import 'package:flutter/widgets.dart';
 import 'package:qnotes/app/dependency_scope.dart';
-import 'package:qnotes/bootstrap/remove_this_file.dart';
+import 'package:qnotes/bootstrap/fakes.dart';
 import 'package:qnotes/utils/inherited_extension.dart';
 
 /// A scope that provides [FakeSettings] to the application.

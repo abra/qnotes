@@ -7,7 +7,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:qnotes/utils/string_extension.dart';
 
-import 'remove_this_file.dart';
+import 'fakes.dart';
 
 /// [BlocObserver] which logs all bloc state changes, errors and events.
 class AppBlocObserver extends BlocObserver {

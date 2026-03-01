@@ -7,7 +7,7 @@
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:qnotes/bootstrap/application_config.dart';
 import 'package:qnotes/bootstrap/dependency_container.dart';
-import 'package:qnotes/bootstrap/remove_this_file.dart';
+import 'package:qnotes/bootstrap/fakes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A place where Application-Wide dependencies are initialized.

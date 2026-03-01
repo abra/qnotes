@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:qnotes/app/app_settings_scope.dart';
 import 'package:qnotes/app/media_query.dart';
-import 'package:qnotes/bootstrap/remove_this_file.dart';
+import 'package:qnotes/bootstrap/fakes.dart';
 
 /// Entry point for the application that creates [MaterialApp].
 class MaterialContext extends StatelessWidget {
