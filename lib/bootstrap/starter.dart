@@ -29,7 +29,8 @@ Future<void> starter() async {
   final logger = createAppLogger(
     observers: [
       FakeErrorReporterLogObserver(errorReporter),
-      if (!kReleaseMode) const FakePrintingLogObserver(logLevel: FakeLogLevel.trace),
+      if (!kReleaseMode)
+        const FakePrintingLogObserver(logLevel: FakeLogLevel.trace),
     ],
   );
 
