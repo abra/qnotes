@@ -29,6 +29,8 @@ class AppSettingsScope extends StatelessWidget {
     BuildContext context,
     FakeSettings Function(FakeSettings) transform,
   ) async {
+    // listen: false — no subscription needed here, we only need a one-time
+    // reference to the service in order to push an update.
     final settingsService = DependenciesScope.of(
       context,
     ).settingsContainer.settingsService;

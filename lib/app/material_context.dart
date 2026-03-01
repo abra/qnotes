@@ -44,6 +44,9 @@ class MaterialContext extends StatelessWidget {
       locale: locale,
       home: const Placeholder(), // TODO: Replace with app entry screen
       builder: (context, child) {
+        // KeyedSubtree with a stable GlobalKey prevents Flutter from
+        // destroying and recreating the subtree when MaterialApp rebuilds,
+        // which is required for correct Flutter Inspector behavior.
         return KeyedSubtree(
           key: _globalKey,
           child: MediaQueryRootOverride(child: child!),

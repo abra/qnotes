@@ -48,6 +48,9 @@ Future<void> starter() async {
       Bloc.observer = AppBlocObserver(logger);
       Bloc.transformer = SequentialBlocTransformer<Object?>().transform;
 
+      // Defined as a local function so it can pass itself as onRetryInitialization,
+      // allowing the error screen to re-run the full initialization without
+      // restarting the process.
       Future<void> composeAndRun() async {
         try {
           final compositionResult = await composeDependencies(
@@ -58,6 +61,8 @@ Future<void> starter() async {
 
           runApp(RootContext(compositionResult: compositionResult));
         } on Object catch (e, stackTrace) {
+          // Catches both Exception and Error (e.g. OutOfMemoryError),
+          // ensuring no failure silently escapes during initialization.
           logger.error(
             'Initialization failed',
             error: e,

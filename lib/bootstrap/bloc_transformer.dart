@@ -17,5 +17,8 @@ abstract base class BlocTransformer<Event> {
 final class SequentialBlocTransformer<Event> extends BlocTransformer<Event> {
   @override
   Stream<Event> transform(Stream<Event> stream, EventMapper<Event> mapper) =>
+      // asyncExpand subscribes to each event stream one at a time —
+      // the next event is not processed until the previous one completes.
+      // This prevents race conditions caused by concurrent event handling.
       stream.asyncExpand(mapper);
 }

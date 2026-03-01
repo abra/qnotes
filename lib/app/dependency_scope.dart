@@ -28,6 +28,9 @@ class DependenciesScope extends StatelessWidget {
   Widget build(BuildContext context) {
     return _DependenciesInherited(
       dependencies: dependencies,
+      // AppSettingsScope is nested here so that settings are always available
+      // to any widget that has access to dependencies, without requiring a
+      // separate scope to be placed manually in the widget tree.
       child: AppSettingsScope(child: child),
     );
   }
@@ -43,5 +46,7 @@ class _DependenciesInherited extends InheritedWidget {
 
   @override
   bool updateShouldNotify(_DependenciesInherited oldWidget) =>
+      // DependenciesContainer is immutable and replaced as a whole, so
+      // identity check is sufficient and more efficient than equality.
       !identical(dependencies, oldWidget.dependencies);
 }
