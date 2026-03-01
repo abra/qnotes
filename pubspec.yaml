@@ -1,5 +1,5 @@
 name: qnotes
-description: "A personal notes app built with Flutter. Clean architecture template with BLoC, DI via InheritedWidget, and modular feature packages."
+description: "Simple note-taking mobile app"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
