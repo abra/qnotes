@@ -17,7 +17,6 @@ import 'package:qnotes/bootstrap/application_config.dart';
 import 'package:qnotes/bootstrap/bloc_transformer.dart';
 import 'package:qnotes/bootstrap/composition.dart';
 import 'package:monitoring/monitoring.dart';
-import 'package:qnotes/bootstrap/fakes.dart';
 
 /// Initializes dependencies and runs app.
 Future<void> starter() async {
