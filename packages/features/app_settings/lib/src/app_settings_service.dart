@@ -38,15 +38,18 @@ class AppSettingsService {
       final map = jsonDecode(json) as Map<String, Object?>;
       final colorMap = map['seedColor'] as Map<String, Object?>?;
       return AppSettings(
-        themeMode: ThemeMode.values.byName(map['themeMode'] as String? ?? 'system'),
-        seedColor: colorMap != null
-            ? Color.from(
-                alpha: (colorMap['a'] as num).toDouble(),
-                red: (colorMap['r'] as num).toDouble(),
-                green: (colorMap['g'] as num).toDouble(),
-                blue: (colorMap['b'] as num).toDouble(),
-              )
-            : const Color(0xFF6200EE),
+        themeMode: ThemeMode.values.byName(
+          map['themeMode'] as String? ?? 'system',
+        ),
+        seedColor:
+            colorMap != null
+                ? Color.from(
+                  alpha: (colorMap['a'] as num).toDouble(),
+                  red: (colorMap['r'] as num).toDouble(),
+                  green: (colorMap['g'] as num).toDouble(),
+                  blue: (colorMap['b'] as num).toDouble(),
+                )
+                : const Color(0xFF6200EE),
         locale: Locale(map['locale'] as String? ?? 'en'),
       );
     } catch (_) {

@@ -9,19 +9,19 @@ that should be replaced with real implementations before shipping to production.
 
 ## What's included
 
-| Class | Type | Status |
-|---|---|---|
-| `Logger` | base class | Ready — dispatches to attached `LogObserver`s |
-| `LogLevel` | enum | Ready |
-| `LogObserver` | mixin | Ready — implement to receive log messages |
-| `LogMessage` | data class | Ready |
-| `PrintingLogObserver` | concrete | Ready — prints to console via `debugPrint` |
-| `ErrorReporterLogObserver` | concrete | Ready — bridges Logger errors into ErrorReportingService |
-| `ErrorReportingService` | interface | Implement for production |
-| `NoopErrorReporter` | concrete | Stub — does nothing, safe for development |
-| `AnalyticsEvent` | abstract base class | Ready — extend to define typed events |
-| `AnalyticsReporter` | interface | Implement for production |
-| `NoopAnalyticsReporter` | concrete | Stub — does nothing, safe for development |
+| Class                      | Type                | Status                                                   |
+|----------------------------|---------------------|----------------------------------------------------------|
+| `Logger`                   | base class          | Ready — dispatches to attached `LogObserver`s            |
+| `LogLevel`                 | enum                | Ready                                                    |
+| `LogObserver`              | mixin               | Ready — implement to receive log messages                |
+| `LogMessage`               | data class          | Ready                                                    |
+| `PrintingLogObserver`      | concrete            | Ready — prints to console via `debugPrint`               |
+| `ErrorReporterLogObserver` | concrete            | Ready — bridges Logger errors into ErrorReportingService |
+| `ErrorReportingService`    | interface           | Implement for production                                 |
+| `NoopErrorReporter`        | concrete            | Stub — does nothing, safe for development                |
+| `AnalyticsEvent`           | abstract base class | Ready — extend to define typed events                    |
+| `AnalyticsReporter`        | interface           | Implement for production                                 |
+| `NoopAnalyticsReporter`    | concrete            | Stub — does nothing, safe for development                |
 
 ---
 
@@ -34,6 +34,7 @@ you just add or remove observers.
 ### Already configured in starter.dart
 
 ```dart
+
 final logger = createAppLogger(
   observers: [
     ErrorReporterLogObserver(errorReporter), // errors go to ErrorReportingService
@@ -51,7 +52,8 @@ final class FileLogObserver with LogObserver {
   @override
   void onLog(LogMessage logMessage) {
     File('app.log').writeAsStringSync(
-      '${logMessage.timestamp} [${logMessage.level.toShortName()}] ${logMessage.message}\n',
+      '${logMessage.timestamp} [${logMessage.level.toShortName()}] ${logMessage
+          .message}\n',
       mode: FileMode.append,
     );
   }
@@ -63,11 +65,14 @@ final class FileLogObserver with LogObserver {
 ```dart
 // composition.dart — add to the observers list
 observers: [
-  ErrorReporterLogObserver(errorReporter),
-  if (!kReleaseMode)
-    const PrintingLogObserver(logLevel: LogLevel.trace),
-  FileLogObserver(), // <- added
-],
+ErrorReporterLogObserver
+(
+errorReporter),
+if (!kReleaseMode)
+const PrintingLogObserver(logLevel: LogLevel.trace),
+FileLogObserver(), // <- added
+]
+,
 ```
 
 ---
@@ -99,9 +104,10 @@ final class SentryErrorReporter implements ErrorReportingService {
   bool get isInitialized => Sentry.isEnabled;
 
   @override
-  Future<void> initialize() => SentryFlutter.init((options) {
-    options.dsn = 'your DSN from sentry.io';
-  });
+  Future<void> initialize() =>
+      SentryFlutter.init((options) {
+        options.dsn = 'your DSN from sentry.io';
+      });
 
   @override
   Future<void> close() => Sentry.close();
@@ -146,21 +152,22 @@ class DependenciesContainer {
   });
 
   final AnalyticsReporter analyticsReporter;
-  // ...
+// ...
 }
 ```
 
 ### 2. Create in composition.dart
 
 ```dart
-Future<DependenciesContainer> createDependenciesContainer(...) async {
-  const analyticsReporter = NoopAnalyticsReporter(); // <- stub
-  if (config.enableAnalytics) await analyticsReporter.initialize();
+Future<DependenciesContainer> createDependenciesContainer
+(...) async {
+const analyticsReporter = NoopAnalyticsReporter(); // <- stub
+if (config.enableAnalytics) await analyticsReporter.initialize();
 
-  return DependenciesContainer(
-    analyticsReporter: analyticsReporter,
-    // ...
-  );
+return DependenciesContainer(
+analyticsReporter: analyticsReporter,
+// ...
+);
 }
 ```
 
@@ -172,6 +179,7 @@ import 'package:monitoring/monitoring.dart';
 
 class NoteCreatedEvent extends AnalyticsEvent {
   const NoteCreatedEvent({required this.noteId});
+
   final String noteId;
 
   @override
@@ -183,6 +191,7 @@ class NoteCreatedEvent extends AnalyticsEvent {
 
 class NoteDeletedEvent extends AnalyticsEvent {
   const NoteDeletedEvent({required this.noteId});
+
   final String noteId;
 
   @override

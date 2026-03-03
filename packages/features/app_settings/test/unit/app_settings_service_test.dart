@@ -11,7 +11,8 @@ void main() {
   late SharedPreferencesAsync prefs;
 
   setUp(() {
-    SharedPreferencesAsyncPlatform.instance = InMemorySharedPreferencesAsync.empty();
+    SharedPreferencesAsyncPlatform.instance =
+        InMemorySharedPreferencesAsync.empty();
     prefs = SharedPreferencesAsync();
   });
 
