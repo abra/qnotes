@@ -9,7 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  shared_preferences: ^2.5.4
+  preferences_storage:
+    path: ../../preferences_storage
 
 dev_dependencies:
   flutter_test:

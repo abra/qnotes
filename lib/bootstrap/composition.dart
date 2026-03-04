@@ -7,9 +7,9 @@
 import 'package:app_settings/app_settings.dart';
 import 'package:monitoring/monitoring.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:preferences_storage/preferences_storage.dart';
 import 'package:qnotes/bootstrap/application_config.dart';
 import 'package:qnotes/bootstrap/dependency_container.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// A place where Application-Wide dependencies are initialized.
 ///
@@ -65,9 +65,11 @@ Future<DependenciesContainer> createDependenciesContainer(
   Logger logger,
   ErrorReportingService errorReporter,
 ) async {
-  final sharedPreferences = SharedPreferencesAsync();
+  final preferencesStorage = PreferencesStorage();
   final packageInfo = await PackageInfo.fromPlatform();
-  final appSettingsService = await AppSettingsService.create(sharedPreferences);
+  final appSettingsService = await AppSettingsService.create(
+    preferencesStorage,
+  );
 
   return DependenciesContainer(
     logger: logger,

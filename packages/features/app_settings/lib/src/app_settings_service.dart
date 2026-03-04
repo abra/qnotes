@@ -4,7 +4,7 @@ import 'dart:ui' show Color, Locale;
 
 import 'package:app_settings/src/app_settings.dart';
 import 'package:flutter/material.dart' show ThemeMode;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:preferences_storage/preferences_storage.dart';
 
 /// Loads, persists and streams [AppSettings].
 class AppSettingsService {
@@ -12,11 +12,11 @@ class AppSettingsService {
 
   static const _key = 'app_settings';
 
-  final SharedPreferencesAsync _prefs;
+  final PreferencesStorage _prefs;
   final _controller = StreamController<AppSettings>.broadcast();
   AppSettings _current;
 
-  static Future<AppSettingsService> create(SharedPreferencesAsync prefs) async {
+  static Future<AppSettingsService> create(PreferencesStorage prefs) async {
     final settings = await _load(prefs);
     return AppSettingsService._(prefs, settings);
   }
@@ -31,7 +31,7 @@ class AppSettingsService {
     _controller.add(_current);
   }
 
-  static Future<AppSettings> _load(SharedPreferencesAsync prefs) async {
+  static Future<AppSettings> _load(PreferencesStorage prefs) async {
     final json = await prefs.getString(_key);
     if (json == null) return const AppSettings();
     try {
@@ -57,7 +57,7 @@ class AppSettingsService {
     }
   }
 
-  static Future<void> _save(SharedPreferencesAsync prefs, AppSettings s) async {
+  static Future<void> _save(PreferencesStorage prefs, AppSettings s) async {
     final map = <String, Object?>{
       'themeMode': s.themeMode.name,
       'seedColor': {
