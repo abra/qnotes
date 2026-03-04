@@ -9,8 +9,8 @@ import 'package:component_library/component_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:qnotes/app/media_query.dart';
-import 'package:qnotes/app/screens/playground_screen.dart';
+import 'package:nota/app/media_query.dart';
+import 'package:nota/app/screens/playground_screen.dart';
 
 /// Entry point for the application that creates [MaterialApp].
 class MaterialContext extends StatelessWidget {

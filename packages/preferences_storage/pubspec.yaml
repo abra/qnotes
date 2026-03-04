@@ -1,5 +1,5 @@
 name: preferences_storage
-description: "SharedPreferences wrapper for qnotes."
+description: "SharedPreferences wrapper."
 publish_to: none
 version: 0.1.0
 

@@ -11,12 +11,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:monitoring/monitoring.dart';
-import 'package:qnotes/app/root_context.dart';
-import 'package:qnotes/app/screens/initialization_failed.dart';
-import 'package:qnotes/bootstrap/bloc/app_bloc_observer.dart';
-import 'package:qnotes/bootstrap/bloc/bloc_transformer.dart';
-import 'package:qnotes/bootstrap/composition.dart';
-import 'package:qnotes/bootstrap/config/application_config.dart';
+import 'package:nota/app/root_context.dart';
+import 'package:nota/app/screens/initialization_failed.dart';
+import 'package:nota/bootstrap/bloc/app_bloc_observer.dart';
+import 'package:nota/bootstrap/bloc/bloc_transformer.dart';
+import 'package:nota/bootstrap/composition.dart';
+import 'package:nota/bootstrap/config/application_config.dart';
 
 /// Initializes dependencies and runs app.
 Future<void> starter() async {

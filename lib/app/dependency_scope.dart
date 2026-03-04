@@ -6,8 +6,8 @@
 
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/widgets.dart';
-import 'package:qnotes/bootstrap/dependency_container.dart';
-import 'package:qnotes/utils/inherited_extension.dart';
+import 'package:nota/bootstrap/dependency_container.dart';
+import 'package:nota/utils/inherited_extension.dart';
 
 /// A scope that provides [DependenciesContainer] to the application.
 class DependenciesScope extends StatelessWidget {
