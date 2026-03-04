@@ -1,4 +1,4 @@
-# qnotes
+# Nota
 
 Simple note-taking mobile app.
 
