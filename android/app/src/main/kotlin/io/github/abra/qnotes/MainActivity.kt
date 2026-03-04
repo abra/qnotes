@@ -1,4 +1,4 @@
-package io.github.abra.qnotes.qnotes
+package io.github.abra.qnotes
 
 import io.flutter.embedding.android.FlutterActivity
 
