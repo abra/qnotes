@@ -15,7 +15,7 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
         path: AppRoutes.notes,
         builder: (context, state) {
           // TODO: remove debug logging before release
-          dependencies.logger.debug('route: ${state.uri}');
+          dependencies.logger.debug('route 1: ${state.fullPath}');
           return const PlaygroundScreen();
         },
         routes: [
@@ -23,7 +23,7 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
             path: 'new',
             builder: (context, state) {
               // TODO: remove debug logging before release
-              dependencies.logger.debug('route: ${state.uri}');
+              dependencies.logger.debug('route 2: ${state.fullPath}');
               return const _StubScreen(title: 'New Note');
             },
           ),
@@ -31,7 +31,7 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
             path: ':id',
             builder: (context, state) {
               // TODO: remove debug logging before release
-              dependencies.logger.debug('route: ${state.uri}');
+              dependencies.logger.debug('route 3: ${state.fullPath}');
               return _StubScreen(
                 title: 'Note #${state.pathParameters['id']}',
               );
@@ -43,7 +43,7 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
         path: AppRoutes.settings,
         builder: (context, state) {
           // TODO: remove debug logging before release
-          dependencies.logger.debug('route: ${state.uri}');
+          dependencies.logger.debug('route 4: ${state.fullPath}');
           return const _StubScreen(title: 'Settings');
         },
       ),
