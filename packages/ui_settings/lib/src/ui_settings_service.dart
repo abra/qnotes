@@ -10,7 +10,7 @@ import 'package:ui_settings/src/ui_settings.dart';
 class UiSettingsService {
   UiSettingsService._(this._prefs, this._current);
 
-  static const _key = 'app_settings';
+  static const _key = 'ui_settings';
 
   final PreferencesStorage _prefs;
   final _controller = StreamController<UiSettings>.broadcast();
