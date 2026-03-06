@@ -6,9 +6,9 @@
 
 import 'package:app_settings/app_settings.dart';
 import 'package:monitoring/monitoring.dart';
+import 'package:nota/app/config/application_config.dart';
+import 'package:nota/app/dependency_container.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:nota/bootstrap/config/application_config.dart';
-import 'package:nota/bootstrap/dependency_container.dart';
 
 /// A place where Application-Wide dependencies are initialized.
 ///

@@ -5,9 +5,9 @@
 // initialization logic.
 
 import 'package:flutter/widgets.dart';
+import 'package:nota/app/composition.dart';
 import 'package:nota/app/dependency_scope.dart';
 import 'package:nota/app/material_context.dart';
-import 'package:nota/bootstrap/composition.dart';
 
 class RootContext extends StatelessWidget {
   const RootContext({required this.compositionResult, super.key});
