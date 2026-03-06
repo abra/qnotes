@@ -1,18 +1,16 @@
-# app_settings
+# app_settings_repository
 
-Manages user preferences: theme mode, seed color, and locale.
-Persists to SharedPreferences automatically. Streams changes to the widget tree via
-`AppSettingsScope`.
+Manages user preferences: theme mode and locale.
+Persists to SharedPreferences automatically and streams changes via `AppSettingsService`.
 
 ---
 
 ## What's included
 
-| Class                | Description                                                                |
-|----------------------|----------------------------------------------------------------------------|
-| `AppSettings`        | Immutable model: `ThemeMode`, `Color`, `Locale`                            |
-| `AppSettingsService` | Loads from disk on startup, persists on update, streams changes            |
-| `AppSettingsScope`   | `StreamBuilder` + `InheritedWidget` — provides settings to the widget tree |
+| Class                | Description                                                     |
+|----------------------|-----------------------------------------------------------------|
+| `AppSettings`        | Immutable model: `ThemeMode`, `Locale`                          |
+| `AppSettingsService` | Loads from disk on startup, persists on update, streams changes |
 
 ---
 
@@ -20,11 +18,12 @@ Persists to SharedPreferences automatically. Streams changes to the widget tree 
 
 ### Read settings
 
+Settings are provided to the widget tree via `AppSettingsScope` (lives in `lib/app/`):
+
 ```dart
 final settings = AppSettingsScope.of(context);
 
 settings.themeMode  // ThemeMode (light / dark / system)
-settings.seedColor  // Color
 settings.locale     // Locale
 ```
 
@@ -33,9 +32,6 @@ settings.locale     // Locale
 ```dart
 // Theme mode
 AppSettingsScope.update(context, (s) => s.copyWith(themeMode: ThemeMode.dark));
-
-// Seed color
-AppSettingsScope.update(context, (s) => s.copyWith(seedColor: Colors.teal));
 
 // Locale
 AppSettingsScope.update(context, (s) => s.copyWith(locale: const Locale('ru')));
@@ -48,14 +44,12 @@ called `AppSettingsScope.of(context)`.
 
 ## Wiring
 
-`AppSettingsService` is created in `composition.dart` and stored in
-`DependenciesContainer`.
-`DependenciesScope` automatically wraps the widget tree in `AppSettingsScope` — no manual
-placement needed.
+`AppSettingsService` is created in `composition.dart` and stored in `DependenciesContainer`.
+`AppSettingsScope` (in `lib/app/`) is placed in `RootContext` and wraps the whole widget tree.
 
 ```
-DependenciesScope
-  └─ AppSettingsScope       ← streams AppSettings
-       └─ MaterialContext   ← reads theme/locale, passes to MaterialApp
+AppSettingsScope          ← StreamBuilder + InheritedWidget (lib/app/)
+  └─ DependenciesScope
+       └─ MaterialContext ← reads theme/locale, passes to MaterialApp
             └─ your app
 ```

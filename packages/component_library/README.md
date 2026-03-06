@@ -14,12 +14,11 @@ The theme system has two layers:
 ### How it works
 
 ```
-AppSettings.seedColor           ← stored in SharedPreferences
+AppSettingsScope.of(context)    ← reads themeMode + locale (lib/app/)
           ↓
-AppSettingsScope.of(context)    ← read in material_context.dart
-          ↓
-LightAppThemeData(seedColor:)   ← built in material_context.dart
-DarkAppThemeData(seedColor:)
+material_context.dart
+  const LightAppThemeData()     ← built once, stateless
+  const DarkAppThemeData()
           ↓
 AppTheme(lightTheme:, darkTheme:, child: MaterialApp(...))
           ↓
