@@ -9,7 +9,6 @@ import 'package:component_library/component_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:nota/app/media_query.dart';
 import 'package:nota/app/screens/playground_screen.dart';
 
 /// Entry point for the application that creates [MaterialApp].
@@ -47,10 +46,21 @@ class MaterialContext extends StatelessWidget {
           // which is required for correct Flutter Inspector behavior.
           return KeyedSubtree(
             key: _globalKey,
-            child: MediaQueryRootOverride(child: child!),
+            child: _MediaQueryRootOverride(child: child!),
           );
         },
       ),
     );
   }
+}
+
+// Clamps system text scale so large accessibility font sizes don't break layouts.
+class _MediaQueryRootOverride extends StatelessWidget {
+  const _MediaQueryRootOverride({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) =>
+      MediaQuery.withClampedTextScaling(maxScaleFactor: 2, child: child);
 }
