@@ -155,15 +155,11 @@ class DependenciesContainer {
 ### 2. Create in composition.dart
 
 ```dart
-Future<DependenciesContainer> createDependenciesContainer
-(...) async {
-const analyticsReporter = NoopAnalyticsReporter(); // <- stub
-if (config.enableAnalytics) await analyticsReporter.initialize();
+Future<DependenciesContainer> createDependenciesContainer(...) async {
+  const analyticsReporter = NoopAnalyticsReporter(); // <- stub
+  if (config.enableAnalytics) await analyticsReporter.initialize();
 
-return DependenciesContainer(
-analyticsReporter: analyticsReporter,
-// ...
-);
+  return DependenciesContainer(analyticsReporter: analyticsReporter, // ...);
 }
 ```
 
