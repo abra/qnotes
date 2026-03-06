@@ -24,7 +24,7 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
             path: 'new',
             builder: (context, state) {
               // TODO: remove debug logging before release
-              DependenciesScope.of(context).logger.debug('route: ${state.uri}');
+              dependencies.logger.debug('route: ${state.uri}');
               return const _StubScreen(title: 'New Note');
             },
           ),
