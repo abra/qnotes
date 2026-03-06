@@ -1,5 +1,5 @@
-import 'package:flutter/widgets.dart';
 import 'package:app_settings_repository/app_settings_repository.dart';
+import 'package:flutter/widgets.dart';
 
 /// Listens to [AppSettingsService] and provides [AppSettings] to the subtree.
 class AppSettingsScope extends StatelessWidget {

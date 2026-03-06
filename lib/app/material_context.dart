@@ -4,11 +4,11 @@
 // from component_library. Wraps MaterialApp in AppTheme so that all widgets
 // in the tree can access custom theme colors via AppTheme.of(context).
 
-import 'package:nota/app/app_settings_scope.dart';
 import 'package:component_library/component_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:nota/app/app_settings_scope.dart';
 import 'package:nota/app/screens/playground_screen.dart';
 
 /// Entry point for the application that creates [MaterialApp].

@@ -1,6 +1,6 @@
-import 'package:nota/app/app_settings_scope.dart';
 import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
+import 'package:nota/app/app_settings_scope.dart';
 
 /// Manual test screen for verifying app-wide settings.
 ///
