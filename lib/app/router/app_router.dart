@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nota/app/dependency_container.dart';
-import 'package:nota/app/dependency_scope.dart';
 import 'package:nota/app/router/app_routes.dart';
 import 'package:nota/app/screens/playground_screen.dart';
 
