@@ -51,7 +51,8 @@ final class CompositionResult {
   final int millisecondsSpent;
 
   @override
-  String toString() => 'CompositionResult('
+  String toString() =>
+      'CompositionResult('
       'dependencies: $dependencies, '
       'millisecondsSpent: $millisecondsSpent'
       ')';
