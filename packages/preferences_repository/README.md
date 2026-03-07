@@ -7,10 +7,10 @@ Persists to SharedPreferences automatically and streams changes via `Preferences
 
 ## What's included
 
-| Class                | Description                                                       |
-|----------------------|-------------------------------------------------------------------|
-| `Preferences`        | Immutable model: `ThemeMode`, `Locale`                            |
-| `PreferencesService` | Loads from disk on startup, persists on update, streams changes   |
+| Class                | Description                                                     |
+|----------------------|-----------------------------------------------------------------|
+| `Preferences`        | Immutable model: `ThemeMode`, `Locale`                          |
+| `PreferencesService` | Loads from disk on startup, persists on update, streams changes |
 
 ---
 
