@@ -58,10 +58,6 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     super.dispose();
   }
 
-  void _save() {
-    context.read<NoteDetailsBloc>().add(NoteDetailsSaved());
-  }
-
   void _showColorPicker(BuildContext context, NoteColor selected) {
     showModalBottomSheet<void>(
       context: context,
@@ -87,83 +83,124 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
         }
       },
       builder: (context, state) {
-        return PopScope(
-          onPopInvokedWithResult: (didPop, _) {
-            if (didPop) _save();
-          },
-          child: Scaffold(
-            appBar: AppBar(
-              leading: BackButton(
-                onPressed: () {
-                  _save();
-                  widget.onBackPressed?.call();
-                },
-              ),
-              actions: [
-                GestureDetector(
-                  onTap: () => _showColorPicker(context, state.color),
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    margin: const EdgeInsets.only(right: 8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: state.color.forBrightness(
-                        Theme.of(context).brightness,
-                      ),
+        return Scaffold(
+          appBar: AppBar(
+            leading: BackButton(onPressed: widget.onBackPressed),
+            actions: [
+              GestureDetector(
+                onTap: () => _showColorPicker(context, state.color),
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: state.color.forBrightness(
+                      Theme.of(context).brightness,
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(
-                    state.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                  ),
-                  onPressed: () => context.read<NoteDetailsBloc>().add(
-                    NoteDetailsPinToggled(),
+              ),
+              IconButton(
+                icon: Icon(
+                  state.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                ),
+                onPressed: () => context.read<NoteDetailsBloc>().add(
+                  NoteDetailsPinToggled(),
+                ),
+              ),
+            ],
+          ),
+          body: Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _titleController,
+                        onChanged: (v) => context.read<NoteDetailsBloc>().add(
+                          NoteDetailsTitleChanged(v),
+                        ),
+                        style: Theme.of(context).textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
+                        decoration: const InputDecoration(
+                          hintText: 'Title',
+                          border: InputBorder.none,
+                        ),
+                      ),
+                      Expanded(
+                        child: TextField(
+                          controller: _contentController,
+                          onChanged: (v) => context.read<NoteDetailsBloc>().add(
+                            NoteDetailsContentChanged(v),
+                          ),
+                          style: Theme.of(context).textTheme.bodyLarge,
+                          decoration: const InputDecoration(
+                            hintText: 'Start typing...',
+                            border: InputBorder.none,
+                          ),
+                          maxLines: null,
+                          expands: true,
+                          textAlignVertical: TextAlignVertical.top,
+                          keyboardType: TextInputType.multiline,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _titleController,
-                    onChanged: (v) => context.read<NoteDetailsBloc>().add(
-                      NoteDetailsTitleChanged(v),
-                    ),
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: const InputDecoration(
-                      hintText: 'Title',
-                      border: InputBorder.none,
-                    ),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: _contentController,
-                      onChanged: (v) => context.read<NoteDetailsBloc>().add(
-                        NoteDetailsContentChanged(v),
-                      ),
-                      style: Theme.of(context).textTheme.bodyLarge,
-                      decoration: const InputDecoration(
-                        hintText: 'Start typing...',
-                        border: InputBorder.none,
-                      ),
-                      maxLines: null,
-                      expands: true,
-                      textAlignVertical: TextAlignVertical.top,
-                      keyboardType: TextInputType.multiline,
-                    ),
-                  ),
-                ],
               ),
-            ),
+              _ActionBar(
+                isSaving: state.status == NoteDetailsStatus.saving,
+                onCancel: widget.onBackPressed,
+                onSave: () =>
+                    context.read<NoteDetailsBloc>().add(NoteDetailsSaved()),
+              ),
+            ],
           ),
         );
       },
+    );
+  }
+}
+
+class _ActionBar extends StatelessWidget {
+  const _ActionBar({required this.isSaving, this.onCancel, this.onSave});
+
+  final bool isSaving;
+  final VoidCallback? onCancel;
+  final VoidCallback? onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: onCancel,
+                child: const Text('Cancel'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: FilledButton(
+                onPressed: isSaving ? null : onSave,
+                child: isSaving
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Text('Save'),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

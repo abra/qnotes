@@ -19,8 +19,8 @@ class NoteListScreen extends StatelessWidget {
 
   final NoteRepository noteRepository;
   final PreferencesService preferencesService;
-  final ValueChanged<Note>? onNotePressed;
-  final VoidCallback? onAddPressed;
+  final Future<void> Function(Note)? onNotePressed;
+  final Future<void> Function()? onAddPressed;
   final VoidCallback? onSettingsPressed;
 
   @override
@@ -49,9 +49,19 @@ class NoteListView extends StatelessWidget {
   });
 
   final PreferencesService preferencesService;
-  final ValueChanged<Note>? onNotePressed;
-  final VoidCallback? onAddPressed;
+  final Future<void> Function(Note)? onNotePressed;
+  final Future<void> Function()? onAddPressed;
   final VoidCallback? onSettingsPressed;
+
+  void _navigateAndRefresh(
+    BuildContext context,
+    Future<void> Function() navigate,
+  ) async {
+    await navigate();
+    if (context.mounted) {
+      context.read<NoteListBloc>().add(NoteListStarted());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +88,14 @@ class NoteListView extends StatelessWidget {
     NoteViewMode viewMode,
   ) {
     return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.more_vert),
+            onPressed: onSettingsPressed,
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Stack(
           children: [
@@ -88,14 +106,24 @@ class NoteListView extends StatelessWidget {
             else if (viewMode == NoteViewMode.grid)
               NotePagedGridView(
                 notes: notes,
-                onNotePressed: onNotePressed,
+                onNotePressed: onNotePressed == null
+                    ? null
+                    : (note) => _navigateAndRefresh(
+                        context,
+                        () => onNotePressed!(note),
+                      ),
                 onNoteDeleted: (id) =>
                     context.read<NoteListBloc>().add(NoteListNoteDeleted(id)),
               )
             else
               NotePagedListView(
                 notes: notes,
-                onNotePressed: onNotePressed,
+                onNotePressed: onNotePressed == null
+                    ? null
+                    : (note) => _navigateAndRefresh(
+                        context,
+                        () => onNotePressed!(note),
+                      ),
                 onNoteDeleted: (id) =>
                     context.read<NoteListBloc>().add(NoteListNoteDeleted(id)),
               ),
@@ -104,10 +132,10 @@ class NoteListView extends StatelessWidget {
               right: 0,
               bottom: 0,
               child: _BottomBar(
-                preferencesService: preferencesService,
                 viewMode: viewMode,
-                onAddPressed: onAddPressed,
-                onSettingsPressed: onSettingsPressed,
+                onAddPressed: onAddPressed == null
+                    ? null
+                    : () => _navigateAndRefresh(context, onAddPressed!),
                 onQueryChanged: (q) =>
                     context.read<NoteListBloc>().add(NoteListQueryChanged(q)),
               ),
@@ -121,17 +149,13 @@ class NoteListView extends StatelessWidget {
 
 class _BottomBar extends StatelessWidget {
   const _BottomBar({
-    required this.preferencesService,
     required this.viewMode,
     this.onAddPressed,
-    this.onSettingsPressed,
     this.onQueryChanged,
   });
 
-  final PreferencesService preferencesService;
   final NoteViewMode viewMode;
   final VoidCallback? onAddPressed;
-  final VoidCallback? onSettingsPressed;
   final ValueChanged<String>? onQueryChanged;
 
   @override
@@ -154,22 +178,6 @@ class _BottomBar extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            IconButton(
-              icon: Icon(
-                viewMode == NoteViewMode.grid ? Icons.grid_view : Icons.list,
-              ),
-              onPressed: () => preferencesService.update(
-                (p) => p.copyWith(
-                  noteViewMode: viewMode == NoteViewMode.grid
-                      ? NoteViewMode.list
-                      : NoteViewMode.grid,
-                ),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.settings_outlined),
-              onPressed: onSettingsPressed,
-            ),
             IconButton(icon: const Icon(Icons.add), onPressed: onAddPressed),
           ],
         ),
