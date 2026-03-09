@@ -1,0 +1,169 @@
+import 'package:component_library/component_library.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared/shared.dart';
+
+import 'note_details_bloc.dart';
+
+part 'note_color_picker.dart';
+
+class NoteDetailsScreen extends StatelessWidget {
+  const NoteDetailsScreen({
+    super.key,
+    required this.noteRepository,
+    this.noteId,
+    this.onBackPressed,
+  });
+
+  final NoteRepository noteRepository;
+  final String? noteId;
+  final VoidCallback? onBackPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<NoteDetailsBloc>(
+      create: (_) =>
+          NoteDetailsBloc(noteRepository: noteRepository, noteId: noteId)
+            ..add(NoteDetailsStarted(noteId: noteId)),
+      child: NoteDetailsView(onBackPressed: onBackPressed),
+    );
+  }
+}
+
+@visibleForTesting
+class NoteDetailsView extends StatefulWidget {
+  const NoteDetailsView({super.key, this.onBackPressed});
+
+  final VoidCallback? onBackPressed;
+
+  @override
+  State<NoteDetailsView> createState() => _NoteDetailsViewState();
+}
+
+class _NoteDetailsViewState extends State<NoteDetailsView> {
+  late final TextEditingController _titleController;
+  late final TextEditingController _contentController;
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController = TextEditingController();
+    _contentController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _contentController.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    context.read<NoteDetailsBloc>().add(NoteDetailsSaved());
+  }
+
+  void _showColorPicker(BuildContext context, NoteColor selected) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (_) => _NoteColorPicker(
+        selected: selected,
+        onSelected: (color) =>
+            context.read<NoteDetailsBloc>().add(NoteDetailsColorChanged(color)),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocConsumer<NoteDetailsBloc, NoteDetailsState>(
+      listenWhen: (prev, curr) => prev.status != curr.status,
+      listener: (context, state) {
+        if (state.status == NoteDetailsStatus.success) {
+          _titleController.text = state.title;
+          _contentController.text = state.content;
+        }
+        if (state.status == NoteDetailsStatus.saved) {
+          widget.onBackPressed?.call();
+        }
+      },
+      builder: (context, state) {
+        return PopScope(
+          onPopInvokedWithResult: (didPop, _) {
+            if (didPop) _save();
+          },
+          child: Scaffold(
+            appBar: AppBar(
+              leading: BackButton(
+                onPressed: () {
+                  _save();
+                  widget.onBackPressed?.call();
+                },
+              ),
+              actions: [
+                GestureDetector(
+                  onTap: () => _showColorPicker(context, state.color),
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    margin: const EdgeInsets.only(right: 8),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: state.color.forBrightness(
+                        Theme.of(context).brightness,
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    state.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                  ),
+                  onPressed: () => context.read<NoteDetailsBloc>().add(
+                    NoteDetailsPinToggled(),
+                  ),
+                ),
+              ],
+            ),
+            body: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _titleController,
+                    onChanged: (v) => context.read<NoteDetailsBloc>().add(
+                      NoteDetailsTitleChanged(v),
+                    ),
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                    decoration: const InputDecoration(
+                      hintText: 'Title',
+                      border: InputBorder.none,
+                    ),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      controller: _contentController,
+                      onChanged: (v) => context.read<NoteDetailsBloc>().add(
+                        NoteDetailsContentChanged(v),
+                      ),
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      decoration: const InputDecoration(
+                        hintText: 'Start typing...',
+                        border: InputBorder.none,
+                      ),
+                      maxLines: null,
+                      expands: true,
+                      textAlignVertical: TextAlignVertical.top,
+                      keyboardType: TextInputType.multiline,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}

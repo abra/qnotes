@@ -1,0 +1,27 @@
+name: note_details
+description: "Note details feature: create and edit notes."
+publish_to: none
+version: 0.0.1
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  equatable: ^2.0.8
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+  shared:
+    path: ../../shared
+  notes_repository:
+    path: ../../notes_repository
+  component_library:
+    path: ../../component_library
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
