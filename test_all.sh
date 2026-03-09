@@ -21,11 +21,14 @@ run() {
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-run "shared"                 "dart test test/"                     "$SCRIPT_DIR/packages/shared"
-run "notes_repository"       "flutter test test/"                  "$SCRIPT_DIR/packages/notes_repository"
-run "preferences_repository" "flutter test test/"                  "$SCRIPT_DIR/packages/preferences_repository"
-run "component_library"      "flutter test test/"                  "$SCRIPT_DIR/packages/component_library"
-run "monitoring"             "flutter test test/"                  "$SCRIPT_DIR/packages/monitoring"
+run "shared"                       "dart test test/"    "$SCRIPT_DIR/packages/shared"
+run "notes_repository"             "flutter test test/" "$SCRIPT_DIR/packages/notes_repository"
+run "preferences_repository"       "flutter test test/" "$SCRIPT_DIR/packages/preferences_repository"
+run "component_library"            "flutter test test/" "$SCRIPT_DIR/packages/component_library"
+run "monitoring"                   "flutter test test/" "$SCRIPT_DIR/packages/monitoring"
+run "note_list"                    "flutter test test/" "$SCRIPT_DIR/packages/features/note_list"
+run "note_details"                 "flutter test test/" "$SCRIPT_DIR/packages/features/note_details"
+run "preferences_bottom_sheet"     "flutter test test/" "$SCRIPT_DIR/packages/features/preferences_bottom_sheet"
 
 echo ""
 echo "────────────────────────────"
