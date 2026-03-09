@@ -54,7 +54,50 @@ class NoteListView extends StatelessWidget {
   final Future<void> Function()? onAddPressed;
   final VoidCallback? onSettingsPressed;
 
-  void _navigateAndRefresh(
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<NoteListBloc, NoteListState>(
+      builder: (context, state) {
+        return StreamBuilder<Preferences>(
+          stream: preferencesService.stream,
+          initialData: preferencesService.current,
+          builder: (context, snapshot) {
+            final viewMode = snapshot.data?.noteViewMode ?? NoteViewMode.grid;
+            final density =
+                snapshot.data?.noteListDensity ?? NoteListDensity.threeLines;
+            return _NoteListScaffold(
+              state: state,
+              viewMode: viewMode,
+              density: density,
+              onNotePressed: onNotePressed,
+              onAddPressed: onAddPressed,
+              onSettingsPressed: onSettingsPressed,
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class _NoteListScaffold extends StatelessWidget {
+  const _NoteListScaffold({
+    required this.state,
+    required this.viewMode,
+    required this.density,
+    this.onNotePressed,
+    this.onAddPressed,
+    this.onSettingsPressed,
+  });
+
+  final NoteListState state;
+  final NoteViewMode viewMode;
+  final NoteListDensity density;
+  final Future<void> Function(Note)? onNotePressed;
+  final Future<void> Function()? onAddPressed;
+  final VoidCallback? onSettingsPressed;
+
+  Future<void> _navigateAndRefresh(
     BuildContext context,
     Future<void> Function() navigate,
   ) async {
@@ -64,7 +107,8 @@ class NoteListView extends StatelessWidget {
     }
   }
 
-  void _deleteSelected(BuildContext context, int count) {
+  void _deleteSelected(BuildContext context) {
+    final count = state.selectedIds.length;
     context.read<NoteListBloc>().add(NoteListSelectedDeleted());
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -86,32 +130,8 @@ class NoteListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NoteListBloc, NoteListState>(
-      builder: (context, state) {
-        final notes = state.filteredNotes;
-
-        return StreamBuilder<Preferences>(
-          stream: preferencesService.stream,
-          initialData: preferencesService.current,
-          builder: (context, snapshot) {
-            final viewMode = snapshot.data?.noteViewMode ?? NoteViewMode.grid;
-            final density =
-                snapshot.data?.noteListDensity ?? NoteListDensity.threeLines;
-            return _buildScaffold(context, state, notes, viewMode, density);
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildScaffold(
-    BuildContext context,
-    NoteListState state,
-    List<Note> notes,
-    NoteViewMode viewMode,
-    NoteListDensity density,
-  ) {
     final bloc = context.read<NoteListBloc>();
+    final notes = state.filteredNotes;
 
     return Scaffold(
       appBar: state.isSelectionMode
@@ -124,8 +144,7 @@ class NoteListView extends StatelessWidget {
               actions: [
                 IconButton(
                   icon: const Icon(Icons.delete_outline),
-                  onPressed: () =>
-                      _deleteSelected(context, state.selectedIds.length),
+                  onPressed: () => _deleteSelected(context),
                 ),
               ],
             )
@@ -182,7 +201,6 @@ class NoteListView extends StatelessWidget {
                 right: 0,
                 bottom: 0,
                 child: _BottomBar(
-                  viewMode: viewMode,
                   onAddPressed: onAddPressed == null
                       ? null
                       : () => _navigateAndRefresh(context, onAddPressed!),
@@ -197,13 +215,8 @@ class NoteListView extends StatelessWidget {
 }
 
 class _BottomBar extends StatelessWidget {
-  const _BottomBar({
-    required this.viewMode,
-    this.onAddPressed,
-    this.onQueryChanged,
-  });
+  const _BottomBar({this.onAddPressed, this.onQueryChanged});
 
-  final NoteViewMode viewMode;
   final VoidCallback? onAddPressed;
   final ValueChanged<String>? onQueryChanged;
 
