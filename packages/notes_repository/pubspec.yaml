@@ -1,0 +1,24 @@
+name: notes_repository
+description: "Note persistence: SQLite storage via drift."
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared:
+    path: ../shared
+  drift: ^2.23.1
+  sqlite3_flutter_libs: ^0.5.0
+  path_provider: ^2.0.0
+  path: ^1.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  drift_dev: ^2.23.1
+  build_runner: ^2.4.0
+  sqlite3: ^2.7.0

@@ -8,5 +8,6 @@
 //   interfaces/  — repository and service abstractions
 //   value_objects/ — typed wrappers (NoteId, Email, ...)
 
+export 'src/interfaces/note_repository.dart';
 export 'src/models/note.dart';
 export 'src/models/note_color.dart';

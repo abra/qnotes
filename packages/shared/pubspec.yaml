@@ -7,3 +7,6 @@ environment:
   sdk: ^3.11.0
 dependencies:
   equatable: ^2.0.8
+
+dev_dependencies:
+  test: ^1.30.0

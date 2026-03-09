@@ -24,6 +24,9 @@ dependencies:
   shared:
     path: packages/shared
 
+  notes_repository:
+    path: packages/notes_repository
+
   note_list:
     path: packages/features/note_list
 
