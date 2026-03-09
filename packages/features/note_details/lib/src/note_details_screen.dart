@@ -97,68 +97,106 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
             }
           },
           child: Scaffold(
-            appBar: AppBar(
-              leading: BackButton(onPressed: widget.onBackPressed),
-              actions: [
-                GestureDetector(
-                  onTap: () => _showColorPicker(context, state.color),
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    margin: const EdgeInsets.only(right: 8),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: state.color.forBrightness(
-                        Theme.of(context).brightness,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top bar
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: widget.onBackPressed,
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                        Expanded(
+                          child: Text(
+                            state.isNew ? 'New note' : 'Edit note',
+                            style: Theme.of(context).textTheme.titleMedium,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            state.isPinned
+                                ? Icons.push_pin
+                                : Icons.push_pin_outlined,
+                          ),
+                          onPressed: () => context.read<NoteDetailsBloc>().add(
+                            NoteDetailsPinToggled(),
+                          ),
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Title row with color dot
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _titleController,
+                            onChanged: (v) => context
+                                .read<NoteDetailsBloc>()
+                                .add(NoteDetailsTitleChanged(v)),
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
+                            decoration: const InputDecoration(
+                              hintText: 'Title',
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () => _showColorPicker(context, state.color),
+                          child: Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: state.color == NoteColor.none
+                                  ? Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceContainerHighest
+                                  : state.color.forBrightness(
+                                      Theme.of(context).brightness,
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    // Content
+                    Expanded(
+                      child: TextField(
+                        controller: _contentController,
+                        onChanged: (v) => context.read<NoteDetailsBloc>().add(
+                          NoteDetailsContentChanged(v),
+                        ),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        decoration: const InputDecoration(
+                          hintText: 'Start typing...',
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        maxLines: null,
+                        expands: true,
+                        textAlignVertical: TextAlignVertical.top,
+                        keyboardType: TextInputType.multiline,
                       ),
                     ),
-                  ),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(
-                    state.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                  ),
-                  onPressed: () => context.read<NoteDetailsBloc>().add(
-                    NoteDetailsPinToggled(),
-                  ),
-                ),
-              ],
-            ),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _titleController,
-                    onChanged: (v) => context.read<NoteDetailsBloc>().add(
-                      NoteDetailsTitleChanged(v),
-                    ),
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: const InputDecoration(
-                      hintText: 'Title',
-                      border: InputBorder.none,
-                    ),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: _contentController,
-                      onChanged: (v) => context.read<NoteDetailsBloc>().add(
-                        NoteDetailsContentChanged(v),
-                      ),
-                      style: Theme.of(context).textTheme.bodyLarge,
-                      decoration: const InputDecoration(
-                        hintText: 'Start typing...',
-                        border: InputBorder.none,
-                      ),
-                      maxLines: null,
-                      expands: true,
-                      textAlignVertical: TextAlignVertical.top,
-                      keyboardType: TextInputType.multiline,
-                    ),
-                  ),
-                ],
               ),
             ),
           ),

@@ -89,6 +89,7 @@ class NoteListView extends StatelessWidget {
   ) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text('Nota'),
         actions: [
           IconButton(
             icon: const Icon(Icons.more_vert),

@@ -42,7 +42,8 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
           note: note,
         ),
       );
-    } catch (_) {
+    } catch (e, st) {
+      addError(e, st);
       emit(state.copyWith(status: NoteDetailsStatus.failure));
     }
   }
@@ -100,7 +101,8 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
         );
       }
       emit(state.copyWith(status: NoteDetailsStatus.saved));
-    } catch (_) {
+    } catch (e, st) {
+      addError(e, st);
       emit(state.copyWith(status: NoteDetailsStatus.failure));
     }
   }

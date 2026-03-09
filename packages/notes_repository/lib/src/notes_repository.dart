@@ -1,10 +1,13 @@
-import 'package:flutter/foundation.dart';
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared/shared.dart';
+import 'package:uuid/uuid.dart';
 
 import 'note_local_storage.dart';
 
 /// Concrete implementation of [NoteRepository] backed by SQLite via drift.
+const _uuid = Uuid();
+
 class NotesRepository implements NoteRepository {
   NotesRepository({@visibleForTesting NoteLocalStorage? localStorage})
     : _storage = localStorage ?? NoteLocalStorage();
@@ -30,7 +33,7 @@ class NotesRepository implements NoteRepository {
     NoteColor color = NoteColor.none,
   }) async {
     final now = DateTime.now();
-    final id = now.microsecondsSinceEpoch.toString();
+    final id = _uuid.v4();
 
     await _storage.insertNote(
       NotesTableCompanion.insert(
