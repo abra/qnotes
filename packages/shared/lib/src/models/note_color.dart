@@ -10,7 +10,15 @@ enum NoteColor {
   green,
   teal,
   blue,
-  purple;
+  purple,
+  pink,
+  lime,
+  indigo,
+  brown,
+  coral,
+  mint,
+  rose,
+  sand;
 
   static NoteColor from(String? value) => switch (value) {
     'red' => NoteColor.red,
@@ -20,6 +28,14 @@ enum NoteColor {
     'teal' => NoteColor.teal,
     'blue' => NoteColor.blue,
     'purple' => NoteColor.purple,
+    'pink' => NoteColor.pink,
+    'lime' => NoteColor.lime,
+    'indigo' => NoteColor.indigo,
+    'brown' => NoteColor.brown,
+    'coral' => NoteColor.coral,
+    'mint' => NoteColor.mint,
+    'rose' => NoteColor.rose,
+    'sand' => NoteColor.sand,
     _ => NoteColor.none,
   };
 }
