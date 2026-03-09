@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:ui' show Locale;
 
 import 'package:flutter/material.dart' show ThemeMode;
-import 'package:shared/shared.dart' show NoteViewMode;
+import 'package:shared/shared.dart' show NoteListDensity, NoteViewMode;
 
 import 'preferences.dart';
 import 'preferences_storage.dart';
@@ -47,6 +47,9 @@ class PreferencesService {
         noteViewMode: NoteViewMode.values.byName(
           map['noteViewMode'] as String? ?? 'grid',
         ),
+        noteListDensity: NoteListDensity.values.byName(
+          map['noteListDensity'] as String? ?? 'threeLines',
+        ),
       );
     } catch (_) {
       return const Preferences();
@@ -58,6 +61,7 @@ class PreferencesService {
       'themeMode': s.themeMode.name,
       'locale': s.locale.languageCode,
       'noteViewMode': s.noteViewMode.name,
+      'noteListDensity': s.noteListDensity.name,
     };
     await prefs.setString(_key, jsonEncode(map));
   }

@@ -95,7 +95,9 @@ class NoteListView extends StatelessWidget {
           initialData: preferencesService.current,
           builder: (context, snapshot) {
             final viewMode = snapshot.data?.noteViewMode ?? NoteViewMode.grid;
-            return _buildScaffold(context, state, notes, viewMode);
+            final density =
+                snapshot.data?.noteListDensity ?? NoteListDensity.threeLines;
+            return _buildScaffold(context, state, notes, viewMode, density);
           },
         );
       },
@@ -107,6 +109,7 @@ class NoteListView extends StatelessWidget {
     NoteListState state,
     List<Note> notes,
     NoteViewMode viewMode,
+    NoteListDensity density,
   ) {
     final bloc = context.read<NoteListBloc>();
 
@@ -160,6 +163,7 @@ class NoteListView extends StatelessWidget {
             else
               NotePagedListView(
                 notes: notes,
+                density: density,
                 selectedIds: state.selectedIds,
                 isSelectionMode: state.isSelectionMode,
                 onNotePressed: onNotePressed == null

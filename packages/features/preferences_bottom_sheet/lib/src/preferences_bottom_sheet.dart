@@ -93,6 +93,33 @@ class PreferencesBottomSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: Spacing.medium),
                 _PreferenceRow(
+                  label: 'List density',
+                  control: SegmentedButton<NoteListDensity>(
+                    segments: const [
+                      ButtonSegment(
+                        value: NoteListDensity.twoLines,
+                        label: Text('2'),
+                        tooltip: '2 lines',
+                      ),
+                      ButtonSegment(
+                        value: NoteListDensity.threeLines,
+                        label: Text('3'),
+                        tooltip: '3 lines',
+                      ),
+                      ButtonSegment(
+                        value: NoteListDensity.fourLines,
+                        label: Text('4'),
+                        tooltip: '4 lines',
+                      ),
+                    ],
+                    selected: {prefs.noteListDensity},
+                    onSelectionChanged: (value) => preferencesService.update(
+                      (p) => p.copyWith(noteListDensity: value.first),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: Spacing.medium),
+                _PreferenceRow(
                   label: 'Language',
                   control: SegmentedButton<String>(
                     segments: const [

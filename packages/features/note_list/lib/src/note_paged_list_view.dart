@@ -8,6 +8,7 @@ class NotePagedListView extends StatelessWidget {
   const NotePagedListView({
     super.key,
     required this.notes,
+    required this.density,
     required this.selectedIds,
     required this.isSelectionMode,
     this.onNotePressed,
@@ -16,11 +17,18 @@ class NotePagedListView extends StatelessWidget {
   });
 
   final List<Note> notes;
+  final NoteListDensity density;
   final Set<String> selectedIds;
   final bool isSelectionMode;
   final ValueChanged<Note>? onNotePressed;
   final ValueChanged<String>? onNoteDeleted;
   final ValueChanged<String>? onNoteLongPressed;
+
+  int get _contentMaxLines => switch (density) {
+    NoteListDensity.twoLines => 1,
+    NoteListDensity.threeLines => 2,
+    NoteListDensity.fourLines => 3,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +43,8 @@ class NotePagedListView extends StatelessWidget {
         final card = NoteCard(
           note: note,
           isSelected: isSelected,
+          titleMaxLines: 1,
+          contentMaxLines: _contentMaxLines,
           onPressed: isSelectionMode
               ? () => onNoteLongPressed?.call(note.id)
               : () => onNotePressed?.call(note),

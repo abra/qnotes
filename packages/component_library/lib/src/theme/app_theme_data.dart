@@ -2,6 +2,25 @@ import 'package:flutter/material.dart';
 
 import 'catppuccin.dart';
 
+// M3 default sizes + 2pt for better readability on mobile.
+const _textTheme = TextTheme(
+  displayLarge: TextStyle(fontSize: 59),
+  displayMedium: TextStyle(fontSize: 47),
+  displaySmall: TextStyle(fontSize: 38),
+  headlineLarge: TextStyle(fontSize: 34),
+  headlineMedium: TextStyle(fontSize: 30),
+  headlineSmall: TextStyle(fontSize: 26),
+  titleLarge: TextStyle(fontSize: 24),
+  titleMedium: TextStyle(fontSize: 18),
+  titleSmall: TextStyle(fontSize: 16),
+  bodyLarge: TextStyle(fontSize: 18),
+  bodyMedium: TextStyle(fontSize: 16),
+  bodySmall: TextStyle(fontSize: 14),
+  labelLarge: TextStyle(fontSize: 16),
+  labelMedium: TextStyle(fontSize: 14),
+  labelSmall: TextStyle(fontSize: 13),
+);
+
 /// Abstract base class describing the app's theme.
 ///
 /// Extend this class to add custom colors for new components:
@@ -23,6 +42,7 @@ final class LightAppThemeData extends AppThemeData {
   @override
   ThemeData get materialThemeData => ThemeData(
     brightness: Brightness.light,
+    textTheme: _textTheme,
     scaffoldBackgroundColor: CatppuccinLatte.base,
     colorScheme: const ColorScheme.light(
       primary: CatppuccinLatte.mauve,
@@ -59,6 +79,7 @@ final class DarkAppThemeData extends AppThemeData {
   @override
   ThemeData get materialThemeData => ThemeData(
     brightness: Brightness.dark,
+    textTheme: _textTheme,
     scaffoldBackgroundColor: CatppuccinFrappe.base,
     colorScheme: const ColorScheme.dark(
       primary: CatppuccinFrappe.mauve,

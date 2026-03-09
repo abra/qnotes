@@ -10,6 +10,8 @@ class NoteCard extends StatelessWidget {
     this.onLongPress,
     this.onDeleted,
     this.isSelected = false,
+    this.contentMaxLines = 6,
+    this.titleMaxLines = 2,
   });
 
   final Note note;
@@ -17,6 +19,8 @@ class NoteCard extends StatelessWidget {
   final VoidCallback? onLongPress;
   final VoidCallback? onDeleted;
   final bool isSelected;
+  final int contentMaxLines;
+  final int titleMaxLines;
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +59,7 @@ class NoteCard extends StatelessWidget {
                               note.title!,
                               style: Theme.of(context).textTheme.titleSmall
                                   ?.copyWith(color: textColor),
-                              maxLines: 2,
+                              maxLines: titleMaxLines,
                               overflow: TextOverflow.ellipsis,
                             ),
                           )
@@ -81,7 +85,7 @@ class NoteCard extends StatelessWidget {
                     style: Theme.of(
                       context,
                     ).textTheme.bodySmall?.copyWith(color: textColor),
-                    maxLines: 6,
+                    maxLines: contentMaxLines,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
