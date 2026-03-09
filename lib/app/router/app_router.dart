@@ -4,6 +4,7 @@ import 'package:note_details/note_details.dart';
 import 'package:note_list/note_list.dart';
 import 'package:nota/app/dependency_container.dart';
 import 'package:nota/app/router/app_routes.dart';
+import 'package:preferences_bottom_sheet/preferences_bottom_sheet.dart';
 
 GoRouter buildRouter({required DependenciesContainer dependencies}) {
   dependencies.logger.debug('buildRouter: GoRouter created');
@@ -21,7 +22,9 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
           onNotePressed: (note) => context.push(AppRoutes.noteEditor(note.id)),
           onSettingsPressed: () => showModalBottomSheet<void>(
             context: context,
-            builder: (_) => const _SettingsPlaceholder(),
+            builder: (_) => PreferencesBottomSheet(
+              preferencesService: dependencies.preferencesService,
+            ),
           ),
         ),
         routes: [
@@ -44,18 +47,4 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
       ),
     ],
   );
-}
-
-class _SettingsPlaceholder extends StatelessWidget {
-  const _SettingsPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const SafeArea(
-      child: Padding(
-        padding: EdgeInsets.all(24),
-        child: Center(child: Text('Settings — coming soon')),
-      ),
-    );
-  }
 }
