@@ -99,6 +99,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
             }
           },
           child: Scaffold(
+            backgroundColor: state.color == NoteColor.none
+                ? null
+                : state.color.forBrightness(Theme.of(context).brightness),
             body: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.symmetric(

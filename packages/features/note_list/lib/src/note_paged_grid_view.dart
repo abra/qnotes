@@ -24,6 +24,7 @@ class NotePagedGridView extends StatelessWidget {
         crossAxisCount: 2,
         crossAxisSpacing: Spacing.small,
         mainAxisSpacing: Spacing.small,
+        childAspectRatio: 0.82,
       ),
       itemCount: notes.length,
       itemBuilder: (context, index) {
