@@ -1,0 +1,1 @@
+enum NoteViewMode { grid, list }

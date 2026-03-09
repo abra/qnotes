@@ -1,5 +1,6 @@
 name: note_list
 description: "Note list feature: displays, searches and manages the list of notes."
+publish_to: none
 version: 0.0.1
 
 environment:
@@ -11,6 +12,12 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1
+  shared:
+    path: ../../shared
+  notes_repository:
+    path: ../../notes_repository
+  preferences_repository:
+    path: ../../preferences_repository
 
 dev_dependencies:
   flutter_test:

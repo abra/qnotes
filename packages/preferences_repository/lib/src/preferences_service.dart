@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:ui' show Locale;
 
 import 'package:flutter/material.dart' show ThemeMode;
+import 'package:shared/shared.dart' show NoteViewMode;
 
 import 'preferences.dart';
 import 'preferences_storage.dart';
@@ -43,6 +44,9 @@ class PreferencesService {
           map['themeMode'] as String? ?? 'system',
         ),
         locale: Locale(map['locale'] as String? ?? 'en'),
+        noteViewMode: NoteViewMode.values.byName(
+          map['noteViewMode'] as String? ?? 'grid',
+        ),
       );
     } catch (_) {
       return const Preferences();
@@ -53,6 +57,7 @@ class PreferencesService {
     final map = <String, Object?>{
       'themeMode': s.themeMode.name,
       'locale': s.locale.languageCode,
+      'noteViewMode': s.noteViewMode.name,
     };
     await prefs.setString(_key, jsonEncode(map));
   }

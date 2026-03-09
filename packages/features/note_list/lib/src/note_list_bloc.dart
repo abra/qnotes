@@ -1,8 +1,47 @@
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared/shared.dart';
 
-import 'note_list_event.dart';
-import 'note_list_state.dart';
+part 'note_list_event.dart';
+part 'note_list_state.dart';
 
 class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
-  NoteListBloc(super.initialState);
+  NoteListBloc({required NoteRepository noteRepository})
+    : _repository = noteRepository,
+      super(const NoteListState()) {
+    on<NoteListStarted>(_onStarted);
+    on<NoteListNoteDeleted>(_onNoteDeleted);
+    on<NoteListQueryChanged>(_onQueryChanged);
+  }
+
+  final NoteRepository _repository;
+
+  Future<void> _onStarted(
+    NoteListStarted event,
+    Emitter<NoteListState> emit,
+  ) async {
+    emit(state.copyWith(status: NoteListStatus.loading));
+    try {
+      final notes = await _repository.getNotes();
+      emit(state.copyWith(status: NoteListStatus.success, notes: notes));
+    } catch (_) {
+      emit(state.copyWith(status: NoteListStatus.failure));
+    }
+  }
+
+  Future<void> _onNoteDeleted(
+    NoteListNoteDeleted event,
+    Emitter<NoteListState> emit,
+  ) async {
+    await _repository.deleteNote(event.id);
+    final notes = state.notes.where((n) => n.id != event.id).toList();
+    emit(state.copyWith(notes: notes));
+  }
+
+  void _onQueryChanged(
+    NoteListQueryChanged event,
+    Emitter<NoteListState> emit,
+  ) {
+    emit(state.copyWith(query: event.query));
+  }
 }
