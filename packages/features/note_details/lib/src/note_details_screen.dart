@@ -66,10 +66,11 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
   void _showColorPicker(BuildContext context, NoteColor selected) {
     showModalBottomSheet<void>(
       context: context,
-      builder: (_) => _NoteColorPicker(
+      builder: (sheetContext) => _NoteColorPicker(
         selected: selected,
         onSelected: (color) =>
             context.read<NoteDetailsBloc>().add(NoteDetailsColorChanged(color)),
+        onDismiss: () => Navigator.of(sheetContext).pop(),
       ),
     );
   }
@@ -177,21 +178,17 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                               ),
                             ),
                             const SizedBox(width: Spacing.small),
-                            GestureDetector(
-                              onTap: () =>
-                                  _showColorPicker(context, state.color),
-                              child: Container(
-                                width: 28,
-                                height: 28,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: state.color == NoteColor.none
-                                      ? Theme.of(
-                                          context,
-                                        ).colorScheme.surfaceContainerHighest
-                                      : state.color.forBrightness(brightness),
-                                ),
+                            IconButton(
+                              icon: Icon(
+                                state.color == NoteColor.none
+                                    ? Icons.palette_outlined
+                                    : Icons.palette,
+                                color: textColor,
                               ),
+                              onPressed: () =>
+                                  _showColorPicker(context, state.color),
+                              padding: EdgeInsets.zero,
+                              visualDensity: VisualDensity.compact,
                             ),
                           ],
                         ),

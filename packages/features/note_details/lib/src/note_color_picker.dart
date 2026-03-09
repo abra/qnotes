@@ -1,10 +1,15 @@
 part of 'note_details_screen.dart';
 
 class _NoteColorPicker extends StatelessWidget {
-  const _NoteColorPicker({required this.selected, required this.onSelected});
+  const _NoteColorPicker({
+    required this.selected,
+    required this.onSelected,
+    required this.onDismiss,
+  });
 
   final NoteColor selected;
   final ValueChanged<NoteColor> onSelected;
+  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +27,7 @@ class _NoteColorPicker extends StatelessWidget {
             return GestureDetector(
               onTap: () {
                 onSelected(color);
-                Navigator.of(context).pop();
+                onDismiss();
               },
               child: Container(
                 width: 40,
