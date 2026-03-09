@@ -12,13 +12,14 @@ class NoteListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<NoteListBloc>(
       create: (_) => NoteListBloc(NoteListState()),
-      child: _NoteListView(onBackPressed: onBackPressed),
+      child: NoteListView(onBackPressed: onBackPressed),
     );
   }
 }
 
-class _NoteListView extends StatelessWidget {
-  const _NoteListView({this.onBackPressed});
+@visibleForTesting
+class NoteListView extends StatelessWidget {
+  const NoteListView({super.key, this.onBackPressed});
 
   final VoidCallback? onBackPressed;
 
