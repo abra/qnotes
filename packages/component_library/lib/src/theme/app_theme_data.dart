@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'catppuccin.dart';
 
-// M3 default sizes + 2pt for better readability on mobile.
+// M3 default sizes + 2pt, Geist typeface.
 const _textTheme = TextTheme(
   displayLarge: TextStyle(fontSize: 59),
   displayMedium: TextStyle(fontSize: 47),
@@ -42,6 +42,7 @@ final class LightAppThemeData extends AppThemeData {
   @override
   ThemeData get materialThemeData => ThemeData(
     brightness: Brightness.light,
+    fontFamily: 'Geist',
     textTheme: _textTheme,
     scaffoldBackgroundColor: CatppuccinLatte.base,
     colorScheme: const ColorScheme.light(
@@ -79,6 +80,7 @@ final class DarkAppThemeData extends AppThemeData {
   @override
   ThemeData get materialThemeData => ThemeData(
     brightness: Brightness.dark,
+    fontFamily: 'Geist',
     textTheme: _textTheme,
     scaffoldBackgroundColor: CatppuccinFrappe.base,
     colorScheme: const ColorScheme.dark(
