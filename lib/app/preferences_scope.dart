@@ -1,5 +1,5 @@
-import 'package:preferences_repository/preferences_repository.dart';
 import 'package:flutter/widgets.dart';
+import 'package:preferences_repository/preferences_repository.dart';
 
 /// Listens to [PreferencesService] and provides [Preferences] to the subtree.
 class PreferencesScope extends StatelessWidget {

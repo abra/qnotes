@@ -6,9 +6,9 @@
 
 import 'package:monitoring/monitoring.dart';
 import 'package:nota/app/config/application_config.dart';
-import 'package:shared/shared.dart' show NoteRepository;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:preferences_repository/preferences_repository.dart';
+import 'package:shared/shared.dart' show NoteRepository;
 
 /// Container for global dependencies.
 class DependenciesContainer {
