@@ -101,7 +101,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
           child: Scaffold(
             body: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Spacing.mediumLarge,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -135,7 +137,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: Spacing.small),
                     // Title row with color dot
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -156,7 +158,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: Spacing.small),
                         GestureDetector(
                           onTap: () => _showColorPicker(context, state.color),
                           child: Container(
@@ -176,7 +178,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: Spacing.small),
                     // Content
                     Expanded(
                       child: TextField(

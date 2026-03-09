@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:note_list/src/note_list_bloc.dart';
-import 'package:note_list/src/note_list_screen.dart';
 import 'package:preferences_repository/preferences_repository.dart';
 import 'package:shared/shared.dart';
 
@@ -33,36 +32,6 @@ class _FakePreferencesService {
     _current = p;
     _controller.add(p);
   }
-}
-
-// Adapter so _FakePreferencesService satisfies the widget signature.
-PreferencesService _wrapFake(_FakePreferencesService fake) {
-  // NoteListView only uses .stream and .current from PreferencesService.
-  // We create a real PreferencesService by subclassing isn't possible (factory).
-  // Instead, expose the fake directly via a thin wrapper using the real class fields.
-  // Because PreferencesService has a private constructor, we use a plain object
-  // that satisfies the duck-typed usage inside StreamBuilder.
-  // The widget uses preferencesService.stream and preferencesService.current,
-  // which are just Stream<Preferences> and Preferences — we can pass an object
-  // with matching members. But Dart is nominal — we need the actual type.
-  //
-  // Solution: create a PreferencesService subclass or use a seam.
-  // Since PreferencesService is a final class, we can't subclass it.
-  //
-  // Workaround: create a real PreferencesService via a private test constructor
-  // or use the NoteListView's dependency as a plain Dart object.
-  //
-  // Because NoteListView accepts PreferencesService (a concrete class, not an
-  // interface), we need a real instance.  The simplest path is to create a
-  // thin subclass via mocktail or use a real in-memory one.
-  //
-  // Here we use the fact that PreferencesService exposes `update` which calls
-  // `_controller.add`.  We can't easily fake it without changing the API.
-  //
-  // ** Pragmatic approach **: extract a `PreferencesSource` interface upstream,
-  // but that's out of scope here.  For widget tests we'll test via the real
-  // NoteListBloc + a fake state directly seeded through the bloc.
-  throw UnimplementedError('see _buildView helper below');
 }
 
 Widget _buildView({

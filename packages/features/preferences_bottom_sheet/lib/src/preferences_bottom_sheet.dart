@@ -1,3 +1,4 @@
+import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:preferences_repository/preferences_repository.dart';
 import 'package:shared/shared.dart';
@@ -16,7 +17,12 @@ class PreferencesBottomSheet extends StatelessWidget {
         final prefs = snapshot.data ?? preferencesService.current;
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            padding: const EdgeInsets.fromLTRB(
+              Spacing.mediumLarge,
+              Spacing.small,
+              Spacing.mediumLarge,
+              Spacing.mediumLarge,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -25,7 +31,7 @@ class PreferencesBottomSheet extends StatelessWidget {
                   child: Container(
                     width: 32,
                     height: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
+                    margin: const EdgeInsets.only(bottom: Spacing.mediumLarge),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.outlineVariant,
                       borderRadius: BorderRadius.circular(2),
@@ -36,7 +42,7 @@ class PreferencesBottomSheet extends StatelessWidget {
                   'Preferences',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: Spacing.mediumLarge),
                 _PreferenceRow(
                   label: 'Theme',
                   control: SegmentedButton<ThemeMode>(
@@ -63,7 +69,7 @@ class PreferencesBottomSheet extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: Spacing.medium),
                 _PreferenceRow(
                   label: 'Notes view',
                   control: SegmentedButton<NoteViewMode>(
@@ -85,7 +91,7 @@ class PreferencesBottomSheet extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: Spacing.medium),
                 _PreferenceRow(
                   label: 'Language',
                   control: SegmentedButton<String>(

@@ -18,6 +18,8 @@ dependencies:
     path: ../../notes_repository
   preferences_repository:
     path: ../../preferences_repository
+  component_library:
+    path: ../../component_library
 
 dev_dependencies:
   flutter_test:

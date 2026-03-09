@@ -1,3 +1,4 @@
+import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/shared.dart';
 
@@ -18,9 +19,9 @@ class NotePagedListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(Spacing.medium),
       itemCount: notes.length,
-      separatorBuilder: (_, _) => const SizedBox(height: 8),
+      separatorBuilder: (_, _) => const SizedBox(height: Spacing.small),
       itemBuilder: (context, index) {
         final note = notes[index];
         return NoteCard(

@@ -10,10 +10,13 @@ class _NoteColorPicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        padding: const EdgeInsets.symmetric(
+          horizontal: Spacing.xLarge,
+          vertical: Spacing.mediumLarge,
+        ),
         child: Wrap(
-          spacing: 16,
-          runSpacing: 16,
+          spacing: Spacing.mediumLarge,
+          runSpacing: Spacing.mediumLarge,
           children: NoteColor.values.map((color) {
             final isSelected = color == selected;
             return GestureDetector(

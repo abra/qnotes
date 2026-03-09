@@ -1,3 +1,4 @@
+import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/shared.dart';
 
@@ -20,7 +21,7 @@ class NoteCard extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         child: Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(Spacing.medium),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -31,7 +32,7 @@ class NoteCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: Spacing.xSmall),
               ],
               Text(
                 note.content,

@@ -1,3 +1,4 @@
+import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:preferences_repository/preferences_repository.dart';
@@ -164,7 +165,10 @@ class _BottomBar extends StatelessWidget {
     return ColoredBox(
       color: Theme.of(context).colorScheme.surface,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(
+          horizontal: Spacing.medium,
+          vertical: Spacing.small,
+        ),
         child: Row(
           children: [
             Expanded(
@@ -178,7 +182,7 @@ class _BottomBar extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: Spacing.small),
             IconButton(icon: const Icon(Icons.add), onPressed: onAddPressed),
           ],
         ),

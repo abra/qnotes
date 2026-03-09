@@ -1,3 +1,4 @@
+import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/shared.dart';
 
@@ -18,11 +19,11 @@ class NotePagedGridView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(Spacing.medium),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
+        crossAxisSpacing: Spacing.small,
+        mainAxisSpacing: Spacing.small,
       ),
       itemCount: notes.length,
       itemBuilder: (context, index) {
