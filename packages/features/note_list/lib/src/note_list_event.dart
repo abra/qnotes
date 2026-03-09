@@ -22,3 +22,21 @@ class NoteListQueryChanged extends NoteListEvent {
   @override
   String toString() => 'NoteListQueryChanged(query: "$query")';
 }
+
+class NoteListSelectionToggled extends NoteListEvent {
+  NoteListSelectionToggled(this.id);
+  final String id;
+
+  @override
+  String toString() => 'NoteListSelectionToggled(id: $id)';
+}
+
+class NoteListSelectionCleared extends NoteListEvent {
+  @override
+  String toString() => 'NoteListSelectionCleared()';
+}
+
+class NoteListSelectedDeleted extends NoteListEvent {
+  @override
+  String toString() => 'NoteListSelectedDeleted()';
+}

@@ -64,6 +64,26 @@ class NoteListView extends StatelessWidget {
     }
   }
 
+  void _deleteSelected(BuildContext context, int count) {
+    context.read<NoteListBloc>().add(NoteListSelectedDeleted());
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$count ${count == 1 ? 'note' : 'notes'} deleted'),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _deleteNote(BuildContext context, String id) {
+    context.read<NoteListBloc>().add(NoteListNoteDeleted(id));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Note deleted'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NoteListBloc, NoteListState>(
@@ -88,60 +108,83 @@ class NoteListView extends StatelessWidget {
     List<Note> notes,
     NoteViewMode viewMode,
   ) {
+    final bloc = context.read<NoteListBloc>();
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Nota'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: onSettingsPressed,
-          ),
-        ],
-      ),
+      appBar: state.isSelectionMode
+          ? AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => bloc.add(NoteListSelectionCleared()),
+              ),
+              title: Text('${state.selectedIds.length} selected'),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () =>
+                      _deleteSelected(context, state.selectedIds.length),
+                ),
+              ],
+            )
+          : AppBar(
+              title: const Text('Nota'),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.more_vert),
+                  onPressed: onSettingsPressed,
+                ),
+              ],
+            ),
       body: SafeArea(
         child: Stack(
           children: [
             if (state.status == NoteListStatus.loading)
               const Center(child: CircularProgressIndicator())
-            else if (notes.isEmpty)
+            else if (notes.isEmpty && !state.isSelectionMode)
               const Center(child: Text('No notes yet'))
             else if (viewMode == NoteViewMode.grid)
               NotePagedGridView(
                 notes: notes,
+                selectedIds: state.selectedIds,
+                isSelectionMode: state.isSelectionMode,
                 onNotePressed: onNotePressed == null
                     ? null
                     : (note) => _navigateAndRefresh(
                         context,
                         () => onNotePressed!(note),
                       ),
-                onNoteDeleted: (id) =>
-                    context.read<NoteListBloc>().add(NoteListNoteDeleted(id)),
+                onNoteDeleted: (id) => _deleteNote(context, id),
+                onNoteLongPressed: (id) =>
+                    bloc.add(NoteListSelectionToggled(id)),
               )
             else
               NotePagedListView(
                 notes: notes,
+                selectedIds: state.selectedIds,
+                isSelectionMode: state.isSelectionMode,
                 onNotePressed: onNotePressed == null
                     ? null
                     : (note) => _navigateAndRefresh(
                         context,
                         () => onNotePressed!(note),
                       ),
-                onNoteDeleted: (id) =>
-                    context.read<NoteListBloc>().add(NoteListNoteDeleted(id)),
+                onNoteDeleted: (id) => _deleteNote(context, id),
+                onNoteLongPressed: (id) =>
+                    bloc.add(NoteListSelectionToggled(id)),
               ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: _BottomBar(
-                viewMode: viewMode,
-                onAddPressed: onAddPressed == null
-                    ? null
-                    : () => _navigateAndRefresh(context, onAddPressed!),
-                onQueryChanged: (q) =>
-                    context.read<NoteListBloc>().add(NoteListQueryChanged(q)),
+            if (!state.isSelectionMode)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: _BottomBar(
+                  viewMode: viewMode,
+                  onAddPressed: onAddPressed == null
+                      ? null
+                      : () => _navigateAndRefresh(context, onAddPressed!),
+                  onQueryChanged: (q) => bloc.add(NoteListQueryChanged(q)),
+                ),
               ),
-            ),
           ],
         ),
       ),

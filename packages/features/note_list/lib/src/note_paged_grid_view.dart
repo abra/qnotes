@@ -8,13 +8,19 @@ class NotePagedGridView extends StatelessWidget {
   const NotePagedGridView({
     super.key,
     required this.notes,
+    required this.selectedIds,
+    required this.isSelectionMode,
     this.onNotePressed,
     this.onNoteDeleted,
+    this.onNoteLongPressed,
   });
 
   final List<Note> notes;
+  final Set<String> selectedIds;
+  final bool isSelectionMode;
   final ValueChanged<Note>? onNotePressed;
   final ValueChanged<String>? onNoteDeleted;
+  final ValueChanged<String>? onNoteLongPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +35,17 @@ class NotePagedGridView extends StatelessWidget {
       itemCount: notes.length,
       itemBuilder: (context, index) {
         final note = notes[index];
+        final isSelected = selectedIds.contains(note.id);
+
         return NoteCard(
           note: note,
-          onPressed: () => onNotePressed?.call(note),
+          isSelected: isSelected,
+          onPressed: isSelectionMode
+              ? () => onNoteLongPressed?.call(note.id)
+              : () => onNotePressed?.call(note),
+          onLongPress: isSelectionMode
+              ? null
+              : () => onNoteLongPressed?.call(note.id),
           onDeleted: () => onNoteDeleted?.call(note.id),
         );
       },

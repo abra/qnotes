@@ -12,6 +12,9 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     on<NoteListStarted>(_onStarted);
     on<NoteListNoteDeleted>(_onNoteDeleted);
     on<NoteListQueryChanged>(_onQueryChanged);
+    on<NoteListSelectionToggled>(_onSelectionToggled);
+    on<NoteListSelectionCleared>(_onSelectionCleared);
+    on<NoteListSelectedDeleted>(_onSelectedDeleted);
   }
 
   final NoteRepository _repository;
@@ -44,5 +47,37 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     Emitter<NoteListState> emit,
   ) {
     emit(state.copyWith(query: event.query));
+  }
+
+  void _onSelectionToggled(
+    NoteListSelectionToggled event,
+    Emitter<NoteListState> emit,
+  ) {
+    final ids = Set<String>.of(state.selectedIds);
+    if (ids.contains(event.id)) {
+      ids.remove(event.id);
+    } else {
+      ids.add(event.id);
+    }
+    emit(state.copyWith(selectedIds: ids));
+  }
+
+  void _onSelectionCleared(
+    NoteListSelectionCleared event,
+    Emitter<NoteListState> emit,
+  ) {
+    emit(state.copyWith(selectedIds: {}));
+  }
+
+  Future<void> _onSelectedDeleted(
+    NoteListSelectedDeleted event,
+    Emitter<NoteListState> emit,
+  ) async {
+    final ids = Set<String>.of(state.selectedIds);
+    for (final id in ids) {
+      await _repository.deleteNote(id);
+    }
+    final notes = state.notes.where((n) => !ids.contains(n.id)).toList();
+    emit(state.copyWith(notes: notes, selectedIds: {}));
   }
 }

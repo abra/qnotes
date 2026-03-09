@@ -7,11 +7,15 @@ class NoteListState extends Equatable {
     this.status = NoteListStatus.initial,
     this.notes = const [],
     this.query = '',
+    this.selectedIds = const {},
   });
 
   final NoteListStatus status;
   final List<Note> notes;
   final String query;
+  final Set<String> selectedIds;
+
+  bool get isSelectionMode => selectedIds.isNotEmpty;
 
   List<Note> get filteredNotes {
     if (query.isEmpty) return notes;
@@ -29,16 +33,19 @@ class NoteListState extends Equatable {
     NoteListStatus? status,
     List<Note>? notes,
     String? query,
+    Set<String>? selectedIds,
   }) => NoteListState(
     status: status ?? this.status,
     notes: notes ?? this.notes,
     query: query ?? this.query,
+    selectedIds: selectedIds ?? this.selectedIds,
   );
 
   @override
-  List<Object?> get props => [status, notes, query];
+  List<Object?> get props => [status, notes, query, selectedIds];
 
   @override
   String toString() =>
-      'NoteListState(status: $status, notes: ${notes.length}, query: "$query")';
+      'NoteListState(status: $status, notes: ${notes.length}, '
+      'query: "$query", selected: ${selectedIds.length})';
 }
