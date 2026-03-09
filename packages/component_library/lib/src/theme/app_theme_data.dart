@@ -19,9 +19,7 @@ final class LightAppThemeData extends AppThemeData {
   const LightAppThemeData();
 
   @override
-  ThemeData get materialThemeData => ThemeData(
-    brightness: Brightness.light,
-  );
+  ThemeData get materialThemeData => ThemeData(brightness: Brightness.light);
 }
 
 /// Dark variant of [AppThemeData].
@@ -29,7 +27,5 @@ final class DarkAppThemeData extends AppThemeData {
   const DarkAppThemeData();
 
   @override
-  ThemeData get materialThemeData => ThemeData(
-    brightness: Brightness.dark,
-  );
+  ThemeData get materialThemeData => ThemeData(brightness: Brightness.dark);
 }

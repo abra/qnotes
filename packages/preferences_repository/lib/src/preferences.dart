@@ -12,10 +12,7 @@ final class Preferences {
   final ThemeMode themeMode;
   final Locale locale;
 
-  Preferences copyWith({
-    ThemeMode? themeMode,
-    Locale? locale,
-  }) => Preferences(
+  Preferences copyWith({ThemeMode? themeMode, Locale? locale}) => Preferences(
     themeMode: themeMode ?? this.themeMode,
     locale: locale ?? this.locale,
   );

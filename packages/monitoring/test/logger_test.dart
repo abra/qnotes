@@ -43,17 +43,14 @@ void main() {
       logger.error('e');
       logger.fatal('f');
 
-      expect(
-        observer.messages.map((m) => m.level),
-        [
-          LogLevel.trace,
-          LogLevel.debug,
-          LogLevel.info,
-          LogLevel.warn,
-          LogLevel.error,
-          LogLevel.fatal,
-        ],
-      );
+      expect(observer.messages.map((m) => m.level), [
+        LogLevel.trace,
+        LogLevel.debug,
+        LogLevel.info,
+        LogLevel.warn,
+        LogLevel.error,
+        LogLevel.fatal,
+      ]);
     });
 
     test('addObserver registers observer after construction', () {

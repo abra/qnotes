@@ -26,7 +26,9 @@ class _NoteListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: TextButton(
-        onPressed: () { if (onBackPressed != null) onBackPressed!(); },
+        onPressed: () {
+          if (onBackPressed != null) onBackPressed!();
+        },
         child: const Text('Back'),
       ),
     );
