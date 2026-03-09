@@ -4,11 +4,12 @@
 // composeDependencies() can be called independently in tests
 // with substituted implementations.
 
-import 'package:preferences_repository/preferences_repository.dart';
 import 'package:monitoring/monitoring.dart';
 import 'package:nota/app/config/application_config.dart';
 import 'package:nota/app/dependency_container.dart';
+import 'package:notes_repository/notes_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:preferences_repository/preferences_repository.dart';
 
 /// A place where Application-Wide dependencies are initialized.
 ///
@@ -66,6 +67,7 @@ Future<DependenciesContainer> createDependenciesContainer(
 ) async {
   final packageInfo = await PackageInfo.fromPlatform();
   final preferencesService = await PreferencesService.create();
+  final noteRepository = NotesRepository();
 
   return DependenciesContainer(
     logger: logger,
@@ -73,6 +75,7 @@ Future<DependenciesContainer> createDependenciesContainer(
     errorReporter: errorReporter,
     packageInfo: packageInfo,
     preferencesService: preferencesService,
+    noteRepository: noteRepository,
   );
 }
 

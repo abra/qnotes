@@ -30,6 +30,9 @@ dependencies:
   note_list:
     path: packages/features/note_list
 
+  note_details:
+    path: packages/features/note_details
+
   cupertino_icons: ^1.0.8
   flutter_bloc: ^9.1.1
   package_info_plus: ^9.0.0

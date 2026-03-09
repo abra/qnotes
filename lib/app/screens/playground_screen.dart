@@ -142,17 +142,6 @@ class PlaygroundScreen extends StatelessWidget {
                   },
                   child: const Text('push → /notes/42'),
                 ),
-                const SizedBox(height: Spacing.small),
-                ElevatedButton(
-                  onPressed: () {
-                    // TODO: remove debug logging before release
-                    dependencies.logger.debug(
-                      'PlaygroundScreen: go ${AppRoutes.settings}',
-                    );
-                    context.go(AppRoutes.settings);
-                  },
-                  child: const Text('go → /settings'),
-                ),
               ],
             ),
           ),
