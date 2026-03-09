@@ -49,4 +49,9 @@ class NoteDetailsState extends Equatable {
     color,
     isPinned,
   ];
+
+  @override
+  String toString() =>
+      'NoteDetailsState(status: $status, isNew: $isNew, '
+      'noteId: ${note?.id}, title: "$title", color: $color, isPinned: $isPinned)';
 }

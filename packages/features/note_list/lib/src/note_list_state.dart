@@ -37,4 +37,8 @@ class NoteListState extends Equatable {
 
   @override
   List<Object?> get props => [status, notes, query];
+
+  @override
+  String toString() =>
+      'NoteListState(status: $status, notes: ${notes.length}, query: "$query")';
 }

@@ -17,9 +17,16 @@ class NoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final brightness = Theme.of(context).brightness;
-    final bgColor = note.color == NoteColor.none
-        ? (brightness == Brightness.light ? Colors.white : null)
-        : note.color.forBrightness(brightness);
+    final hasColor = note.color != NoteColor.none;
+    final bgColor = hasColor
+        ? note.color.forBrightness(brightness)
+        : (brightness == Brightness.light ? Colors.white : null);
+
+    // Colored cards always have a light pastel bg — force dark text.
+    // Uncolored cards: use onSurface (bright in dark mode, dark in light mode).
+    final textColor = hasColor
+        ? CatppuccinLatte.text
+        : Theme.of(context).colorScheme.onSurface;
 
     return Card(
       clipBehavior: Clip.antiAlias,
@@ -41,7 +48,9 @@ class NoteCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           note.title!,
-                          style: Theme.of(context).textTheme.titleSmall,
+                          style: Theme.of(
+                            context,
+                          ).textTheme.titleSmall?.copyWith(color: textColor),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -54,9 +63,7 @@ class NoteCard extends StatelessWidget {
                         child: Icon(
                           Icons.push_pin,
                           size: 14,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.6),
+                          color: textColor.withValues(alpha: 0.6),
                         ),
                       ),
                   ],
@@ -65,7 +72,9 @@ class NoteCard extends StatelessWidget {
               ],
               Text(
                 note.content,
-                style: Theme.of(context).textTheme.bodySmall,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: textColor),
                 maxLines: 6,
                 overflow: TextOverflow.ellipsis,
               ),
