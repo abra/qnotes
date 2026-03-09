@@ -73,4 +73,12 @@ class NotesRepository implements NoteRepository {
 
   @override
   Future<void> deleteNote(String id) => _storage.deleteNote(id);
+
+  @override
+  Future<NoteColor?> getLastCreatedNoteColor() async {
+    final raw = await _storage.lastCreatedNoteColor();
+    if (raw == null) return null;
+    final color = NoteColor.from(raw);
+    return color == NoteColor.none ? null : color;
+  }
 }

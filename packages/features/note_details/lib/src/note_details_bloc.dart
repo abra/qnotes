@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/shared.dart';
@@ -19,11 +21,26 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
 
   final NoteRepository _repository;
 
+  static final _colorChoices = NoteColor.values
+      .where((c) => c != NoteColor.none)
+      .toList();
+
+  NoteColor _pickColor(NoteColor? last) {
+    final candidates = last == null
+        ? _colorChoices
+        : _colorChoices.where((c) => c != last).toList();
+    return candidates[Random().nextInt(candidates.length)];
+  }
+
   Future<void> _onStarted(
     NoteDetailsStarted event,
     Emitter<NoteDetailsState> emit,
   ) async {
-    if (event.noteId == null) return;
+    if (event.noteId == null) {
+      final lastColor = await _repository.getLastCreatedNoteColor();
+      emit(state.copyWith(color: _pickColor(lastColor)));
+      return;
+    }
 
     emit(state.copyWith(status: NoteDetailsStatus.loading));
     try {

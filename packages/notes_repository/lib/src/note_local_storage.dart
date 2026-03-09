@@ -52,6 +52,13 @@ class NoteLocalStorage extends _$NoteLocalStorage {
   Future<NotesTableData?> noteById(String id) =>
       (select(notesTable)..where((t) => t.id.equals(id))).getSingleOrNull();
 
+  Future<String?> lastCreatedNoteColor() =>
+      (select(notesTable)
+            ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
+            ..limit(1))
+          .map((row) => row.color)
+          .getSingleOrNull();
+
   Future<void> insertNote(NotesTableCompanion note) =>
       into(notesTable).insert(note);
 

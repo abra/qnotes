@@ -20,4 +20,7 @@ abstract interface class NoteRepository {
 
   /// Deletes a note by [id].
   Future<void> deleteNote(String id);
+
+  /// Returns the color of the most recently created note, or null if none exist.
+  Future<NoteColor?> getLastCreatedNoteColor();
 }

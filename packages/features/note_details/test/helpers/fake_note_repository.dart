@@ -50,4 +50,13 @@ class FakeNoteRepository implements NoteRepository {
   Future<void> deleteNote(String id) async {
     _notes.removeWhere((n) => n.id == id);
   }
+
+  @override
+  Future<NoteColor?> getLastCreatedNoteColor() async {
+    if (_notes.isEmpty) return null;
+    final last = _notes.reduce(
+      (a, b) => a.createdAt.isAfter(b.createdAt) ? a : b,
+    );
+    return last.color == NoteColor.none ? null : last.color;
+  }
 }
