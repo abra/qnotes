@@ -83,30 +83,3 @@ Future<DependenciesContainer> createDependenciesContainer(
     supportedLocales: SupportedLocales.locales,
   );
 }
-
-/// Creates the [Logger] instance and attaches any provided observers.
-Logger createAppLogger({List<LogObserver> observers = const []}) {
-  final logger = Logger();
-
-  for (final observer in observers) {
-    logger.addObserver(observer);
-  }
-
-  return logger;
-}
-
-/// Creates the [ErrorReportingService] instance.
-///
-/// Replace [NoopErrorReporter] with a real implementation (e.g. Crashlytics)
-/// from packages/monitoring when ready.
-Future<ErrorReportingService> createErrorReporter(
-  ApplicationConfig config,
-) async {
-  const errorReporter = NoopErrorReporter();
-
-  if (config.enableSentry) {
-    await errorReporter.initialize();
-  }
-
-  return errorReporter;
-}
