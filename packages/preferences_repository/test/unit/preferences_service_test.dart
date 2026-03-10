@@ -7,6 +7,19 @@ import 'package:preferences_repository/src/preferences_storage.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
+const _supportedCodes = [
+  'en',
+  'zh',
+  'hi',
+  'es',
+  'ar',
+  'fr',
+  'ru',
+  'pt',
+  'de',
+  'ja',
+];
+
 void main() {
   setUp(() {
     SharedPreferencesAsyncPlatform.instance =
@@ -15,13 +28,17 @@ void main() {
 
   group('PreferencesService', () {
     test('create() returns default preferences when prefs is empty', () async {
-      final service = await PreferencesService.create();
+      final service = await PreferencesService.create(
+        supportedCodes: _supportedCodes,
+      );
 
       expect(service.current, const Preferences());
     });
 
     test('update() changes current preferences', () async {
-      final service = await PreferencesService.create();
+      final service = await PreferencesService.create(
+        supportedCodes: _supportedCodes,
+      );
 
       await service.update((s) => s.copyWith(themeMode: ThemeMode.dark));
 
@@ -29,7 +46,9 @@ void main() {
     });
 
     test('update() emits updated preferences on stream', () async {
-      final service = await PreferencesService.create();
+      final service = await PreferencesService.create(
+        supportedCodes: _supportedCodes,
+      );
 
       expectLater(
         service.stream,
@@ -46,19 +65,27 @@ void main() {
     });
 
     test('preferences persist across service recreations', () async {
-      final service = await PreferencesService.create();
+      final service = await PreferencesService.create(
+        supportedCodes: _supportedCodes,
+      );
       await service.update((s) => s.copyWith(themeMode: ThemeMode.dark));
 
-      final service2 = await PreferencesService.create();
+      final service2 = await PreferencesService.create(
+        supportedCodes: _supportedCodes,
+      );
 
       expect(service2.current.themeMode, ThemeMode.dark);
     });
 
     test('persists locale correctly', () async {
-      final service = await PreferencesService.create();
+      final service = await PreferencesService.create(
+        supportedCodes: _supportedCodes,
+      );
       await service.update((s) => s.copyWith(locale: const Locale('ru')));
 
-      final service2 = await PreferencesService.create();
+      final service2 = await PreferencesService.create(
+        supportedCodes: _supportedCodes,
+      );
 
       expect(service2.current.locale, const Locale('ru'));
     });
@@ -66,7 +93,9 @@ void main() {
     test('create() returns defaults when stored data is corrupted', () async {
       await PreferencesStorage().setString('preferences', 'not valid json');
 
-      final service = await PreferencesService.create();
+      final service = await PreferencesService.create(
+        supportedCodes: _supportedCodes,
+      );
 
       expect(service.current, const Preferences());
     });

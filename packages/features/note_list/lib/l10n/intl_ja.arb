@@ -3,7 +3,6 @@
   "selected": "{count} 件選択中",
   "notesDeleted": "{count, plural, one{メモを削除しました} other{{count} 件のメモを削除しました}}",
   "emptyState": "メモがありません",
-  "searchHint": "検索"
-,
+  "searchHint": "検索",
   "noteDeleteFailed": "Failed to delete note"
 }

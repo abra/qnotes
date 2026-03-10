@@ -13,5 +13,5 @@ export 'src/exceptions/note_storage_exception.dart';
 export 'src/interfaces/note_repository.dart';
 export 'src/models/note.dart';
 export 'src/models/note_color.dart';
-export 'src/models/note_view_mode.dart';
 export 'src/models/note_list_density.dart';
+export 'src/models/note_view_mode.dart';

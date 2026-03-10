@@ -3,8 +3,7 @@
   "newNote": "新建笔记",
   "editNote": "编辑笔记",
   "titleHint": "标题",
-  "contentHint": "开始输入..."
-,
+  "contentHint": "开始输入...",
   "noteNotFound": "Note not found",
   "noteLoadFailed": "Failed to load note",
   "noteSaveFailed": "Failed to save note"

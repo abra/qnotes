@@ -3,8 +3,7 @@
   "newNote": "新しいメモ",
   "editNote": "メモを編集",
   "titleHint": "タイトル",
-  "contentHint": "入力を開始..."
-,
+  "contentHint": "入力を開始...",
   "noteNotFound": "Note not found",
   "noteLoadFailed": "Failed to load note",
   "noteSaveFailed": "Failed to save note"

@@ -3,8 +3,7 @@
   "newNote": "Nova nota",
   "editNote": "Editar nota",
   "titleHint": "Título",
-  "contentHint": "Comece a escrever..."
-,
+  "contentHint": "Comece a escrever...",
   "noteNotFound": "Note not found",
   "noteLoadFailed": "Failed to load note",
   "noteSaveFailed": "Failed to save note"

@@ -26,6 +26,7 @@ class _FakePreferencesService {
   final StreamController<Preferences> _controller;
 
   Preferences get current => _current;
+
   Stream<Preferences> get stream => _controller.stream;
 
   void emit(Preferences p) {

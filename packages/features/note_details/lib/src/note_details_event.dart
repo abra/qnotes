@@ -4,6 +4,7 @@ sealed class NoteDetailsEvent {}
 
 class NoteDetailsStarted extends NoteDetailsEvent {
   NoteDetailsStarted({this.noteId});
+
   final String? noteId;
 
   @override
@@ -12,6 +13,7 @@ class NoteDetailsStarted extends NoteDetailsEvent {
 
 class NoteDetailsTitleChanged extends NoteDetailsEvent {
   NoteDetailsTitleChanged(this.title);
+
   final String title;
 
   @override
@@ -20,6 +22,7 @@ class NoteDetailsTitleChanged extends NoteDetailsEvent {
 
 class NoteDetailsContentChanged extends NoteDetailsEvent {
   NoteDetailsContentChanged(this.content);
+
   final String content;
 
   @override
@@ -29,6 +32,7 @@ class NoteDetailsContentChanged extends NoteDetailsEvent {
 
 class NoteDetailsColorChanged extends NoteDetailsEvent {
   NoteDetailsColorChanged(this.color);
+
   final NoteColor color;
 
   @override

@@ -3,13 +3,17 @@
   "selected": "{count} selected",
   "@selected": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "notesDeleted": "{count, plural, one{Note deleted} other{{count} notes deleted}}",
   "@notesDeleted": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "emptyState": "No notes yet",

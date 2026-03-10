@@ -3,7 +3,6 @@
   "selected": "{count} selecionados",
   "notesDeleted": "{count, plural, one{Nota excluída} other{{count} notas excluídas}}",
   "emptyState": "Sem notas",
-  "searchHint": "Pesquisar"
-,
+  "searchHint": "Pesquisar",
   "noteDeleteFailed": "Failed to delete note"
 }

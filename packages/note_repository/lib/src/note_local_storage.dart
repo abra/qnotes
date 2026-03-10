@@ -19,11 +19,15 @@ part 'note_local_storage.g.dart';
 
 class NotesTable extends Table {
   TextColumn get id => text()();
+
   TextColumn get title => text().nullable()();
+
   TextColumn get content => text()();
+
   TextColumn get createdAt => text()(); // ISO 8601
   TextColumn get updatedAt => text()(); // ISO 8601
   BoolColumn get isPinned => boolean().withDefault(const Constant(false))();
+
   TextColumn get color => text().withDefault(const Constant('none'))();
 
   @override

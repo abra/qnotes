@@ -9,6 +9,7 @@ class NoteListStarted extends NoteListEvent {
 
 class NoteListNoteDeleted extends NoteListEvent {
   NoteListNoteDeleted(this.id);
+
   final String id;
 
   @override
@@ -17,6 +18,7 @@ class NoteListNoteDeleted extends NoteListEvent {
 
 class NoteListQueryChanged extends NoteListEvent {
   NoteListQueryChanged(this.query);
+
   final String query;
 
   @override
@@ -25,6 +27,7 @@ class NoteListQueryChanged extends NoteListEvent {
 
 class NoteListSelectionToggled extends NoteListEvent {
   NoteListSelectionToggled(this.id);
+
   final String id;
 
   @override

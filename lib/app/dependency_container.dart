@@ -4,6 +4,8 @@
 // singletons or a service locator. This keeps dependencies explicit and makes
 // them easy to substitute in tests via TestDependenciesContainer.
 
+import 'dart:ui' show Locale;
+
 import 'package:monitoring/monitoring.dart';
 import 'package:nota/app/config/application_config.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -19,6 +21,8 @@ class DependenciesContainer {
     required this.packageInfo,
     required this.preferencesService,
     required this.noteRepository,
+    required this.supportedLanguages,
+    required this.supportedLocales,
   });
 
   final Logger logger;
@@ -27,6 +31,8 @@ class DependenciesContainer {
   final PackageInfo packageInfo;
   final PreferencesService preferencesService;
   final NoteRepository noteRepository;
+  final List<SupportedLanguage> supportedLanguages;
+  final List<Locale> supportedLocales;
 }
 
 /// A special version of [DependenciesContainer] that is used in tests.

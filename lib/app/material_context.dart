@@ -7,13 +7,13 @@ import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:toastification/toastification.dart';
 import 'package:nota/app/dependency_scope.dart';
 import 'package:nota/app/preferences_scope.dart';
 import 'package:nota/app/router/app_router.dart';
 import 'package:note_details/note_details.dart';
 import 'package:note_list/note_list.dart';
 import 'package:preferences_bottom_sheet/preferences_bottom_sheet.dart';
+import 'package:toastification/toastification.dart';
 
 /// Entry point for the application that creates [MaterialApp.router].
 class MaterialContext extends StatefulWidget {
@@ -45,6 +45,7 @@ class _MaterialContextState extends State<MaterialContext> {
   @override
   Widget build(BuildContext context) {
     final preferences = PreferencesScope.of(context);
+    final dependencies = DependenciesScope.of(context);
 
     const lightTheme = LightAppThemeData();
     const darkTheme = DarkAppThemeData();
@@ -59,18 +60,7 @@ class _MaterialContextState extends State<MaterialContext> {
           theme: lightTheme.materialThemeData,
           darkTheme: darkTheme.materialThemeData,
           locale: preferences.locale,
-          supportedLocales: const [
-            Locale('en'),
-            Locale('zh'),
-            Locale('hi'),
-            Locale('es'),
-            Locale('ar'),
-            Locale('fr'),
-            Locale('ru'),
-            Locale('pt'),
-            Locale('de'),
-            Locale('ja'),
-          ],
+          supportedLocales: dependencies.supportedLocales,
           localizationsDelegates: const [
             NoteListLocalizations.delegate,
             NoteDetailsLocalizations.delegate,

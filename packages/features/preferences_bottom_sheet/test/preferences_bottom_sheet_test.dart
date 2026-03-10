@@ -4,10 +4,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:preferences_bottom_sheet/preferences_bottom_sheet.dart';
 import 'package:preferences_repository/preferences_repository.dart';
 import 'package:shared/shared.dart';
-import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
-Future<PreferencesService> _createService() => PreferencesService.create();
+const _testLanguages = <SupportedLanguage>[
+  (code: 'en', name: 'English'),
+  (code: 'ru', name: 'Русский'),
+];
+
+Future<PreferencesService> _createService() => PreferencesService.create(
+  supportedCodes: _testLanguages.map((l) => l.code).toList(),
+);
 
 Widget _buildSheet(PreferencesService service) {
   return MaterialApp(
@@ -17,7 +24,12 @@ Widget _buildSheet(PreferencesService service) {
       GlobalWidgetsLocalizations.delegate,
     ],
     supportedLocales: const [Locale('en'), Locale('ru')],
-    home: Scaffold(body: PreferencesBottomSheet(preferencesService: service)),
+    home: Scaffold(
+      body: PreferencesBottomSheet(
+        preferencesService: service,
+        supportedLanguages: _testLanguages,
+      ),
+    ),
   );
 }
 

@@ -1,5 +1,5 @@
-import 'package:test/test.dart';
 import 'package:shared/shared.dart';
+import 'package:test/test.dart';
 
 Note _note({
   String id = '1',

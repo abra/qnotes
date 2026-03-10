@@ -6,25 +6,6 @@ import 'package:shared/shared.dart';
 import 'l10n/preferences_localizations.dart';
 
 // ---------------------------------------------------------------------------
-// Supported languages
-// ---------------------------------------------------------------------------
-
-typedef _Language = ({String code, String name});
-
-const _supportedLanguages = <_Language>[
-  (code: 'en', name: 'English'),
-  (code: 'zh', name: '中文（简体）'),
-  (code: 'hi', name: 'हिन्दी'),
-  (code: 'es', name: 'Español'),
-  (code: 'ar', name: 'العربية'),
-  (code: 'fr', name: 'Français'),
-  (code: 'ru', name: 'Русский'),
-  (code: 'pt', name: 'Português'),
-  (code: 'de', name: 'Deutsch'),
-  (code: 'ja', name: '日本語'),
-];
-
-// ---------------------------------------------------------------------------
 // Sheet pages
 // ---------------------------------------------------------------------------
 
@@ -35,9 +16,14 @@ enum _Page { main, language }
 // ---------------------------------------------------------------------------
 
 class PreferencesBottomSheet extends StatefulWidget {
-  const PreferencesBottomSheet({super.key, required this.preferencesService});
+  const PreferencesBottomSheet({
+    super.key,
+    required this.preferencesService,
+    required this.supportedLanguages,
+  });
 
   final PreferencesService preferencesService;
+  final List<SupportedLanguage> supportedLanguages;
 
   @override
   State<PreferencesBottomSheet> createState() => _PreferencesBottomSheetState();
@@ -47,6 +33,7 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
   _Page _page = _Page.main;
 
   void _goToLanguage() => setState(() => _page = _Page.language);
+
   void _goToMain() => setState(() => _page = _Page.main);
 
   @override
@@ -69,11 +56,13 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
                       key: const ValueKey(_Page.main),
                       prefs: prefs,
                       preferencesService: widget.preferencesService,
+                      supportedLanguages: widget.supportedLanguages,
                       onLanguageTap: _goToLanguage,
                     )
                   : _LanguagePage(
                       key: const ValueKey(_Page.language),
                       selectedCode: prefs.locale.languageCode,
+                      supportedLanguages: widget.supportedLanguages,
                       onSelected: (code) {
                         widget.preferencesService.update(
                           (p) => p.copyWith(locale: Locale(code)),
@@ -117,17 +106,19 @@ class _MainPage extends StatelessWidget {
     super.key,
     required this.prefs,
     required this.preferencesService,
+    required this.supportedLanguages,
     required this.onLanguageTap,
   });
 
   final Preferences prefs;
   final PreferencesService preferencesService;
+  final List<SupportedLanguage> supportedLanguages;
   final VoidCallback onLanguageTap;
 
   @override
   Widget build(BuildContext context) {
     final l10n = PreferencesLocalizations.of(context)!;
-    final selectedLanguage = _supportedLanguages.firstWhere(
+    final selectedLanguage = supportedLanguages.firstWhere(
       (l) => l.code == prefs.locale.languageCode,
       orElse: () => (
         code: prefs.locale.languageCode,
@@ -258,11 +249,13 @@ class _LanguagePage extends StatefulWidget {
   const _LanguagePage({
     super.key,
     required this.selectedCode,
+    required this.supportedLanguages,
     required this.onSelected,
     required this.onBack,
   });
 
   final String selectedCode;
+  final List<SupportedLanguage> supportedLanguages;
   final ValueChanged<String> onSelected;
   final VoidCallback onBack;
 
@@ -273,10 +266,10 @@ class _LanguagePage extends StatefulWidget {
 class _LanguagePageState extends State<_LanguagePage> {
   var _query = '';
 
-  List<_Language> get _filtered {
-    if (_query.isEmpty) return _supportedLanguages;
+  List<SupportedLanguage> get _filtered {
+    if (_query.isEmpty) return widget.supportedLanguages;
     final q = _query.toLowerCase();
-    return _supportedLanguages
+    return widget.supportedLanguages
         .where((l) => l.name.toLowerCase().contains(q) || l.code.contains(q))
         .toList();
   }

@@ -3,7 +3,6 @@
   "selected": "{count} ausgewählt",
   "notesDeleted": "{count, plural, one{Notiz gelöscht} other{{count} Notizen gelöscht}}",
   "emptyState": "Keine Notizen",
-  "searchHint": "Suchen"
-,
+  "searchHint": "Suchen",
   "noteDeleteFailed": "Failed to delete note"
 }

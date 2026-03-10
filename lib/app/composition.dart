@@ -6,6 +6,7 @@
 
 import 'package:monitoring/monitoring.dart';
 import 'package:nota/app/config/application_config.dart';
+import 'package:nota/app/config/supported_locales.dart';
 import 'package:nota/app/dependency_container.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -66,7 +67,9 @@ Future<DependenciesContainer> createDependenciesContainer(
   ErrorReportingService errorReporter,
 ) async {
   final packageInfo = await PackageInfo.fromPlatform();
-  final preferencesService = await PreferencesService.create();
+  final preferencesService = await PreferencesService.create(
+    supportedCodes: SupportedLocales.codes,
+  );
   final noteRepository = NoteRepositoryImpl();
 
   return DependenciesContainer(
@@ -76,6 +79,8 @@ Future<DependenciesContainer> createDependenciesContainer(
     packageInfo: packageInfo,
     preferencesService: preferencesService,
     noteRepository: noteRepository,
+    supportedLanguages: SupportedLocales.languages,
+    supportedLocales: SupportedLocales.locales,
   );
 }
 

@@ -3,8 +3,7 @@
   "newNote": "ملاحظة جديدة",
   "editNote": "تعديل الملاحظة",
   "titleHint": "العنوان",
-  "contentHint": "ابدأ الكتابة..."
-,
+  "contentHint": "ابدأ الكتابة...",
   "noteNotFound": "Note not found",
   "noteLoadFailed": "Failed to load note",
   "noteSaveFailed": "Failed to save note"

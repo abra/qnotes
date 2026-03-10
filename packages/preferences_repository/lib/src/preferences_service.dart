@@ -18,9 +18,11 @@ class PreferencesService {
   final _controller = StreamController<Preferences>.broadcast();
   Preferences _current;
 
-  static Future<PreferencesService> create() async {
+  static Future<PreferencesService> create({
+    required List<String> supportedCodes,
+  }) async {
     final prefs = PreferencesStorage();
-    final settings = await _load(prefs);
+    final settings = await _load(prefs, supportedCodes);
     return PreferencesService._(prefs, settings);
   }
 
@@ -28,33 +30,26 @@ class PreferencesService {
 
   Preferences get current => _current;
 
+  // Future<void> dispose() => _controller.close();
+
   Future<void> update(Preferences Function(Preferences) transform) async {
     _current = transform(_current);
     await _save(_prefs, _current);
     _controller.add(_current);
   }
 
-  static const _supportedLocales = [
-    'en',
-    'zh',
-    'hi',
-    'es',
-    'ar',
-    'fr',
-    'ru',
-    'pt',
-    'de',
-    'ja',
-  ];
-
-  static Locale _resolveInitialLocale() {
+  static Locale _resolveInitialLocale(List<String> supportedCodes) {
     final code = PlatformDispatcher.instance.locale.languageCode;
-    return Locale(_supportedLocales.contains(code) ? code : 'en');
+    return Locale(supportedCodes.contains(code) ? code : 'en');
   }
 
-  static Future<Preferences> _load(PreferencesStorage prefs) async {
+  static Future<Preferences> _load(
+    PreferencesStorage prefs,
+    List<String> supportedCodes,
+  ) async {
     final json = await prefs.getString(_key);
-    if (json == null) return Preferences(locale: _resolveInitialLocale());
+    if (json == null)
+      return Preferences(locale: _resolveInitialLocale(supportedCodes));
     try {
       final map = jsonDecode(json) as Map<String, Object?>;
       return Preferences(

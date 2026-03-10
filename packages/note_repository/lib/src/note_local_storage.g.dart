@@ -8,7 +8,9 @@ class $NotesTableTable extends NotesTable
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
+
   $NotesTableTable(this.attachedDatabase, [this._alias]);
+
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
@@ -85,6 +87,7 @@ class $NotesTableTable extends NotesTable
     requiredDuringInsert: false,
     defaultValue: const Constant('none'),
   );
+
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -95,11 +98,14 @@ class $NotesTableTable extends NotesTable
     isPinned,
     color,
   ];
+
   @override
   String get aliasedName => _alias ?? actualTableName;
+
   @override
   String get actualTableName => $name;
   static const String $name = 'notes_table';
+
   @override
   VerificationContext validateIntegrity(
     Insertable<NotesTableData> instance, {
@@ -159,6 +165,7 @@ class $NotesTableTable extends NotesTable
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
+
   @override
   NotesTableData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
@@ -208,6 +215,7 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
   final String updatedAt;
   final bool isPinned;
   final String color;
+
   const NotesTableData({
     required this.id,
     this.title,
@@ -217,6 +225,7 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
     required this.isPinned,
     required this.color,
   });
+
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -261,6 +270,7 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
       color: serializer.fromJson<String>(json['color']),
     );
   }
+
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
@@ -292,6 +302,7 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
     isPinned: isPinned ?? this.isPinned,
     color: color ?? this.color,
   );
+
   NotesTableData copyWithCompanion(NotesTableCompanion data) {
     return NotesTableData(
       id: data.id.present ? data.id.value : this.id,
@@ -321,6 +332,7 @@ class NotesTableData extends DataClass implements Insertable<NotesTableData> {
   @override
   int get hashCode =>
       Object.hash(id, title, content, createdAt, updatedAt, isPinned, color);
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -343,6 +355,7 @@ class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
   final Value<bool> isPinned;
   final Value<String> color;
   final Value<int> rowid;
+
   const NotesTableCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -353,6 +366,7 @@ class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
     this.color = const Value.absent(),
     this.rowid = const Value.absent(),
   });
+
   NotesTableCompanion.insert({
     required String id,
     this.title = const Value.absent(),
@@ -366,6 +380,7 @@ class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
        content = Value(content),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
+
   static Insertable<NotesTableData> custom({
     Expression<String>? id,
     Expression<String>? title,
@@ -458,11 +473,14 @@ class NotesTableCompanion extends UpdateCompanion<NotesTableData> {
 
 abstract class _$NoteLocalStorage extends GeneratedDatabase {
   _$NoteLocalStorage(QueryExecutor e) : super(e);
+
   $NoteLocalStorageManager get managers => $NoteLocalStorageManager(this);
   late final $NotesTableTable notesTable = $NotesTableTable(this);
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
+
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [notesTable];
 }
@@ -499,6 +517,7 @@ class $$NotesTableTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
@@ -544,6 +563,7 @@ class $$NotesTableTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
@@ -589,6 +609,7 @@ class $$NotesTableTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
+
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
@@ -712,7 +733,9 @@ typedef $$NotesTableTableProcessedTableManager =
 
 class $NoteLocalStorageManager {
   final _$NoteLocalStorage _db;
+
   $NoteLocalStorageManager(this._db);
+
   $$NotesTableTableTableManager get notesTable =>
       $$NotesTableTableTableManager(_db, _db.notesTable);
 }
