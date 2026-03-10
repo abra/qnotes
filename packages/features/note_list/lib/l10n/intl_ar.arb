@@ -1,0 +1,7 @@
+{
+  "@@locale": "ar",
+  "selected": "{count} محدد",
+  "notesDeleted": "{count, plural, one{تم حذف الملاحظة} other{تم حذف {count} ملاحظات}}",
+  "emptyState": "لا توجد ملاحظات",
+  "searchHint": "بحث"
+}

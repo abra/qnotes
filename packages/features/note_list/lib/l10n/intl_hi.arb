@@ -1,0 +1,7 @@
+{
+  "@@locale": "hi",
+  "selected": "{count} चुने गए",
+  "notesDeleted": "{count, plural, one{नोट हटाया गया} other{{count} नोट हटाए गए}}",
+  "emptyState": "अभी कोई नोट नहीं",
+  "searchHint": "खोजें"
+}

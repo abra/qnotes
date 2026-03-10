@@ -1,0 +1,28 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'preferences_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for Hindi (`hi`).
+class PreferencesLocalizationsHi extends PreferencesLocalizations {
+  PreferencesLocalizationsHi([String locale = 'hi']) : super(locale);
+
+  @override
+  String get preferences => 'प्राथमिकताएं';
+
+  @override
+  String get theme => 'थीम';
+
+  @override
+  String get notesView => 'नोट्स दृश्य';
+
+  @override
+  String get listDensity => 'सूची घनत्व';
+
+  @override
+  String get language => 'भाषा';
+
+  @override
+  String get searchHint => 'खोजें';
+}

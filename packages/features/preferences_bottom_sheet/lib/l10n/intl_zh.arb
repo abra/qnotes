@@ -1,0 +1,9 @@
+{
+  "@@locale": "zh",
+  "preferences": "首选项",
+  "theme": "主题",
+  "notesView": "笔记视图",
+  "listDensity": "列表密度",
+  "language": "语言",
+  "searchHint": "搜索"
+}

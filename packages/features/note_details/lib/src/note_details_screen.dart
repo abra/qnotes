@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/shared.dart';
 
+import 'l10n/note_details_localizations.dart';
 import 'note_details_bloc.dart';
 
 part 'note_color_picker.dart';
@@ -101,6 +102,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
           },
           child: Builder(
             builder: (context) {
+              final l10n = NoteDetailsLocalizations.of(context)!;
               final brightness = Theme.of(context).brightness;
               final hasColor = state.color != NoteColor.none;
               final textColor = hasColor
@@ -131,7 +133,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                             ),
                             Expanded(
                               child: Text(
-                                state.isNew ? 'New note' : 'Edit note',
+                                state.isNew ? l10n.newNote : l10n.editNote,
                                 style: Theme.of(context).textTheme.titleMedium
                                     ?.copyWith(color: textColor),
                                 textAlign: TextAlign.center,
@@ -169,7 +171,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                                       color: textColor,
                                     ),
                                 decoration: InputDecoration(
-                                  hintText: 'Title',
+                                  hintText: l10n.titleHint,
                                   hintStyle: TextStyle(color: hintColor),
                                   border: InputBorder.none,
                                   isDense: true,
@@ -204,7 +206,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                               context,
                             ).textTheme.bodyLarge?.copyWith(color: textColor),
                             decoration: InputDecoration(
-                              hintText: 'Start typing...',
+                              hintText: l10n.contentHint,
                               hintStyle: TextStyle(color: hintColor),
                               border: InputBorder.none,
                               isDense: true,

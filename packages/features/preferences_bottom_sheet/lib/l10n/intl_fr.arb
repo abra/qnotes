@@ -1,0 +1,9 @@
+{
+  "@@locale": "fr",
+  "preferences": "Préférences",
+  "theme": "Thème",
+  "notesView": "Vue des notes",
+  "listDensity": "Densité de liste",
+  "language": "Langue",
+  "searchHint": "Rechercher"
+}

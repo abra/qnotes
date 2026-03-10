@@ -10,6 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
   preferences_repository:
     path: ../../preferences_repository
   shared:
@@ -25,3 +28,4 @@ dev_dependencies:
   shared_preferences_platform_interface: ^2.4.1
 
 flutter:
+  generate: true

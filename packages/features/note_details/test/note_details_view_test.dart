@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:note_details/src/l10n/note_details_localizations.dart';
 import 'package:note_details/src/note_details_bloc.dart';
 import 'package:note_details/src/note_details_screen.dart';
 import 'package:shared/shared.dart';
@@ -17,6 +19,12 @@ final _existingNote = Note(
 
 Widget _buildView(NoteDetailsBloc bloc, {VoidCallback? onBackPressed}) {
   return MaterialApp(
+    localizationsDelegates: const [
+      NoteDetailsLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+    ],
+    supportedLocales: const [Locale('en')],
     home: BlocProvider<NoteDetailsBloc>.value(
       value: bloc,
       child: NoteDetailsView(onBackPressed: onBackPressed),

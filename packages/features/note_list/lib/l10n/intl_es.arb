@@ -1,0 +1,7 @@
+{
+  "@@locale": "es",
+  "selected": "{count} seleccionados",
+  "notesDeleted": "{count, plural, one{Nota eliminada} other{{count} notas eliminadas}}",
+  "emptyState": "No hay notas",
+  "searchHint": "Buscar"
+}

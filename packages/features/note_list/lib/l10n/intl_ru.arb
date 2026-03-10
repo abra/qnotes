@@ -1,0 +1,7 @@
+{
+  "@@locale": "ru",
+  "selected": "{count} выбрано",
+  "notesDeleted": "{count, plural, one{Заметка удалена} other{{count} заметки удалены}}",
+  "emptyState": "Нет заметок",
+  "searchHint": "Поиск"
+}

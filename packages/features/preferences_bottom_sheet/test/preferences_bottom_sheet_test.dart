@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:preferences_bottom_sheet/preferences_bottom_sheet.dart';
+import 'package:preferences_bottom_sheet/src/l10n/preferences_localizations.dart';
 import 'package:preferences_repository/preferences_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
@@ -10,6 +12,12 @@ Future<PreferencesService> _createService() => PreferencesService.create();
 
 Widget _buildSheet(PreferencesService service) {
   return MaterialApp(
+    localizationsDelegates: const [
+      PreferencesLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+    ],
+    supportedLocales: const [Locale('en'), Locale('ru')],
     home: Scaffold(body: PreferencesBottomSheet(preferencesService: service)),
   );
 }
@@ -28,30 +36,35 @@ void main() {
       expect(find.text('Preferences'), findsOneWidget);
     });
 
-    testWidgets('shows Theme, Notes view, Language labels', (tester) async {
+    testWidgets('shows Theme, Notes view, List density, Language labels', (
+      tester,
+    ) async {
       final service = await _createService();
       await tester.pumpWidget(_buildSheet(service));
 
       expect(find.text('Theme'), findsOneWidget);
       expect(find.text('Notes view'), findsOneWidget);
+      expect(find.text('List density'), findsOneWidget);
       expect(find.text('Language'), findsOneWidget);
     });
 
-    testWidgets('shows four SegmentedButtons', (tester) async {
-      final service = await _createService();
-      await tester.pumpWidget(_buildSheet(service));
+    testWidgets(
+      'shows three SegmentedButtons (Theme, Notes view, List density)',
+      (tester) async {
+        final service = await _createService();
+        await tester.pumpWidget(_buildSheet(service));
 
-      expect(
-        find.byWidgetPredicate((w) => w is SegmentedButton),
-        findsNWidgets(4),
-      );
-    });
+        expect(
+          find.byWidgetPredicate((w) => w is SegmentedButton),
+          findsNWidgets(3),
+        );
+      },
+    );
 
     testWidgets('shows drag handle', (tester) async {
       final service = await _createService();
       await tester.pumpWidget(_buildSheet(service));
 
-      // Drag handle is a Container with fixed width 32 and height 4
       final containers = tester
           .widgetList<Container>(find.byType(Container))
           .where((c) {
@@ -66,7 +79,6 @@ void main() {
       final service = await _createService();
       await tester.pumpWidget(_buildSheet(service));
 
-      // Tap "Dark" segment (Icons.dark_mode)
       await tester.tap(find.byIcon(Icons.dark_mode));
       await tester.pump();
 
@@ -77,35 +89,64 @@ void main() {
       final service = await _createService();
       await tester.pumpWidget(_buildSheet(service));
 
-      // Tap "List" segment (Icons.list)
       await tester.tap(find.byIcon(Icons.list));
       await tester.pump();
 
       expect(service.current.noteViewMode, NoteViewMode.list);
     });
 
-    testWidgets('updates locale to RU on segment tap', (tester) async {
+    testWidgets('shows current language name on main page', (tester) async {
       final service = await _createService();
       await tester.pumpWidget(_buildSheet(service));
 
-      await tester.tap(find.text('RU'));
+      expect(find.text('English'), findsOneWidget);
+    });
+
+    testWidgets('navigates to language page on language tap', (tester) async {
+      final service = await _createService();
+      await tester.pumpWidget(_buildSheet(service));
+
+      await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Language'), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
+    });
+
+    testWidgets('updates locale to RU via language page', (tester) async {
+      final service = await _createService();
+      await tester.pumpWidget(_buildSheet(service));
+
+      await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), 'ru');
       await tester.pump();
+      await tester.tap(find.text('Русский'));
+      await tester.pumpAndSettle();
 
       expect(service.current.locale.languageCode, 'ru');
     });
 
-    testWidgets('rebuilds when service emits new preferences', (tester) async {
+    testWidgets('back arrow returns to main page', (tester) async {
       final service = await _createService();
       await tester.pumpWidget(_buildSheet(service));
 
-      // Default: system theme selected → verify EN is selected
+      await tester.tap(find.text('English'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Preferences'), findsOneWidget);
+    });
+
+    testWidgets('rebuilds when service emits new locale', (tester) async {
+      final service = await _createService();
+      await tester.pumpWidget(_buildSheet(service));
+
       await service.update((p) => p.copyWith(locale: const Locale('ru')));
       await tester.pump();
 
-      // After update the SegmentedButton for Language should reflect 'ru'
-      // The selected segment highlights — just verify no exception is thrown
-      // and the widget is still rendered.
-      expect(find.text('Language'), findsOneWidget);
+      expect(find.text('Русский'), findsOneWidget);
     });
   });
 }

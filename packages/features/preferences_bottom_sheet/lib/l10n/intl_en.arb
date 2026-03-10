@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+  "preferences": "Preferences",
+  "@preferences": {},
+  "theme": "Theme",
+  "@theme": {},
+  "notesView": "Notes view",
+  "@notesView": {},
+  "listDensity": "List density",
+  "@listDensity": {},
+  "language": "Language",
+  "@language": {},
+  "searchHint": "Search",
+  "@searchHint": {}
+}

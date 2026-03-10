@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "newNote": "New note",
+  "@newNote": {},
+  "editNote": "Edit note",
+  "@editNote": {},
+  "titleHint": "Title",
+  "@titleHint": {},
+  "contentHint": "Start typing...",
+  "@contentHint": {}
+}

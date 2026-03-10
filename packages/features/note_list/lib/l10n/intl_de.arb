@@ -1,0 +1,7 @@
+{
+  "@@locale": "de",
+  "selected": "{count} ausgewählt",
+  "notesDeleted": "{count, plural, one{Notiz gelöscht} other{{count} Notizen gelöscht}}",
+  "emptyState": "Keine Notizen",
+  "searchHint": "Suchen"
+}

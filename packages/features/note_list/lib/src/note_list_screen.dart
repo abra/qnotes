@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:preferences_repository/preferences_repository.dart';
 import 'package:shared/shared.dart';
 
+import 'l10n/note_list_localizations.dart';
 import 'note_list_bloc.dart';
 import 'note_paged_grid_view.dart';
 import 'note_paged_list_view.dart';
@@ -109,21 +110,23 @@ class _NoteListScaffold extends StatelessWidget {
 
   void _deleteSelected(BuildContext context) {
     final count = state.selectedIds.length;
+    final l10n = NoteListLocalizations.of(context)!;
     context.read<NoteListBloc>().add(NoteListSelectedDeleted());
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$count ${count == 1 ? 'note' : 'notes'} deleted'),
+        content: Text(l10n.notesDeleted(count)),
         duration: const Duration(seconds: 2),
       ),
     );
   }
 
   void _deleteNote(BuildContext context, String id) {
+    final l10n = NoteListLocalizations.of(context)!;
     context.read<NoteListBloc>().add(NoteListNoteDeleted(id));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Note deleted'),
-        duration: Duration(seconds: 2),
+      SnackBar(
+        content: Text(l10n.notesDeleted(1)),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -132,6 +135,7 @@ class _NoteListScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final bloc = context.read<NoteListBloc>();
     final notes = state.filteredNotes;
+    final l10n = NoteListLocalizations.of(context)!;
 
     return Scaffold(
       appBar: state.isSelectionMode
@@ -140,7 +144,7 @@ class _NoteListScaffold extends StatelessWidget {
                 icon: const Icon(Icons.close),
                 onPressed: () => bloc.add(NoteListSelectionCleared()),
               ),
-              title: Text('${state.selectedIds.length} selected'),
+              title: Text(l10n.selected(state.selectedIds.length)),
               actions: [
                 IconButton(
                   icon: const Icon(Icons.delete_outline),
@@ -163,7 +167,7 @@ class _NoteListScaffold extends StatelessWidget {
             if (state.status == NoteListStatus.loading)
               const Center(child: CircularProgressIndicator())
             else if (notes.isEmpty && !state.isSelectionMode)
-              const Center(child: Text('No notes yet'))
+              Center(child: Text(l10n.emptyState))
             else if (viewMode == NoteViewMode.grid)
               NotePagedGridView(
                 notes: notes,
@@ -222,6 +226,7 @@ class _BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = NoteListLocalizations.of(context)!;
     return ColoredBox(
       color: Theme.of(context).colorScheme.surface,
       child: Padding(
@@ -234,10 +239,10 @@ class _BottomBar extends StatelessWidget {
             Expanded(
               child: TextField(
                 onChanged: onQueryChanged,
-                decoration: const InputDecoration(
-                  hintText: 'Search',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: l10n.searchHint,
+                  prefixIcon: const Icon(Icons.search),
+                  border: const OutlineInputBorder(),
                   isDense: true,
                 ),
               ),

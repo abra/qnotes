@@ -1,0 +1,9 @@
+{
+  "@@locale": "ru",
+  "preferences": "Настройки",
+  "theme": "Тема",
+  "notesView": "Вид заметок",
+  "listDensity": "Плотность списка",
+  "language": "Язык",
+  "searchHint": "Поиск"
+}
