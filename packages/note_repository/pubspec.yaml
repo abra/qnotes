@@ -1,4 +1,4 @@
-name: notes_repository
+name: note_repository
 description: "Note persistence: SQLite storage via drift."
 publish_to: none
 version: 0.1.0

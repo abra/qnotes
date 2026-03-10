@@ -1,6 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:notes_repository/notes_repository.dart';
+import 'package:note_repository/note_repository.dart';
 import 'package:shared/shared.dart';
 
 NoteLocalStorage _openInMemory() =>
@@ -75,13 +75,13 @@ void main() {
     });
   });
 
-  group('NotesRepository', () {
+  group('NoteRepositoryImpl', () {
     late NoteLocalStorage storage;
-    late NotesRepository repo;
+    late NoteRepositoryImpl repo;
 
     setUp(() {
       storage = _openInMemory();
-      repo = NotesRepository(localStorage: storage);
+      repo = NoteRepositoryImpl(localStorage: storage);
     });
     tearDown(() => storage.close());
 

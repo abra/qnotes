@@ -17,8 +17,8 @@ dependencies:
   flutter_bloc: ^9.1.1
   shared:
     path: ../../shared
-  notes_repository:
-    path: ../../notes_repository
+  note_repository:
+    path: ../../note_repository
   preferences_repository:
     path: ../../preferences_repository
   component_library:

@@ -4,8 +4,8 @@ import 'package:shared/shared.dart';
 import 'note_local_storage.dart';
 
 /// Concrete implementation of [NoteRepository] backed by SQLite via drift.
-class NotesRepository implements NoteRepository {
-  NotesRepository({@visibleForTesting NoteLocalStorage? localStorage})
+class NoteRepositoryImpl implements NoteRepository {
+  NoteRepositoryImpl({@visibleForTesting NoteLocalStorage? localStorage})
     : _storage = localStorage ?? NoteLocalStorage();
 
   final NoteLocalStorage _storage;

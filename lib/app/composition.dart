@@ -7,7 +7,7 @@
 import 'package:monitoring/monitoring.dart';
 import 'package:nota/app/config/application_config.dart';
 import 'package:nota/app/dependency_container.dart';
-import 'package:notes_repository/notes_repository.dart';
+import 'package:note_repository/note_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:preferences_repository/preferences_repository.dart';
 
@@ -67,7 +67,7 @@ Future<DependenciesContainer> createDependenciesContainer(
 ) async {
   final packageInfo = await PackageInfo.fromPlatform();
   final preferencesService = await PreferencesService.create();
-  final noteRepository = NotesRepository();
+  final noteRepository = NoteRepositoryImpl();
 
   return DependenciesContainer(
     logger: logger,
