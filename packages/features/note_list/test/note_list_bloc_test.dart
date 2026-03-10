@@ -89,6 +89,7 @@ void main() {
         'updates query in state',
         build: () => NoteListBloc(noteRepository: repo),
         act: (bloc) => bloc.add(NoteListQueryChanged('hello')),
+        wait: const Duration(milliseconds: 350),
         expect: () => [const NoteListState(query: 'hello')],
       );
     });

@@ -8,7 +8,7 @@ class FakeNoteRepository implements NoteRepository {
 
   @override
   Future<List<Note>> getNotes() async {
-    if (shouldThrow) throw Exception('getNotes failed');
+    if (shouldThrow) throw const NoteStorageException(cause: 'getNotes failed');
     return List.of(_notes);
   }
 

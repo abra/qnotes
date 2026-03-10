@@ -12,7 +12,9 @@ class FakeNoteRepository implements NoteRepository {
 
   @override
   Future<Note?> getNoteById(String id) async {
-    if (shouldThrow) throw Exception('getNoteById failed');
+    if (shouldThrow) {
+      throw const NoteStorageException(cause: 'getNoteById failed');
+    }
     if (getNoteByIdOverride != null) return getNoteByIdOverride!(id);
     return _notes.where((n) => n.id == id).firstOrNull;
   }
@@ -23,7 +25,9 @@ class FakeNoteRepository implements NoteRepository {
     required String content,
     NoteColor color = NoteColor.none,
   }) async {
-    if (shouldThrow) throw Exception('createNote failed');
+    if (shouldThrow) {
+      throw const NoteStorageException(cause: 'createNote failed');
+    }
     final note = Note(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       title: title,
@@ -38,7 +42,9 @@ class FakeNoteRepository implements NoteRepository {
 
   @override
   Future<Note> updateNote(Note note) async {
-    if (shouldThrow) throw Exception('updateNote failed');
+    if (shouldThrow) {
+      throw const NoteStorageException(cause: 'updateNote failed');
+    }
     _notes = [
       for (final n in _notes)
         if (n.id == note.id) note else n,

@@ -11,10 +11,22 @@ class NoteRepositoryImpl implements NoteRepository {
   final NoteLocalStorage _storage;
 
   @override
-  Future<List<Note>> getNotes() => _storage.allNotes();
+  Future<List<Note>> getNotes() async {
+    try {
+      return await _storage.allNotes();
+    } catch (e) {
+      throw NoteStorageException(cause: e);
+    }
+  }
 
   @override
-  Future<Note?> getNoteById(String id) => _storage.noteById(id);
+  Future<Note?> getNoteById(String id) async {
+    try {
+      return await _storage.noteById(id);
+    } catch (e) {
+      throw NoteStorageException(cause: e);
+    }
+  }
 
   @override
   Future<Note> createNote({
@@ -31,25 +43,43 @@ class NoteRepositoryImpl implements NoteRepository {
       updatedAt: now,
       color: color,
     );
-    await _storage.insertNote(note);
+    try {
+      await _storage.insertNote(note);
+    } catch (e) {
+      throw NoteStorageException(cause: e);
+    }
     return note;
   }
 
   @override
   Future<Note> updateNote(Note note) async {
     final updated = note.copyWith(updatedAt: DateTime.now());
-    await _storage.updateNote(updated);
+    try {
+      await _storage.updateNote(updated);
+    } catch (e) {
+      throw NoteStorageException(cause: e);
+    }
     return updated;
   }
 
   @override
-  Future<void> deleteNote(String id) => _storage.deleteNote(id);
+  Future<void> deleteNote(String id) async {
+    try {
+      await _storage.deleteNote(id);
+    } catch (e) {
+      throw NoteStorageException(cause: e);
+    }
+  }
 
   @override
   Future<NoteColor?> getLastCreatedNoteColor() async {
-    final raw = await _storage.lastCreatedNoteColor();
-    if (raw == null) return null;
-    final color = NoteColor.from(raw);
-    return color == NoteColor.none ? null : color;
+    try {
+      final raw = await _storage.lastCreatedNoteColor();
+      if (raw == null) return null;
+      final color = NoteColor.from(raw);
+      return color == NoteColor.none ? null : color;
+    } catch (e) {
+      throw NoteStorageException(cause: e);
+    }
   }
 }

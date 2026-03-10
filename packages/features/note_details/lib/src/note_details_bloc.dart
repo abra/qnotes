@@ -45,10 +45,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     emit(state.copyWith(status: NoteDetailsStatus.loading));
     try {
       final note = await _repository.getNoteById(event.noteId!);
-      if (note == null) {
-        emit(state.copyWith(status: NoteDetailsStatus.failure));
-        return;
-      }
+      if (note == null) throw NoteNotFoundException(event.noteId!);
       emit(
         state.copyWith(
           status: NoteDetailsStatus.success,
@@ -59,7 +56,10 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
           note: note,
         ),
       );
-    } catch (e, st) {
+    } on NoteNotFoundException catch (e, st) {
+      addError(e, st);
+      emit(state.copyWith(status: NoteDetailsStatus.failure));
+    } on NoteStorageException catch (e, st) {
       addError(e, st);
       emit(state.copyWith(status: NoteDetailsStatus.failure));
     }
@@ -118,7 +118,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
         );
       }
       emit(state.copyWith(status: NoteDetailsStatus.saved));
-    } catch (e, st) {
+    } on NoteStorageException catch (e, st) {
       addError(e, st);
       emit(state.copyWith(status: NoteDetailsStatus.failure));
     }

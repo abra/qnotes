@@ -28,7 +28,7 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     try {
       final notes = await _repository.getNotes();
       emit(state.copyWith(status: NoteListStatus.success, notes: notes));
-    } catch (e, st) {
+    } on NoteStorageException catch (e, st) {
       addError(e, st);
       emit(state.copyWith(status: NoteListStatus.failure));
     }
