@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ui' show Locale;
+import 'dart:ui' show Locale, PlatformDispatcher;
 
 import 'package:flutter/material.dart' show ThemeMode;
 import 'package:shared/shared.dart' show NoteListDensity, NoteViewMode;
@@ -34,9 +34,27 @@ class PreferencesService {
     _controller.add(_current);
   }
 
+  static const _supportedLocales = [
+    'en',
+    'zh',
+    'hi',
+    'es',
+    'ar',
+    'fr',
+    'ru',
+    'pt',
+    'de',
+    'ja',
+  ];
+
+  static Locale _resolveInitialLocale() {
+    final code = PlatformDispatcher.instance.locale.languageCode;
+    return Locale(_supportedLocales.contains(code) ? code : 'en');
+  }
+
   static Future<Preferences> _load(PreferencesStorage prefs) async {
     final json = await prefs.getString(_key);
-    if (json == null) return const Preferences();
+    if (json == null) return Preferences(locale: _resolveInitialLocale());
     try {
       final map = jsonDecode(json) as Map<String, Object?>;
       return Preferences(
