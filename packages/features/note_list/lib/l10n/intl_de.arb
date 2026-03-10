@@ -4,4 +4,6 @@
   "notesDeleted": "{count, plural, one{Notiz gelöscht} other{{count} Notizen gelöscht}}",
   "emptyState": "Keine Notizen",
   "searchHint": "Suchen"
+,
+  "noteDeleteFailed": "Failed to delete note"
 }

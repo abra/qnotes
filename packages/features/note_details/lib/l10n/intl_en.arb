@@ -7,5 +7,11 @@
   "titleHint": "Title",
   "@titleHint": {},
   "contentHint": "Start typing...",
-  "@contentHint": {}
+  "@contentHint": {},
+  "noteNotFound": "Note not found",
+  "@noteNotFound": {},
+  "noteLoadFailed": "Failed to load note",
+  "@noteLoadFailed": {},
+  "noteSaveFailed": "Failed to save note",
+  "@noteSaveFailed": {}
 }

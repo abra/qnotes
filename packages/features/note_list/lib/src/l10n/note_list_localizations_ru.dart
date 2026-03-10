@@ -29,4 +29,7 @@ class NoteListLocalizationsRu extends NoteListLocalizations {
 
   @override
   String get searchHint => 'Поиск';
+
+  @override
+  String get noteDeleteFailed => 'Не удалось удалить заметку';
 }

@@ -4,4 +4,8 @@
   "editNote": "Editar nota",
   "titleHint": "Título",
   "contentHint": "Empieza a escribir..."
+,
+  "noteNotFound": "Note not found",
+  "noteLoadFailed": "Failed to load note",
+  "noteSaveFailed": "Failed to save note"
 }

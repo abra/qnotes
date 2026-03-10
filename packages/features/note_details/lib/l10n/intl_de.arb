@@ -4,4 +4,8 @@
   "editNote": "Notiz bearbeiten",
   "titleHint": "Titel",
   "contentHint": "Beginne zu tippen..."
+,
+  "noteNotFound": "Note not found",
+  "noteLoadFailed": "Failed to load note",
+  "noteSaveFailed": "Failed to save note"
 }

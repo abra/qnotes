@@ -19,4 +19,13 @@ class NoteDetailsLocalizationsRu extends NoteDetailsLocalizations {
 
   @override
   String get contentHint => 'Начните писать...';
+
+  @override
+  String get noteNotFound => 'Заметка не найдена';
+
+  @override
+  String get noteLoadFailed => 'Не удалось загрузить заметку';
+
+  @override
+  String get noteSaveFailed => 'Не удалось сохранить заметку';
 }

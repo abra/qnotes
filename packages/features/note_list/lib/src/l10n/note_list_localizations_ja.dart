@@ -29,4 +29,7 @@ class NoteListLocalizationsJa extends NoteListLocalizations {
 
   @override
   String get searchHint => '検索';
+
+  @override
+  String get noteDeleteFailed => 'Failed to delete note';
 }

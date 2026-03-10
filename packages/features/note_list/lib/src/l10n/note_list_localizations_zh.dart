@@ -29,4 +29,7 @@ class NoteListLocalizationsZh extends NoteListLocalizations {
 
   @override
   String get searchHint => '搜索';
+
+  @override
+  String get noteDeleteFailed => 'Failed to delete note';
 }

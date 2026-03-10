@@ -140,6 +140,12 @@ abstract class NoteListLocalizations {
   /// In en, this message translates to:
   /// **'Search'**
   String get searchHint;
+
+  /// No description provided for @noteDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete note'**
+  String get noteDeleteFailed;
 }
 
 class _NoteListLocalizationsDelegate

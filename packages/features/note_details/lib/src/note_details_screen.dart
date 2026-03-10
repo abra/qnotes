@@ -2,6 +2,7 @@ import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/shared.dart';
+import 'package:toastification/toastification.dart';
 
 import 'l10n/note_details_localizations.dart';
 import 'note_details_bloc.dart';
@@ -81,12 +82,39 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     return BlocConsumer<NoteDetailsBloc, NoteDetailsState>(
       listenWhen: (prev, curr) => prev.status != curr.status,
       listener: (context, state) {
+        final l10n = NoteDetailsLocalizations.of(context)!;
         if (state.status == NoteDetailsStatus.success) {
           _titleController.text = state.title;
           _contentController.text = state.content;
         }
         if (state.status == NoteDetailsStatus.saved && !_poppedByBack) {
           widget.onBackPressed?.call();
+        }
+        if (state.status == NoteDetailsStatus.failure) {
+          final isNotFound = state.loadError is NoteNotFoundException;
+          toastification.show(
+            context: context,
+            type: ToastificationType.error,
+            style: ToastificationStyle.flat,
+            title: Text(
+              isNotFound
+                  ? l10n.noteNotFound
+                  : state.saveError != null
+                  ? l10n.noteSaveFailed
+                  : l10n.noteLoadFailed,
+            ),
+            autoCloseDuration: const Duration(seconds: 3),
+            alignment: Alignment.topCenter,
+            animationBuilder: (context, animation, alignment, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, -1),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              );
+            },
+          );
         }
       },
       builder: (context, state) {

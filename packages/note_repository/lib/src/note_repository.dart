@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared/shared.dart';
 
 import 'note_local_storage.dart';
+import 'note_local_storage_exception.dart';
 
 /// Concrete implementation of [NoteRepository] backed by SQLite via drift.
 class NoteRepositoryImpl implements NoteRepository {
@@ -14,8 +15,8 @@ class NoteRepositoryImpl implements NoteRepository {
   Future<List<Note>> getNotes() async {
     try {
       return await _storage.allNotes();
-    } catch (e) {
-      throw NoteStorageException(cause: e);
+    } on NoteLocalStorageException catch (e) {
+      throw NoteStorageException(cause: e.cause);
     }
   }
 
@@ -23,8 +24,8 @@ class NoteRepositoryImpl implements NoteRepository {
   Future<Note?> getNoteById(String id) async {
     try {
       return await _storage.noteById(id);
-    } catch (e) {
-      throw NoteStorageException(cause: e);
+    } on NoteLocalStorageException catch (e) {
+      throw NoteStorageException(cause: e.cause);
     }
   }
 
@@ -45,8 +46,8 @@ class NoteRepositoryImpl implements NoteRepository {
     );
     try {
       await _storage.insertNote(note);
-    } catch (e) {
-      throw NoteStorageException(cause: e);
+    } on NoteLocalStorageException catch (e) {
+      throw NoteStorageException(cause: e.cause);
     }
     return note;
   }
@@ -56,8 +57,8 @@ class NoteRepositoryImpl implements NoteRepository {
     final updated = note.copyWith(updatedAt: DateTime.now());
     try {
       await _storage.updateNote(updated);
-    } catch (e) {
-      throw NoteStorageException(cause: e);
+    } on NoteLocalStorageException catch (e) {
+      throw NoteStorageException(cause: e.cause);
     }
     return updated;
   }
@@ -66,8 +67,8 @@ class NoteRepositoryImpl implements NoteRepository {
   Future<void> deleteNote(String id) async {
     try {
       await _storage.deleteNote(id);
-    } catch (e) {
-      throw NoteStorageException(cause: e);
+    } on NoteLocalStorageException catch (e) {
+      throw NoteStorageException(cause: e.cause);
     }
   }
 
@@ -78,8 +79,8 @@ class NoteRepositoryImpl implements NoteRepository {
       if (raw == null) return null;
       final color = NoteColor.from(raw);
       return color == NoteColor.none ? null : color;
-    } catch (e) {
-      throw NoteStorageException(cause: e);
+    } on NoteLocalStorageException catch (e) {
+      throw NoteStorageException(cause: e.cause);
     }
   }
 }

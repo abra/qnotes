@@ -3,5 +3,8 @@
   "newNote": "Новая заметка",
   "editNote": "Редактировать",
   "titleHint": "Заголовок",
-  "contentHint": "Начните писать..."
+  "contentHint": "Начните писать...",
+  "noteNotFound": "Заметка не найдена",
+  "noteLoadFailed": "Не удалось загрузить заметку",
+  "noteSaveFailed": "Не удалось сохранить заметку"
 }

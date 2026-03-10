@@ -38,9 +38,14 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     NoteListNoteDeleted event,
     Emitter<NoteListState> emit,
   ) async {
-    await _repository.deleteNote(event.id);
-    final notes = state.notes.where((n) => n.id != event.id).toList();
-    emit(state.copyWith(notes: notes));
+    try {
+      await _repository.deleteNote(event.id);
+      final notes = state.notes.where((n) => n.id != event.id).toList();
+      emit(state.copyWith(notes: notes));
+    } on NoteStorageException catch (e, st) {
+      addError(e, st);
+      emit(state.copyWith(deleteError: e));
+    }
   }
 
   Future<void> _onQueryChanged(
@@ -76,10 +81,15 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     Emitter<NoteListState> emit,
   ) async {
     final ids = Set<String>.of(state.selectedIds);
-    for (final id in ids) {
-      await _repository.deleteNote(id);
+    try {
+      for (final id in ids) {
+        await _repository.deleteNote(id);
+      }
+      final notes = state.notes.where((n) => !ids.contains(n.id)).toList();
+      emit(state.copyWith(notes: notes, selectedIds: {}));
+    } on NoteStorageException catch (e, st) {
+      addError(e, st);
+      emit(state.copyWith(deleteError: e));
     }
-    final notes = state.notes.where((n) => !ids.contains(n.id)).toList();
-    emit(state.copyWith(notes: notes, selectedIds: {}));
   }
 }

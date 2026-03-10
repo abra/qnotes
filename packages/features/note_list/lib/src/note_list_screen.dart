@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:preferences_repository/preferences_repository.dart';
 import 'package:shared/shared.dart';
+import 'package:toastification/toastification.dart';
 
 import 'l10n/note_list_localizations.dart';
 import 'note_list_bloc.dart';
@@ -57,7 +58,30 @@ class NoteListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NoteListBloc, NoteListState>(
+    return BlocConsumer<NoteListBloc, NoteListState>(
+      listenWhen: (prev, curr) => prev.deleteError != curr.deleteError,
+      listener: (context, state) {
+        if (state.deleteError != null) {
+          final l10n = NoteListLocalizations.of(context)!;
+          toastification.show(
+            context: context,
+            type: ToastificationType.error,
+            style: ToastificationStyle.flat,
+            title: Text(l10n.noteDeleteFailed),
+            autoCloseDuration: const Duration(seconds: 3),
+            alignment: Alignment.topCenter,
+            animationBuilder: (context, animation, alignment, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, -1),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              );
+            },
+          );
+        }
+      },
       builder: (context, state) {
         return StreamBuilder<Preferences>(
           stream: preferencesService.stream,
@@ -112,22 +136,44 @@ class _NoteListScaffold extends StatelessWidget {
     final count = state.selectedIds.length;
     final l10n = NoteListLocalizations.of(context)!;
     context.read<NoteListBloc>().add(NoteListSelectedDeleted());
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.notesDeleted(count)),
-        duration: const Duration(seconds: 2),
-      ),
+    toastification.show(
+      context: context,
+      type: ToastificationType.success,
+      style: ToastificationStyle.flat,
+      title: Text(l10n.notesDeleted(count)),
+      autoCloseDuration: const Duration(seconds: 3),
+      alignment: Alignment.topCenter,
+      animationBuilder: (context, animation, alignment, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, -1),
+            end: Offset.zero,
+          ).animate(animation),
+          child: child,
+        );
+      },
     );
   }
 
   void _deleteNote(BuildContext context, String id) {
     final l10n = NoteListLocalizations.of(context)!;
     context.read<NoteListBloc>().add(NoteListNoteDeleted(id));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.notesDeleted(1)),
-        duration: const Duration(seconds: 2),
-      ),
+    toastification.show(
+      context: context,
+      type: ToastificationType.success,
+      style: ToastificationStyle.flat,
+      title: Text(l10n.notesDeleted(1)),
+      autoCloseDuration: const Duration(seconds: 3),
+      alignment: Alignment.topCenter,
+      animationBuilder: (context, animation, alignment, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, -1),
+            end: Offset.zero,
+          ).animate(animation),
+          child: child,
+        );
+      },
     );
   }
 

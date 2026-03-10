@@ -4,4 +4,6 @@
   "notesDeleted": "{count, plural, one{Nota excluída} other{{count} notas excluídas}}",
   "emptyState": "Sem notas",
   "searchHint": "Pesquisar"
+,
+  "noteDeleteFailed": "Failed to delete note"
 }

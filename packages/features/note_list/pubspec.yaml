@@ -24,6 +24,7 @@ dependencies:
     path: ../../preferences_repository
   component_library:
     path: ../../component_library
+  toastification: ^3.0.3
 
 dev_dependencies:
   flutter_test:

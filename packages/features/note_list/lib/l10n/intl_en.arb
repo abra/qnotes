@@ -15,5 +15,7 @@
   "emptyState": "No notes yet",
   "@emptyState": {},
   "searchHint": "Search",
-  "@searchHint": {}
+  "@searchHint": {},
+  "noteDeleteFailed": "Failed to delete note",
+  "@noteDeleteFailed": {}
 }

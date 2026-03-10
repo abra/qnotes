@@ -9,6 +9,7 @@ import 'package:shared/shared.dart';
 
 import 'mappers/domain_to_storage.dart';
 import 'mappers/storage_to_domain.dart';
+import 'note_local_storage_exception.dart';
 
 part 'note_local_storage.g.dart';
 
@@ -46,38 +47,67 @@ class NoteLocalStorage extends _$NoteLocalStorage {
   // --- queries ---
 
   Future<List<Note>> allNotes() async {
-    final rows =
-        await (select(notesTable)..orderBy([
-              (t) => OrderingTerm.desc(t.isPinned),
-              (t) => OrderingTerm.desc(t.updatedAt),
-            ]))
-            .get();
-    return rows.map((r) => r.toDomainModel()).toList();
+    try {
+      final rows =
+          await (select(notesTable)..orderBy([
+                (t) => OrderingTerm.desc(t.isPinned),
+                (t) => OrderingTerm.desc(t.updatedAt),
+              ]))
+              .get();
+      return rows.map((r) => r.toDomainModel()).toList();
+    } catch (e) {
+      throw NoteLocalStorageException(cause: e);
+    }
   }
 
   Future<Note?> noteById(String id) async {
-    final row = await (select(
-      notesTable,
-    )..where((t) => t.id.equals(id))).getSingleOrNull();
-    return row?.toDomainModel();
+    try {
+      final row = await (select(
+        notesTable,
+      )..where((t) => t.id.equals(id))).getSingleOrNull();
+      return row?.toDomainModel();
+    } catch (e) {
+      throw NoteLocalStorageException(cause: e);
+    }
   }
 
-  Future<String?> lastCreatedNoteColor() =>
-      (select(notesTable)
+  Future<String?> lastCreatedNoteColor() async {
+    try {
+      return await (select(notesTable)
             ..orderBy([(t) => OrderingTerm.desc(t.createdAt)])
             ..limit(1))
           .map((row) => row.color)
           .getSingleOrNull();
+    } catch (e) {
+      throw NoteLocalStorageException(cause: e);
+    }
+  }
 
-  Future<void> insertNote(Note note) =>
-      into(notesTable).insert(note.toStorageModel());
+  Future<void> insertNote(Note note) async {
+    try {
+      await into(notesTable).insert(note.toStorageModel());
+    } catch (e) {
+      throw NoteLocalStorageException(cause: e);
+    }
+  }
 
-  Future<void> updateNote(Note note) => (update(
-    notesTable,
-  )..where((t) => t.id.equals(note.id))).write(note.toStorageModel());
+  Future<void> updateNote(Note note) async {
+    try {
+      await (update(
+        notesTable,
+      )..where((t) => t.id.equals(note.id))).write(note.toStorageModel());
+    } catch (e) {
+      throw NoteLocalStorageException(cause: e);
+    }
+  }
 
-  Future<void> deleteNote(String id) =>
-      (delete(notesTable)..where((t) => t.id.equals(id))).go();
+  Future<void> deleteNote(String id) async {
+    try {
+      await (delete(notesTable)..where((t) => t.id.equals(id))).go();
+    } catch (e) {
+      throw NoteLocalStorageException(cause: e);
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

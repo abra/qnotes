@@ -140,6 +140,24 @@ abstract class NoteDetailsLocalizations {
   /// In en, this message translates to:
   /// **'Start typing...'**
   String get contentHint;
+
+  /// No description provided for @noteNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Note not found'**
+  String get noteNotFound;
+
+  /// No description provided for @noteLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load note'**
+  String get noteLoadFailed;
+
+  /// No description provided for @noteSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save note'**
+  String get noteSaveFailed;
 }
 
 class _NoteDetailsLocalizationsDelegate

@@ -4,4 +4,8 @@
   "editNote": "नोट संपादित करें",
   "titleHint": "शीर्षक",
   "contentHint": "टाइप करना शुरू करें..."
+,
+  "noteNotFound": "Note not found",
+  "noteLoadFailed": "Failed to load note",
+  "noteSaveFailed": "Failed to save note"
 }

@@ -11,6 +11,8 @@ class NoteDetailsState extends Equatable {
     this.content = '',
     this.color = NoteColor.none,
     this.isPinned = false,
+    this.loadError,
+    this.saveError,
   });
 
   final NoteDetailsStatus status;
@@ -20,6 +22,8 @@ class NoteDetailsState extends Equatable {
   final String content;
   final NoteColor color;
   final bool isPinned;
+  final Object? loadError;
+  final Object? saveError;
 
   NoteDetailsState copyWith({
     NoteDetailsStatus? status,
@@ -29,6 +33,8 @@ class NoteDetailsState extends Equatable {
     String? content,
     NoteColor? color,
     bool? isPinned,
+    Object? loadError,
+    Object? saveError,
   }) => NoteDetailsState(
     status: status ?? this.status,
     isNew: isNew ?? this.isNew,
@@ -37,6 +43,8 @@ class NoteDetailsState extends Equatable {
     content: content ?? this.content,
     color: color ?? this.color,
     isPinned: isPinned ?? this.isPinned,
+    loadError: loadError,
+    saveError: saveError,
   );
 
   @override
@@ -48,6 +56,8 @@ class NoteDetailsState extends Equatable {
     content,
     color,
     isPinned,
+    loadError,
+    saveError,
   ];
 
   @override

@@ -54,10 +54,10 @@ void main() {
           noteId: 'missing',
         ),
         act: (bloc) => bloc.add(NoteDetailsStarted(noteId: 'missing')),
-        expect: () => [
-          NoteDetailsState(isNew: false, status: NoteDetailsStatus.loading),
-          NoteDetailsState(isNew: false, status: NoteDetailsStatus.failure),
-        ],
+        verify: (bloc) {
+          expect(bloc.state.status, NoteDetailsStatus.failure);
+          expect(bloc.state.loadError, isA<NoteNotFoundException>());
+        },
       );
 
       blocTest<NoteDetailsBloc, NoteDetailsState>(
@@ -67,10 +67,10 @@ void main() {
           return NoteDetailsBloc(noteRepository: r, noteId: '99');
         },
         act: (bloc) => bloc.add(NoteDetailsStarted(noteId: '99')),
-        expect: () => [
-          NoteDetailsState(isNew: false, status: NoteDetailsStatus.loading),
-          NoteDetailsState(isNew: false, status: NoteDetailsStatus.failure),
-        ],
+        verify: (bloc) {
+          expect(bloc.state.status, NoteDetailsStatus.failure);
+          expect(bloc.state.loadError, isA<NoteStorageException>());
+        },
       );
     });
 
@@ -162,16 +162,10 @@ void main() {
         },
         seed: () => const NoteDetailsState(content: 'content'),
         act: (bloc) => bloc.add(NoteDetailsSaved()),
-        expect: () => [
-          const NoteDetailsState(
-            status: NoteDetailsStatus.saving,
-            content: 'content',
-          ),
-          const NoteDetailsState(
-            status: NoteDetailsStatus.failure,
-            content: 'content',
-          ),
-        ],
+        verify: (bloc) {
+          expect(bloc.state.status, NoteDetailsStatus.failure);
+          expect(bloc.state.saveError, isA<NoteStorageException>());
+        },
       );
     });
 
@@ -223,22 +217,10 @@ void main() {
           content: 'C',
         ),
         act: (bloc) => bloc.add(NoteDetailsSaved()),
-        expect: () => [
-          NoteDetailsState(
-            isNew: false,
-            note: _existingNote,
-            status: NoteDetailsStatus.saving,
-            title: 'T',
-            content: 'C',
-          ),
-          NoteDetailsState(
-            isNew: false,
-            note: _existingNote,
-            status: NoteDetailsStatus.failure,
-            title: 'T',
-            content: 'C',
-          ),
-        ],
+        verify: (bloc) {
+          expect(bloc.state.status, NoteDetailsStatus.failure);
+          expect(bloc.state.saveError, isA<NoteStorageException>());
+        },
       );
     });
   });

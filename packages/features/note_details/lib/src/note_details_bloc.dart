@@ -58,10 +58,10 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
       );
     } on NoteNotFoundException catch (e, st) {
       addError(e, st);
-      emit(state.copyWith(status: NoteDetailsStatus.failure));
+      emit(state.copyWith(status: NoteDetailsStatus.failure, loadError: e));
     } on NoteStorageException catch (e, st) {
       addError(e, st);
-      emit(state.copyWith(status: NoteDetailsStatus.failure));
+      emit(state.copyWith(status: NoteDetailsStatus.failure, loadError: e));
     }
   }
 
@@ -120,7 +120,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
       emit(state.copyWith(status: NoteDetailsStatus.saved));
     } on NoteStorageException catch (e, st) {
       addError(e, st);
-      emit(state.copyWith(status: NoteDetailsStatus.failure));
+      emit(state.copyWith(status: NoteDetailsStatus.failure, saveError: e));
     }
   }
 }
