@@ -1,6 +1,6 @@
 import 'dart:ui' show Locale;
 
-import 'package:preferences_repository/preferences_repository.dart';
+import 'package:shared/shared.dart';
 
 /// Single source of truth for all locales supported by the app.
 ///
