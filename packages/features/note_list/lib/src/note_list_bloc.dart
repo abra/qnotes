@@ -1,3 +1,4 @@
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/shared.dart';
@@ -11,7 +12,7 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
       super(const NoteListState()) {
     on<NoteListStarted>(_onStarted);
     on<NoteListNoteDeleted>(_onNoteDeleted);
-    on<NoteListQueryChanged>(_onQueryChanged);
+    on<NoteListQueryChanged>(_onQueryChanged, transformer: restartable());
     on<NoteListSelectionToggled>(_onSelectionToggled);
     on<NoteListSelectionCleared>(_onSelectionCleared);
     on<NoteListSelectedDeleted>(_onSelectedDeleted);
@@ -42,10 +43,11 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     emit(state.copyWith(notes: notes));
   }
 
-  void _onQueryChanged(
+  Future<void> _onQueryChanged(
     NoteListQueryChanged event,
     Emitter<NoteListState> emit,
-  ) {
+  ) async {
+    await Future<void>.delayed(const Duration(milliseconds: 300));
     emit(state.copyWith(query: event.query));
   }
 
