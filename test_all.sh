@@ -22,7 +22,7 @@ run() {
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 run "shared"                       "dart test test/"    "$SCRIPT_DIR/packages/shared"
-run "notes_repository"             "flutter test test/" "$SCRIPT_DIR/packages/notes_repository"
+run "note_repository"              "flutter test test/" "$SCRIPT_DIR/packages/note_repository"
 run "preferences_repository"       "flutter test test/" "$SCRIPT_DIR/packages/preferences_repository"
 run "component_library"            "flutter test test/" "$SCRIPT_DIR/packages/component_library"
 run "monitoring"                   "flutter test test/" "$SCRIPT_DIR/packages/monitoring"
