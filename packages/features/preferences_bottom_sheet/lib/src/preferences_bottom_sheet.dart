@@ -336,7 +336,10 @@ class _LanguagePageState extends State<_LanguagePage> {
                   final isSelected = lang.code == widget.selectedCode;
                   return ListTile(
                     dense: true,
-                    title: Text(lang.name),
+                    title: Text(
+                      lang.name,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                     trailing: isSelected
                         ? Icon(
                             Icons.check,

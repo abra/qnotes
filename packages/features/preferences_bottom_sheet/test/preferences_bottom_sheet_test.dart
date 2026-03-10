@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:preferences_bottom_sheet/preferences_bottom_sheet.dart';
-import 'package:preferences_bottom_sheet/src/l10n/preferences_localizations.dart';
 import 'package:preferences_repository/preferences_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';

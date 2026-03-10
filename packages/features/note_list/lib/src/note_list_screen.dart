@@ -201,9 +201,9 @@ class _NoteListScaffold extends StatelessWidget {
               ),
             if (!state.isSelectionMode)
               Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
+                left: Spacing.medium,
+                right: Spacing.medium,
+                bottom: Spacing.mediumLarge,
                 child: _BottomBar(
                   onAddPressed: onAddPressed == null
                       ? null
@@ -218,37 +218,128 @@ class _NoteListScaffold extends StatelessWidget {
   }
 }
 
-class _BottomBar extends StatelessWidget {
+class _BottomBar extends StatefulWidget {
   const _BottomBar({this.onAddPressed, this.onQueryChanged});
 
   final VoidCallback? onAddPressed;
   final ValueChanged<String>? onQueryChanged;
 
   @override
+  State<_BottomBar> createState() => _BottomBarState();
+}
+
+class _BottomBarState extends State<_BottomBar> {
+  final _controller = TextEditingController();
+  final _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _clear() {
+    _controller.clear();
+    widget.onQueryChanged?.call('');
+    _focusNode.requestFocus();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = NoteListLocalizations.of(context)!;
-    return ColoredBox(
-      color: Theme.of(context).colorScheme.surface,
+    final colorScheme = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, -1),
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: Spacing.medium,
-          vertical: Spacing.small,
-        ),
+        padding: const EdgeInsets.all(Spacing.small),
         child: Row(
           children: [
             Expanded(
-              child: TextField(
-                onChanged: onQueryChanged,
-                decoration: InputDecoration(
-                  hintText: l10n.searchHint,
-                  prefixIcon: const Icon(Icons.search),
-                  border: const OutlineInputBorder(),
-                  isDense: true,
+              child: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _controller,
+                builder: (context, value, _) => TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  onChanged: widget.onQueryChanged,
+                  decoration: InputDecoration(
+                    hintText: l10n.searchHint,
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: colorScheme.onSurfaceVariant,
+                      size: 24,
+                    ),
+                    hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurfaceVariant,
+                    ),
+                    filled: true,
+                    fillColor: colorScheme.surfaceContainerHighest,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: Spacing.medium,
+                    ),
+                    suffixIcon: value.text.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(
+                              Icons.close,
+                              size: 18,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            onPressed: _clear,
+                          )
+                        : null,
+                  ),
                 ),
               ),
             ),
             const SizedBox(width: Spacing.small),
-            IconButton(icon: const Icon(Icons.add), onPressed: onAddPressed),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: colorScheme.primary,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.add, color: Colors.white),
+                onPressed: widget.onAddPressed,
+              ),
+            ),
           ],
         ),
       ),
