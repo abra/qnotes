@@ -1,6 +1,6 @@
 # component_library
 
-UI components and design system for qnotes.
+UI components and design system for Nota.
 
 ---
 
@@ -14,7 +14,7 @@ The theme system has two layers:
 ### How it works
 
 ```
-AppSettingsScope.of(context)    ← reads themeMode + locale (lib/app/)
+PreferencesScope.of(context)    ← reads themeMode + locale (lib/app/)
           ↓
 material_context.dart
   const LightAppThemeData()     ← built once, stateless
@@ -128,6 +128,8 @@ lib/
     theme/
       app_theme.dart              ← AppTheme (InheritedWidget)
       app_theme_data.dart         ← AppThemeData + LightAppThemeData + DarkAppThemeData
+      catppuccin.dart             ← Catppuccin Latte + Frappé color palettes
+      note_color_x.dart           ← NoteColor.forBrightness() extension
       spacing.dart                ← Spacing constants
       font_size.dart              ← FontSize constants
 ```

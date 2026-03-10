@@ -19,11 +19,13 @@ void main() {
   group('NoteDetailsBloc', () {
     group('NoteDetailsStarted', () {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
-        'does nothing when noteId is null (new note)',
+        'emits state with auto-picked color for new note',
         build: () =>
             NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
         act: (bloc) => bloc.add(NoteDetailsStarted(noteId: null)),
-        expect: () => <NoteDetailsState>[],
+        verify: (bloc) {
+          expect(bloc.state.color, isNot(NoteColor.none));
+        },
       );
 
       blocTest<NoteDetailsBloc, NoteDetailsState>(

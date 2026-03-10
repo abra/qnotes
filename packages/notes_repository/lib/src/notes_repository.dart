@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:flutter/foundation.dart';
 import 'package:shared/shared.dart';
 
@@ -12,16 +11,10 @@ class NotesRepository implements NoteRepository {
   final NoteLocalStorage _storage;
 
   @override
-  Future<List<Note>> getNotes() async {
-    final rows = await _storage.allNotes();
-    return rows.map((r) => r.toNote()).toList();
-  }
+  Future<List<Note>> getNotes() => _storage.allNotes();
 
   @override
-  Future<Note?> getNoteById(String id) async {
-    final row = await _storage.noteById(id);
-    return row?.toNote();
-  }
+  Future<Note?> getNoteById(String id) => _storage.noteById(id);
 
   @override
   Future<Note> createNote({
@@ -30,44 +23,22 @@ class NotesRepository implements NoteRepository {
     NoteColor color = NoteColor.none,
   }) async {
     final now = DateTime.now();
-    final id = now.microsecondsSinceEpoch.toString();
-
-    await _storage.insertNote(
-      NotesTableCompanion.insert(
-        id: id,
-        title: Value(title),
-        content: content,
-        createdAt: now.toIso8601String(),
-        updatedAt: now.toIso8601String(),
-        color: Value(color.name),
-      ),
-    );
-
-    return Note(
-      id: id,
+    final note = Note(
+      id: now.microsecondsSinceEpoch.toString(),
       title: title,
       content: content,
       createdAt: now,
       updatedAt: now,
       color: color,
     );
+    await _storage.insertNote(note);
+    return note;
   }
 
   @override
   Future<Note> updateNote(Note note) async {
     final updated = note.copyWith(updatedAt: DateTime.now());
-
-    await _storage.updateNote(
-      NotesTableCompanion(
-        id: Value(updated.id),
-        title: Value(updated.title),
-        content: Value(updated.content),
-        updatedAt: Value(updated.updatedAt.toIso8601String()),
-        isPinned: Value(updated.isPinned),
-        color: Value(updated.color.name),
-      ),
-    );
-
+    await _storage.updateNote(updated);
     return updated;
   }
 

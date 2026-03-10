@@ -7,6 +7,9 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:shared/shared.dart';
 
+import 'mappers/domain_to_storage.dart';
+import 'mappers/storage_to_domain.dart';
+
 part 'note_local_storage.g.dart';
 
 // ---------------------------------------------------------------------------
@@ -42,15 +45,22 @@ class NoteLocalStorage extends _$NoteLocalStorage {
 
   // --- queries ---
 
-  Future<List<NotesTableData>> allNotes() =>
-      (select(notesTable)..orderBy([
-            (t) => OrderingTerm.desc(t.isPinned),
-            (t) => OrderingTerm.desc(t.updatedAt),
-          ]))
-          .get();
+  Future<List<Note>> allNotes() async {
+    final rows =
+        await (select(notesTable)..orderBy([
+              (t) => OrderingTerm.desc(t.isPinned),
+              (t) => OrderingTerm.desc(t.updatedAt),
+            ]))
+            .get();
+    return rows.map((r) => r.toDomainModel()).toList();
+  }
 
-  Future<NotesTableData?> noteById(String id) =>
-      (select(notesTable)..where((t) => t.id.equals(id))).getSingleOrNull();
+  Future<Note?> noteById(String id) async {
+    final row = await (select(
+      notesTable,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
+    return row?.toDomainModel();
+  }
 
   Future<String?> lastCreatedNoteColor() =>
       (select(notesTable)
@@ -59,31 +69,15 @@ class NoteLocalStorage extends _$NoteLocalStorage {
           .map((row) => row.color)
           .getSingleOrNull();
 
-  Future<void> insertNote(NotesTableCompanion note) =>
-      into(notesTable).insert(note);
+  Future<void> insertNote(Note note) =>
+      into(notesTable).insert(note.toStorageModel());
 
-  Future<void> updateNote(NotesTableCompanion note) => (update(
+  Future<void> updateNote(Note note) => (update(
     notesTable,
-  )..where((t) => t.id.equals(note.id.value))).write(note);
+  )..where((t) => t.id.equals(note.id))).write(note.toStorageModel());
 
   Future<void> deleteNote(String id) =>
       (delete(notesTable)..where((t) => t.id.equals(id))).go();
-}
-
-// ---------------------------------------------------------------------------
-// Mapping helpers
-// ---------------------------------------------------------------------------
-
-extension NoteLocalStorageX on NotesTableData {
-  Note toNote() => Note(
-    id: id,
-    title: title,
-    content: content,
-    createdAt: DateTime.parse(createdAt),
-    updatedAt: DateTime.parse(updatedAt),
-    isPinned: isPinned,
-    color: NoteColor.from(color),
-  );
 }
 
 // ---------------------------------------------------------------------------

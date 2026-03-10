@@ -9,7 +9,7 @@ Persists to SharedPreferences automatically and streams changes via `Preferences
 
 | Class                | Description                                                     |
 |----------------------|-----------------------------------------------------------------|
-| `Preferences`        | Immutable model: `ThemeMode`, `Locale`                          |
+| `Preferences`        | Immutable model: `ThemeMode`, `Locale`, `NoteViewMode`, `NoteListDensity` |
 | `PreferencesService` | Loads from disk on startup, persists on update, streams changes |
 
 ---

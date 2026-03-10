@@ -37,13 +37,13 @@ void main() {
       expect(find.text('Language'), findsOneWidget);
     });
 
-    testWidgets('shows three SegmentedButtons', (tester) async {
+    testWidgets('shows four SegmentedButtons', (tester) async {
       final service = await _createService();
       await tester.pumpWidget(_buildSheet(service));
 
       expect(
         find.byWidgetPredicate((w) => w is SegmentedButton),
-        findsNWidgets(3),
+        findsNWidgets(4),
       );
     });
 

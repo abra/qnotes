@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:notes_repository/notes_repository.dart';
@@ -6,6 +5,27 @@ import 'package:shared/shared.dart';
 
 NoteLocalStorage _openInMemory() =>
     NoteLocalStorage.forTesting(NativeDatabase.memory());
+
+Note _note({
+  String id = '1',
+  String content = 'hello',
+  String? title,
+  DateTime? createdAt,
+  DateTime? updatedAt,
+  bool isPinned = false,
+  NoteColor color = NoteColor.none,
+}) {
+  final now = DateTime(2024);
+  return Note(
+    id: id,
+    title: title,
+    content: content,
+    createdAt: createdAt ?? now,
+    updatedAt: updatedAt ?? now,
+    isPinned: isPinned,
+    color: color,
+  );
+}
 
 void main() {
   group('NoteLocalStorage', () {
@@ -18,72 +38,39 @@ void main() {
       expect(await storage.allNotes(), isEmpty);
     });
 
-    test('insertNote then allNotes returns one row', () async {
-      await storage.insertNote(
-        NotesTableCompanion.insert(
-          id: '1',
-          content: 'hello',
-          createdAt: '2024-01-01T00:00:00.000',
-          updatedAt: '2024-01-01T00:00:00.000',
-        ),
-      );
+    test('insertNote then allNotes returns one note', () async {
+      await storage.insertNote(_note(content: 'hello'));
 
-      final rows = await storage.allNotes();
-      expect(rows, hasLength(1));
-      expect(rows.first.content, 'hello');
+      final notes = await storage.allNotes();
+      expect(notes, hasLength(1));
+      expect(notes.first.content, 'hello');
     });
 
     test('noteById returns null for missing id', () async {
       expect(await storage.noteById('999'), isNull);
     });
 
-    test('noteById returns correct row', () async {
-      await storage.insertNote(
-        NotesTableCompanion.insert(
-          id: '42',
-          content: 'find me',
-          createdAt: '2024-01-01T00:00:00.000',
-          updatedAt: '2024-01-01T00:00:00.000',
-        ),
-      );
+    test('noteById returns correct note', () async {
+      await storage.insertNote(_note(id: '42', content: 'find me'));
 
-      final row = await storage.noteById('42');
-      expect(row?.content, 'find me');
+      final note = await storage.noteById('42');
+      expect(note?.content, 'find me');
     });
 
     test('updateNote persists changes', () async {
-      await storage.insertNote(
-        NotesTableCompanion.insert(
-          id: '1',
-          content: 'original',
-          createdAt: '2024-01-01T00:00:00.000',
-          updatedAt: '2024-01-01T00:00:00.000',
-        ),
-      );
-
+      await storage.insertNote(_note(id: '1', content: 'original'));
       await storage.updateNote(
-        NotesTableCompanion(
-          id: const Value('1'),
-          content: const Value('updated'),
-          updatedAt: const Value('2025-01-01T00:00:00.000'),
-        ),
+        _note(id: '1', content: 'updated', updatedAt: DateTime(2025)),
       );
 
-      final row = await storage.noteById('1');
-      expect(row?.content, 'updated');
+      final note = await storage.noteById('1');
+      expect(note?.content, 'updated');
     });
 
-    test('deleteNote removes the row', () async {
-      await storage.insertNote(
-        NotesTableCompanion.insert(
-          id: '1',
-          content: 'to delete',
-          createdAt: '2024-01-01T00:00:00.000',
-          updatedAt: '2024-01-01T00:00:00.000',
-        ),
-      );
-
+    test('deleteNote removes the note', () async {
+      await storage.insertNote(_note(id: '1', content: 'to delete'));
       await storage.deleteNote('1');
+
       expect(await storage.allNotes(), isEmpty);
     });
   });
