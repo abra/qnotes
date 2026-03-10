@@ -4,7 +4,7 @@ import 'package:nota/app/dependency_container.dart';
 import 'package:nota/app/router/app_routes.dart';
 import 'package:note_details/note_details.dart';
 import 'package:note_list/note_list.dart';
-import 'package:preferences_bottom_sheet/preferences_bottom_sheet.dart';
+import 'package:preferences_menu/preferences_menu.dart';
 
 GoRouter buildRouter({required DependenciesContainer dependencies}) {
   dependencies.logger.debug('buildRouter: GoRouter created');

@@ -1,4 +1,4 @@
-name: preferences_bottom_sheet
+name: preferences_menu
 description: "Preferences bottom sheet: theme, locale and note view mode."
 publish_to: none
 version: 0.0.1

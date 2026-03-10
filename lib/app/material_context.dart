@@ -12,7 +12,7 @@ import 'package:nota/app/preferences_scope.dart';
 import 'package:nota/app/router/app_router.dart';
 import 'package:note_details/note_details.dart';
 import 'package:note_list/note_list.dart';
-import 'package:preferences_bottom_sheet/preferences_bottom_sheet.dart';
+import 'package:preferences_menu/preferences_menu.dart';
 import 'package:toastification/toastification.dart';
 
 /// Entry point for the application that creates [MaterialApp.router].
