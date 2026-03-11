@@ -280,6 +280,7 @@ class _BottomBar extends StatefulWidget {
 class _BottomBarState extends State<_BottomBar> {
   static const _outerRadius = BorderRadius.all(Radius.circular(20));
   static const _innerRadius = BorderRadius.all(Radius.circular(14));
+  static const _iconSize = 28.0;
 
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
@@ -344,7 +345,7 @@ class _BottomBarState extends State<_BottomBar> {
                     prefixIcon: Icon(
                       Icons.search,
                       color: colorScheme.onSurfaceVariant,
-                      size: 24,
+                      size: _iconSize,
                     ),
                     hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: colorScheme.onSurfaceVariant,
@@ -388,7 +389,11 @@ class _BottomBarState extends State<_BottomBar> {
                 borderRadius: _innerRadius,
               ),
               child: IconButton(
-                icon: Icon(Icons.menu, color: colorScheme.onSurfaceVariant),
+                icon: Icon(
+                  Icons.menu,
+                  color: colorScheme.onSurfaceVariant,
+                  size: _iconSize,
+                ),
                 onPressed: widget.onSettingsPressed,
               ),
             ),
@@ -399,7 +404,11 @@ class _BottomBarState extends State<_BottomBar> {
                 borderRadius: _innerRadius,
               ),
               child: IconButton(
-                icon: const Icon(Icons.add, color: Colors.white),
+                icon: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                  size: _iconSize,
+                ),
                 onPressed: widget.onAddPressed,
               ),
             ),
