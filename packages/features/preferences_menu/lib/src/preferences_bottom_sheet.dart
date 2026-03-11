@@ -38,43 +38,35 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Preferences>(
-      stream: widget.preferencesService.stream,
-      initialData: widget.preferencesService.current,
-      builder: (context, snapshot) {
-        final prefs = snapshot.data ?? widget.preferencesService.current;
-
-        return ClipRect(
-          child: AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: _slideTransition,
-              child: _page == _Page.main
-                  ? _MainPage(
-                      key: const ValueKey(_Page.main),
-                      prefs: prefs,
-                      preferencesService: widget.preferencesService,
-                      supportedLanguages: widget.supportedLanguages,
-                      onLanguageTap: _goToLanguage,
-                    )
-                  : _LanguagePage(
-                      key: const ValueKey(_Page.language),
-                      selectedCode: prefs.locale.languageCode,
-                      supportedLanguages: widget.supportedLanguages,
-                      onSelected: (code) {
-                        widget.preferencesService.update(
-                          (p) => p.copyWith(locale: Locale(code)),
-                        );
-                        _goToMain();
-                      },
-                      onBack: _goToMain,
-                    ),
-            ),
-          ),
-        );
-      },
+    return ClipRect(
+      child: AnimatedSize(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: _slideTransition,
+          child: _page == _Page.main
+              ? _MainPage(
+                  key: const ValueKey(_Page.main),
+                  preferencesService: widget.preferencesService,
+                  supportedLanguages: widget.supportedLanguages,
+                  onLanguageTap: _goToLanguage,
+                )
+              : _LanguagePage(
+                  key: const ValueKey(_Page.language),
+                  selectedCode:
+                      widget.preferencesService.current.locale.languageCode,
+                  supportedLanguages: widget.supportedLanguages,
+                  onSelected: (code) {
+                    widget.preferencesService.update(
+                      (p) => p.copyWith(locale: Locale(code)),
+                    );
+                    _goToMain();
+                  },
+                  onBack: _goToMain,
+                ),
+        ),
+      ),
     );
   }
 
@@ -104,6 +96,35 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
 class _MainPage extends StatelessWidget {
   const _MainPage({
     super.key,
+    required this.preferencesService,
+    required this.supportedLanguages,
+    required this.onLanguageTap,
+  });
+
+  final PreferencesService preferencesService;
+  final List<SupportedLanguage> supportedLanguages;
+  final VoidCallback onLanguageTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<Preferences>(
+      stream: preferencesService.stream,
+      initialData: preferencesService.current,
+      builder: (context, snapshot) {
+        final prefs = snapshot.data ?? preferencesService.current;
+        return _MainPageContent(
+          prefs: prefs,
+          preferencesService: preferencesService,
+          supportedLanguages: supportedLanguages,
+          onLanguageTap: onLanguageTap,
+        );
+      },
+    );
+  }
+}
+
+class _MainPageContent extends StatelessWidget {
+  const _MainPageContent({
     required this.prefs,
     required this.preferencesService,
     required this.supportedLanguages,
@@ -245,7 +266,7 @@ class _MainPage extends StatelessWidget {
 // Language page
 // ---------------------------------------------------------------------------
 
-class _LanguagePage extends StatefulWidget {
+class _LanguagePage extends StatelessWidget {
   const _LanguagePage({
     super.key,
     required this.selectedCode,
@@ -260,24 +281,8 @@ class _LanguagePage extends StatefulWidget {
   final VoidCallback onBack;
 
   @override
-  State<_LanguagePage> createState() => _LanguagePageState();
-}
-
-class _LanguagePageState extends State<_LanguagePage> {
-  var _query = '';
-
-  List<SupportedLanguage> get _filtered {
-    if (_query.isEmpty) return widget.supportedLanguages;
-    final q = _query.toLowerCase();
-    return widget.supportedLanguages
-        .where((l) => l.name.toLowerCase().contains(q) || l.code.contains(q))
-        .toList();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final l10n = PreferencesLocalizations.of(context)!;
-    final filtered = _filtered;
 
     return SafeArea(
       child: Padding(
@@ -296,7 +301,7 @@ class _LanguagePageState extends State<_LanguagePage> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.arrow_back),
-                  onPressed: widget.onBack,
+                  onPressed: onBack,
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
                 ),
@@ -308,39 +313,32 @@ class _LanguagePageState extends State<_LanguagePage> {
               ],
             ),
             const SizedBox(height: Spacing.mediumLarge),
-            TextField(
-              autofocus: false,
-              onChanged: (v) => setState(() => _query = v),
-              decoration: InputDecoration(
-                hintText: l10n.searchHint,
-                prefixIcon: const Icon(Icons.search),
-                border: const OutlineInputBorder(),
-                isDense: true,
-              ),
-            ),
-            const SizedBox(height: Spacing.small),
             ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 300),
-              child: ListView.builder(
-                itemCount: filtered.length,
-                itemBuilder: (context, index) {
-                  final lang = filtered[index];
-                  final isSelected = lang.code == widget.selectedCode;
-                  return ListTile(
-                    dense: true,
-                    title: Text(
-                      lang.name,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    trailing: isSelected
-                        ? Icon(
-                            Icons.check,
-                            color: Theme.of(context).colorScheme.primary,
-                          )
-                        : null,
-                    onTap: () => widget.onSelected(lang.code),
-                  );
-                },
+              child: Scrollbar(
+                thickness: 4,
+                radius: const Radius.circular(2),
+                child: ListView.builder(
+                  itemCount: supportedLanguages.length,
+                  itemBuilder: (context, index) {
+                    final lang = supportedLanguages[index];
+                    final isSelected = lang.code == selectedCode;
+                    return ListTile(
+                      dense: true,
+                      title: Text(
+                        lang.name,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      trailing: isSelected
+                          ? Icon(
+                              Icons.check,
+                              color: Theme.of(context).colorScheme.primary,
+                            )
+                          : null,
+                      onTap: () => onSelected(lang.code),
+                    );
+                  },
+                ),
               ),
             ),
           ],
