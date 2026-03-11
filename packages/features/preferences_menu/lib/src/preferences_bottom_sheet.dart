@@ -166,11 +166,14 @@ class _MainPageContent extends StatelessWidget {
                   l10n.preferences,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(),
-                  visualDensity: VisualDensity.compact,
-                  padding: EdgeInsets.zero,
+                Transform.translate(
+                  offset: const Offset(Spacing.small, 0),
+                  child: IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                  ),
                 ),
               ],
             ),
