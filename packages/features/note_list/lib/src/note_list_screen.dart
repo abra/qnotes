@@ -351,7 +351,7 @@ class _BottomBarState extends State<_BottomBar> {
                       color: colorScheme.onSurfaceVariant,
                     ),
                     filled: true,
-                    fillColor: colorScheme.surfaceContainerHighest,
+                    fillColor: colorScheme.surface,
                     border: const OutlineInputBorder(
                       borderRadius: _innerRadius,
                       borderSide: BorderSide.none,
