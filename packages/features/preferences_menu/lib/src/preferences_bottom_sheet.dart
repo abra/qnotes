@@ -159,10 +159,20 @@ class _MainPageContent extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _DragHandle(),
-            Text(
-              l10n.preferences,
-              style: Theme.of(context).textTheme.titleLarge,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.preferences,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.of(context).pop(),
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                ),
+              ],
             ),
             const SizedBox(height: Spacing.mediumLarge),
             _PreferenceRow(
@@ -296,7 +306,6 @@ class _LanguagePage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _DragHandle(),
             Row(
               children: [
                 IconButton(
@@ -351,27 +360,6 @@ class _LanguagePage extends StatelessWidget {
 // ---------------------------------------------------------------------------
 // Shared widgets
 // ---------------------------------------------------------------------------
-
-class _DragHandle extends StatelessWidget {
-  const _DragHandle();
-
-  static const _radius = BorderRadius.all(Radius.circular(2));
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: 32,
-        height: 4,
-        margin: const EdgeInsets.only(bottom: Spacing.mediumLarge),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.outlineVariant,
-          borderRadius: _radius,
-        ),
-      ),
-    );
-  }
-}
 
 class _PreferenceRow extends StatelessWidget {
   const _PreferenceRow({required this.label, required this.control});
