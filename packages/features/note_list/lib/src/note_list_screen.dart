@@ -58,38 +58,43 @@ class NoteListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<NoteListBloc, NoteListState>(
-      listenWhen: (prev, curr) => prev.deleteError != curr.deleteError,
-      listener: (context, state) {
-        if (state.deleteError != null) {
-          final l10n = NoteListLocalizations.of(context)!;
-          toastification.show(
-            context: context,
-            type: ToastificationType.error,
-            style: ToastificationStyle.flat,
-            title: Text(l10n.noteDeleteFailed),
-            autoCloseDuration: const Duration(seconds: 3),
-            alignment: Alignment.topCenter,
-            animationBuilder: (context, animation, alignment, child) {
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, -1),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
+    return StreamBuilder<Preferences>(
+      stream: preferencesService.stream,
+      initialData: preferencesService.current,
+      builder: (context, snapshot) {
+        final viewMode = snapshot.data?.noteViewMode ?? NoteViewMode.grid;
+        final density =
+            snapshot.data?.noteListDensity ?? NoteListDensity.threeLines;
+        return BlocConsumer<NoteListBloc, NoteListState>(
+          listenWhen: (prev, curr) => prev.deleteError != curr.deleteError,
+          listener: (context, state) {
+            if (state.deleteError != null) {
+              final l10n = NoteListLocalizations.of(context)!;
+              toastification.show(
+                context: context,
+                type: ToastificationType.error,
+                style: ToastificationStyle.flat,
+                title: Text(l10n.noteDeleteFailed),
+                autoCloseDuration: const Duration(seconds: 3),
+                alignment: Alignment.topCenter,
+                animationBuilder: (context, animation, alignment, child) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, -1),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                },
               );
-            },
-          );
-        }
-      },
-      builder: (context, state) {
-        return StreamBuilder<Preferences>(
-          stream: preferencesService.stream,
-          initialData: preferencesService.current,
-          builder: (context, snapshot) {
-            final viewMode = snapshot.data?.noteViewMode ?? NoteViewMode.grid;
-            final density =
-                snapshot.data?.noteListDensity ?? NoteListDensity.threeLines;
+            }
+          },
+          buildWhen: (prev, curr) =>
+              prev.status != curr.status ||
+              prev.notes != curr.notes ||
+              prev.selectedIds != curr.selectedIds ||
+              prev.query != curr.query,
+          builder: (context, state) {
             return _NoteListScaffold(
               state: state,
               viewMode: viewMode,
@@ -275,6 +280,9 @@ class _BottomBar extends StatefulWidget {
 }
 
 class _BottomBarState extends State<_BottomBar> {
+  static const _outerRadius = BorderRadius.all(Radius.circular(20));
+  static const _innerRadius = BorderRadius.all(Radius.circular(14));
+
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
 
@@ -298,7 +306,7 @@ class _BottomBarState extends State<_BottomBar> {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: _outerRadius,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -345,16 +353,16 @@ class _BottomBarState extends State<_BottomBar> {
                     ),
                     filled: true,
                     fillColor: colorScheme.surfaceContainerHighest,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
+                    border: const OutlineInputBorder(
+                      borderRadius: _innerRadius,
                       borderSide: BorderSide.none,
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
+                    enabledBorder: const OutlineInputBorder(
+                      borderRadius: _innerRadius,
                       borderSide: BorderSide.none,
                     ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
+                    focusedBorder: const OutlineInputBorder(
+                      borderRadius: _innerRadius,
                       borderSide: BorderSide.none,
                     ),
                     isDense: true,
@@ -379,7 +387,7 @@ class _BottomBarState extends State<_BottomBar> {
             DecoratedBox(
               decoration: BoxDecoration(
                 color: colorScheme.primary,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: _innerRadius,
               ),
               child: IconButton(
                 icon: const Icon(Icons.add, color: Colors.white),

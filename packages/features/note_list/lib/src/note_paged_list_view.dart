@@ -24,6 +24,8 @@ class NotePagedListView extends StatelessWidget {
   final ValueChanged<String>? onNoteDeleted;
   final ValueChanged<String>? onNoteLongPressed;
 
+  static const _dismissRadius = BorderRadius.all(Radius.circular(12));
+
   int get _contentMaxLines => switch (density) {
     NoteListDensity.twoLines => 1,
     NoteListDensity.threeLines => 2,
@@ -41,6 +43,7 @@ class NotePagedListView extends StatelessWidget {
         final isSelected = selectedIds.contains(note.id);
 
         final card = NoteCard(
+          key: ValueKey(note.id),
           note: note,
           isSelected: isSelected,
           titleMaxLines: 1,
@@ -65,7 +68,7 @@ class NotePagedListView extends StatelessWidget {
             padding: const EdgeInsets.only(right: Spacing.large),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.error,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: _dismissRadius,
             ),
             child: Icon(
               Icons.delete_outline,

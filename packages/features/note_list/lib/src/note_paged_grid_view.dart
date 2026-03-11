@@ -38,6 +38,7 @@ class NotePagedGridView extends StatelessWidget {
         final isSelected = selectedIds.contains(note.id);
 
         return NoteCard(
+          key: ValueKey(note.id),
           note: note,
           isSelected: isSelected,
           onPressed: isSelectionMode

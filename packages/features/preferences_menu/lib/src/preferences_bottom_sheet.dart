@@ -322,7 +322,6 @@ class _LanguagePageState extends State<_LanguagePage> {
             ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 300),
               child: ListView.builder(
-                shrinkWrap: true,
                 itemCount: filtered.length,
                 itemBuilder: (context, index) {
                   final lang = filtered[index];
@@ -358,6 +357,8 @@ class _LanguagePageState extends State<_LanguagePage> {
 class _DragHandle extends StatelessWidget {
   const _DragHandle();
 
+  static const _radius = BorderRadius.all(Radius.circular(2));
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -367,7 +368,7 @@ class _DragHandle extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: Spacing.mediumLarge),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.outlineVariant,
-          borderRadius: BorderRadius.circular(2),
+          borderRadius: _radius,
         ),
       ),
     );

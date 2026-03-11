@@ -81,6 +81,11 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
   Widget build(BuildContext context) {
     return BlocConsumer<NoteDetailsBloc, NoteDetailsState>(
       listenWhen: (prev, curr) => prev.status != curr.status,
+      buildWhen: (prev, curr) =>
+          prev.status != curr.status ||
+          prev.color != curr.color ||
+          prev.isPinned != curr.isPinned ||
+          prev.isNew != curr.isNew,
       listener: (context, state) {
         final l10n = NoteDetailsLocalizations.of(context)!;
         if (state.status == NoteDetailsStatus.success) {
@@ -118,6 +123,14 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
         }
       },
       builder: (context, state) {
+        final l10n = NoteDetailsLocalizations.of(context)!;
+        final brightness = Theme.of(context).brightness;
+        final hasColor = state.color != NoteColor.none;
+        final textColor = hasColor
+            ? CatppuccinLatte.text
+            : Theme.of(context).colorScheme.onSurface;
+        final hintColor = textColor.withValues(alpha: 0.45);
+
         return PopScope(
           onPopInvokedWithResult: (didPop, _) {
             if (!didPop) return;
@@ -128,130 +141,119 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
               _save(context);
             }
           },
-          child: Builder(
-            builder: (context) {
-              final l10n = NoteDetailsLocalizations.of(context)!;
-              final brightness = Theme.of(context).brightness;
-              final hasColor = state.color != NoteColor.none;
-              final textColor = hasColor
-                  ? CatppuccinLatte.text
-                  : Theme.of(context).colorScheme.onSurface;
-              final hintColor = textColor.withValues(alpha: 0.45);
-
-              return Scaffold(
-                backgroundColor: hasColor
-                    ? state.color.forBrightness(brightness)
-                    : null,
-                body: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: Spacing.mediumLarge,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          child: Scaffold(
+            backgroundColor: hasColor
+                ? state.color.forBrightness(brightness)
+                : null,
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: Spacing.mediumLarge,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top bar
+                    Row(
                       children: [
-                        // Top bar
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.arrow_back, color: textColor),
-                              onPressed: widget.onBackPressed,
-                              padding: EdgeInsets.zero,
-                              visualDensity: VisualDensity.compact,
-                            ),
-                            Expanded(
-                              child: Text(
-                                state.isNew ? l10n.newNote : l10n.editNote,
-                                style: Theme.of(context).textTheme.titleMedium
-                                    ?.copyWith(color: textColor),
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                state.isPinned
-                                    ? Icons.push_pin
-                                    : Icons.push_pin_outlined,
-                                color: textColor,
-                              ),
-                              onPressed: () => context
-                                  .read<NoteDetailsBloc>()
-                                  .add(NoteDetailsPinToggled()),
-                              padding: EdgeInsets.zero,
-                              visualDensity: VisualDensity.compact,
-                            ),
-                          ],
+                        IconButton(
+                          icon: Icon(Icons.arrow_back, color: textColor),
+                          onPressed: widget.onBackPressed,
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
                         ),
-                        const SizedBox(height: Spacing.small),
-                        // Title row with color dot
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: TextField(
-                                controller: _titleController,
-                                onChanged: (v) => context
-                                    .read<NoteDetailsBloc>()
-                                    .add(NoteDetailsTitleChanged(v)),
-                                style: Theme.of(context).textTheme.headlineSmall
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: textColor,
-                                    ),
-                                decoration: InputDecoration(
-                                  hintText: l10n.titleHint,
-                                  hintStyle: TextStyle(color: hintColor),
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.zero,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: Spacing.small),
-                            IconButton(
-                              icon: Icon(
-                                state.color == NoteColor.none
-                                    ? Icons.palette_outlined
-                                    : Icons.palette,
-                                color: textColor,
-                              ),
-                              onPressed: () =>
-                                  _showColorPicker(context, state.color),
-                              padding: EdgeInsets.zero,
-                              visualDensity: VisualDensity.compact,
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: Spacing.small),
-                        // Content
                         Expanded(
-                          child: TextField(
-                            controller: _contentController,
-                            onChanged: (v) => context
-                                .read<NoteDetailsBloc>()
-                                .add(NoteDetailsContentChanged(v)),
+                          child: Text(
+                            state.isNew ? l10n.newNote : l10n.editNote,
                             style: Theme.of(
                               context,
-                            ).textTheme.bodyLarge?.copyWith(color: textColor),
+                            ).textTheme.titleMedium?.copyWith(color: textColor),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            state.isPinned
+                                ? Icons.push_pin
+                                : Icons.push_pin_outlined,
+                            color: textColor,
+                          ),
+                          onPressed: () => context.read<NoteDetailsBloc>().add(
+                            NoteDetailsPinToggled(),
+                          ),
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: Spacing.small),
+                    // Title row with color dot
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _titleController,
+                            onChanged: (v) => context
+                                .read<NoteDetailsBloc>()
+                                .add(NoteDetailsTitleChanged(v)),
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor,
+                                ),
                             decoration: InputDecoration(
-                              hintText: l10n.contentHint,
+                              hintText: l10n.titleHint,
                               hintStyle: TextStyle(color: hintColor),
                               border: InputBorder.none,
                               isDense: true,
                               contentPadding: EdgeInsets.zero,
                             ),
-                            maxLines: null,
-                            expands: true,
-                            textAlignVertical: TextAlignVertical.top,
-                            keyboardType: TextInputType.multiline,
                           ),
+                        ),
+                        const SizedBox(width: Spacing.small),
+                        IconButton(
+                          icon: Icon(
+                            state.color == NoteColor.none
+                                ? Icons.palette_outlined
+                                : Icons.palette,
+                            color: textColor,
+                          ),
+                          onPressed: () =>
+                              _showColorPicker(context, state.color),
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
                         ),
                       ],
                     ),
-                  ),
+                    const SizedBox(height: Spacing.small),
+                    // Content
+                    Expanded(
+                      child: TextField(
+                        controller: _contentController,
+                        onChanged: (v) => context.read<NoteDetailsBloc>().add(
+                          NoteDetailsContentChanged(v),
+                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyLarge?.copyWith(color: textColor),
+                        decoration: InputDecoration(
+                          hintText: l10n.contentHint,
+                          hintStyle: TextStyle(color: hintColor),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        maxLines: null,
+                        expands: true,
+                        textAlignVertical: TextAlignVertical.top,
+                        keyboardType: TextInputType.multiline,
+                      ),
+                    ),
+                  ],
                 ),
-              );
-            },
+              ),
+            ),
           ),
         );
       },
