@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared/shared.dart';
+import 'package:uuid/uuid.dart';
 
 import 'note_local_storage.dart';
 import 'note_local_storage_exception.dart';
+
+const _uuid = Uuid();
 
 /// Concrete implementation of [NoteRepository] backed by SQLite via drift.
 class NoteRepositoryImpl implements NoteRepository {
@@ -37,7 +40,7 @@ class NoteRepositoryImpl implements NoteRepository {
   }) async {
     final now = DateTime.now();
     final note = Note(
-      id: now.microsecondsSinceEpoch.toString(),
+      id: _uuid.v4(),
       title: title,
       content: content,
       createdAt: now,

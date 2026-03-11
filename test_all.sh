@@ -28,7 +28,7 @@ run "component_library"            "flutter test test/" "$SCRIPT_DIR/packages/co
 run "monitoring"                   "flutter test test/" "$SCRIPT_DIR/packages/monitoring"
 run "note_list"                    "flutter test test/" "$SCRIPT_DIR/packages/features/note_list"
 run "note_details"                 "flutter test test/" "$SCRIPT_DIR/packages/features/note_details"
-run "preferences_bottom_sheet"     "flutter test test/" "$SCRIPT_DIR/packages/features/preferences_bottom_sheet"
+run "preferences_menu"             "flutter test test/" "$SCRIPT_DIR/packages/features/preferences_menu"
 
 echo ""
 echo "────────────────────────────"
