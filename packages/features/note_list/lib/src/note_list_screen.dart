@@ -203,15 +203,7 @@ class _NoteListScaffold extends StatelessWidget {
                 ),
               ],
             )
-          : AppBar(
-              title: const Text('Nota'),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.more_vert),
-                  onPressed: onSettingsPressed,
-                ),
-              ],
-            ),
+          : AppBar(title: const Text('Nota')),
       body: SafeArea(
         child: Stack(
           children: [
@@ -260,6 +252,7 @@ class _NoteListScaffold extends StatelessWidget {
                       ? null
                       : () => _navigateAndRefresh(context, onAddPressed!),
                   onQueryChanged: (q) => bloc.add(NoteListQueryChanged(q)),
+                  onSettingsPressed: onSettingsPressed,
                 ),
               ),
           ],
@@ -270,10 +263,15 @@ class _NoteListScaffold extends StatelessWidget {
 }
 
 class _BottomBar extends StatefulWidget {
-  const _BottomBar({this.onAddPressed, this.onQueryChanged});
+  const _BottomBar({
+    this.onAddPressed,
+    this.onQueryChanged,
+    this.onSettingsPressed,
+  });
 
   final VoidCallback? onAddPressed;
   final ValueChanged<String>? onQueryChanged;
+  final VoidCallback? onSettingsPressed;
 
   @override
   State<_BottomBar> createState() => _BottomBarState();
@@ -381,6 +379,17 @@ class _BottomBarState extends State<_BottomBar> {
                         : null,
                   ),
                 ),
+              ),
+            ),
+            const SizedBox(width: Spacing.small),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: _innerRadius,
+              ),
+              child: IconButton(
+                icon: Icon(Icons.menu, color: colorScheme.onSurfaceVariant),
+                onPressed: widget.onSettingsPressed,
               ),
             ),
             const SizedBox(width: Spacing.small),
