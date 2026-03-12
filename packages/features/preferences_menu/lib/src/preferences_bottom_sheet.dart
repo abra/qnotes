@@ -5,15 +5,7 @@ import 'package:shared/shared.dart';
 
 import 'l10n/preferences_localizations.dart';
 
-// ---------------------------------------------------------------------------
-// Sheet pages
-// ---------------------------------------------------------------------------
-
 enum _Page { main, language }
-
-// ---------------------------------------------------------------------------
-// PreferencesBottomSheet
-// ---------------------------------------------------------------------------
 
 /// Bottom sheet with app preferences. Manages navigation between
 /// the main settings page and the language selection page.
@@ -86,10 +78,6 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Main page
-// ---------------------------------------------------------------------------
 
 /// Reads current [Preferences] from [PreferencesScope] and renders
 /// theme, notes view, list density and language controls.
@@ -246,10 +234,6 @@ class _MainPage extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Language page
-// ---------------------------------------------------------------------------
-
 /// Scrollable list of supported languages with a checkmark
 /// on the currently selected one.
 class _LanguagePage extends StatelessWidget {
@@ -332,10 +316,6 @@ class _LanguagePage extends StatelessWidget {
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Shared widgets
-// ---------------------------------------------------------------------------
 
 /// A single row with a label on the left and a control widget on the right.
 class _PreferenceRow extends StatelessWidget {
