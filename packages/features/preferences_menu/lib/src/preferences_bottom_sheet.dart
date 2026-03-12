@@ -18,13 +18,8 @@ enum _Page { main, language }
 /// Bottom sheet with app preferences. Manages navigation between
 /// the main settings page and the language selection page.
 class PreferencesBottomSheet extends StatefulWidget {
-  const PreferencesBottomSheet({
-    super.key,
-    required this.preferencesService,
-    required this.supportedLanguages,
-  });
+  const PreferencesBottomSheet({super.key, required this.supportedLanguages});
 
-  final PreferencesService preferencesService;
   final List<SupportedLanguage> supportedLanguages;
 
   @override
@@ -50,17 +45,18 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
           child: _page == _Page.main
               ? _MainPage(
                   key: const ValueKey(_Page.main),
-                  preferencesService: widget.preferencesService,
                   supportedLanguages: widget.supportedLanguages,
                   onLanguageTap: _goToLanguage,
                 )
               : _LanguagePage(
                   key: const ValueKey(_Page.language),
-                  selectedCode:
-                      widget.preferencesService.current.locale.languageCode,
+                  selectedCode: PreferencesScope.of(
+                    context,
+                  ).locale.languageCode,
                   supportedLanguages: widget.supportedLanguages,
                   onSelected: (code) {
-                    widget.preferencesService.update(
+                    PreferencesScope.update(
+                      context,
                       (p) => p.copyWith(locale: Locale(code)),
                     );
                     _goToMain();
@@ -95,55 +91,21 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
 // Main page
 // ---------------------------------------------------------------------------
 
-/// Subscribes to [PreferencesService] stream and passes current
-/// preferences down to [_MainPageContent].
+/// Reads current [Preferences] from [PreferencesScope] and renders
+/// theme, notes view, list density and language controls.
 class _MainPage extends StatelessWidget {
   const _MainPage({
     super.key,
-    required this.preferencesService,
     required this.supportedLanguages,
     required this.onLanguageTap,
   });
 
-  final PreferencesService preferencesService;
   final List<SupportedLanguage> supportedLanguages;
   final VoidCallback onLanguageTap;
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Preferences>(
-      stream: preferencesService.stream,
-      initialData: preferencesService.current,
-      builder: (context, snapshot) {
-        final prefs = snapshot.data ?? preferencesService.current;
-        return _MainPageContent(
-          prefs: prefs,
-          preferencesService: preferencesService,
-          supportedLanguages: supportedLanguages,
-          onLanguageTap: onLanguageTap,
-        );
-      },
-    );
-  }
-}
-
-/// Renders the main preferences page: theme, notes view,
-/// list density and language controls.
-class _MainPageContent extends StatelessWidget {
-  const _MainPageContent({
-    required this.prefs,
-    required this.preferencesService,
-    required this.supportedLanguages,
-    required this.onLanguageTap,
-  });
-
-  final Preferences prefs;
-  final PreferencesService preferencesService;
-  final List<SupportedLanguage> supportedLanguages;
-  final VoidCallback onLanguageTap;
-
-  @override
-  Widget build(BuildContext context) {
+    final prefs = PreferencesScope.of(context);
     final l10n = PreferencesLocalizations.of(context)!;
     final selectedLanguage = supportedLanguages.firstWhere(
       (l) => l.code == prefs.locale.languageCode,
@@ -205,7 +167,8 @@ class _MainPageContent extends StatelessWidget {
                   ),
                 ],
                 selected: {prefs.themeMode},
-                onSelectionChanged: (value) => preferencesService.update(
+                onSelectionChanged: (value) => PreferencesScope.update(
+                  context,
                   (p) => p.copyWith(themeMode: value.first),
                 ),
               ),
@@ -227,7 +190,8 @@ class _MainPageContent extends StatelessWidget {
                   ),
                 ],
                 selected: {prefs.noteViewMode},
-                onSelectionChanged: (value) => preferencesService.update(
+                onSelectionChanged: (value) => PreferencesScope.update(
+                  context,
                   (p) => p.copyWith(noteViewMode: value.first),
                 ),
               ),
@@ -254,7 +218,8 @@ class _MainPageContent extends StatelessWidget {
                   ),
                 ],
                 selected: {prefs.noteListDensity},
-                onSelectionChanged: (value) => preferencesService.update(
+                onSelectionChanged: (value) => PreferencesScope.update(
+                  context,
                   (p) => p.copyWith(noteListDensity: value.first),
                 ),
               ),

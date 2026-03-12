@@ -24,10 +24,10 @@ Widget _buildSheet(PreferencesService service) {
       GlobalWidgetsLocalizations.delegate,
     ],
     supportedLocales: const [Locale('en'), Locale('ru')],
-    home: Scaffold(
-      body: PreferencesBottomSheet(
-        preferencesService: service,
-        supportedLanguages: _testLanguages,
+    home: PreferencesScope(
+      service: service,
+      child: Scaffold(
+        body: PreferencesBottomSheet(supportedLanguages: _testLanguages),
       ),
     ),
   );

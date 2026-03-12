@@ -23,7 +23,6 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
             context: context,
             isScrollControlled: true,
             builder: (_) => PreferencesBottomSheet(
-              preferencesService: dependencies.preferencesService,
               supportedLanguages: dependencies.supportedLanguages,
             ),
           ),
