@@ -16,7 +16,7 @@ Future<PreferencesService> _createService() => PreferencesService.create(
   supportedCodes: _testLanguages.map((l) => l.code).toList(),
 );
 
-Widget _buildSheet(PreferencesService service) {
+Widget _buildMenu(PreferencesService service) {
   return MaterialApp(
     localizationsDelegates: const [
       PreferencesLocalizations.delegate,
@@ -27,7 +27,7 @@ Widget _buildSheet(PreferencesService service) {
     home: PreferencesScope(
       service: service,
       child: Scaffold(
-        body: PreferencesBottomSheet(supportedLanguages: _testLanguages),
+        body: PreferencesMenu(supportedLanguages: _testLanguages),
       ),
     ),
   );
@@ -39,10 +39,10 @@ void main() {
         InMemorySharedPreferencesAsync.empty();
   });
 
-  group('PreferencesBottomSheet', () {
+  group('PreferencesMenu', () {
     testWidgets('shows "Preferences" title', (tester) async {
       final service = await _createService();
-      await tester.pumpWidget(_buildSheet(service));
+      await tester.pumpWidget(_buildMenu(service));
 
       expect(find.text('Preferences'), findsOneWidget);
     });
@@ -51,7 +51,7 @@ void main() {
       tester,
     ) async {
       final service = await _createService();
-      await tester.pumpWidget(_buildSheet(service));
+      await tester.pumpWidget(_buildMenu(service));
 
       expect(find.text('Theme'), findsOneWidget);
       expect(find.text('Notes view'), findsOneWidget);
@@ -63,7 +63,7 @@ void main() {
       'shows three SegmentedButtons (Theme, Notes view, List density)',
       (tester) async {
         final service = await _createService();
-        await tester.pumpWidget(_buildSheet(service));
+        await tester.pumpWidget(_buildMenu(service));
 
         expect(
           find.byWidgetPredicate((w) => w is SegmentedButton),
@@ -74,14 +74,14 @@ void main() {
 
     testWidgets('shows close button on main page', (tester) async {
       final service = await _createService();
-      await tester.pumpWidget(_buildSheet(service));
+      await tester.pumpWidget(_buildMenu(service));
 
       expect(find.byIcon(Icons.close), findsOneWidget);
     });
 
     testWidgets('updates theme preference on segment tap', (tester) async {
       final service = await _createService();
-      await tester.pumpWidget(_buildSheet(service));
+      await tester.pumpWidget(_buildMenu(service));
 
       await tester.tap(find.byIcon(Icons.dark_mode));
       await tester.pump();
@@ -91,7 +91,7 @@ void main() {
 
     testWidgets('updates noteViewMode to list on segment tap', (tester) async {
       final service = await _createService();
-      await tester.pumpWidget(_buildSheet(service));
+      await tester.pumpWidget(_buildMenu(service));
 
       await tester.tap(find.byIcon(Icons.list));
       await tester.pump();
@@ -101,14 +101,14 @@ void main() {
 
     testWidgets('shows current language name on main page', (tester) async {
       final service = await _createService();
-      await tester.pumpWidget(_buildSheet(service));
+      await tester.pumpWidget(_buildMenu(service));
 
       expect(find.text('English'), findsOneWidget);
     });
 
     testWidgets('navigates to language page on language tap', (tester) async {
       final service = await _createService();
-      await tester.pumpWidget(_buildSheet(service));
+      await tester.pumpWidget(_buildMenu(service));
 
       await tester.tap(find.text('English'));
       await tester.pumpAndSettle();
@@ -120,7 +120,7 @@ void main() {
 
     testWidgets('updates locale to RU via language page', (tester) async {
       final service = await _createService();
-      await tester.pumpWidget(_buildSheet(service));
+      await tester.pumpWidget(_buildMenu(service));
 
       await tester.tap(find.text('English'));
       await tester.pumpAndSettle();
@@ -132,7 +132,7 @@ void main() {
 
     testWidgets('back arrow returns to main page', (tester) async {
       final service = await _createService();
-      await tester.pumpWidget(_buildSheet(service));
+      await tester.pumpWidget(_buildMenu(service));
 
       await tester.tap(find.text('English'));
       await tester.pumpAndSettle();
@@ -144,7 +144,7 @@ void main() {
 
     testWidgets('rebuilds when service emits new locale', (tester) async {
       final service = await _createService();
-      await tester.pumpWidget(_buildSheet(service));
+      await tester.pumpWidget(_buildMenu(service));
 
       await service.update((p) => p.copyWith(locale: const Locale('ru')));
       await tester.pump();

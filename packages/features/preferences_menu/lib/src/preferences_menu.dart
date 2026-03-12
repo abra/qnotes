@@ -7,18 +7,18 @@ import 'l10n/preferences_localizations.dart';
 
 enum _Page { main, language }
 
-/// Bottom sheet with app preferences. Manages navigation between
+/// App preferences menu. Manages navigation between
 /// the main settings page and the language selection page.
-class PreferencesBottomSheet extends StatefulWidget {
-  const PreferencesBottomSheet({super.key, required this.supportedLanguages});
+class PreferencesMenu extends StatefulWidget {
+  const PreferencesMenu({super.key, required this.supportedLanguages});
 
   final List<SupportedLanguage> supportedLanguages;
 
   @override
-  State<PreferencesBottomSheet> createState() => _PreferencesBottomSheetState();
+  State<PreferencesMenu> createState() => _PreferencesMenuState();
 }
 
-class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
+class _PreferencesMenuState extends State<PreferencesMenu> {
   _Page _page = _Page.main;
 
   void _goToLanguage() => setState(() => _page = _Page.language);

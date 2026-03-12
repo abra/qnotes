@@ -22,7 +22,7 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
           onSettingsPressed: () => showModalBottomSheet<void>(
             context: context,
             isScrollControlled: true,
-            builder: (_) => PreferencesBottomSheet(
+            builder: (_) => PreferencesMenu(
               supportedLanguages: dependencies.supportedLanguages,
             ),
           ),
