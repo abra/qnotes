@@ -1,6 +1,6 @@
 import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
-import 'package:preferences_repository/preferences_repository.dart';
+import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 
 import 'l10n/preferences_localizations.dart';

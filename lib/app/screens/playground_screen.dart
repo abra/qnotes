@@ -2,8 +2,9 @@ import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nota/app/dependency_scope.dart';
-import 'package:nota/app/preferences_scope.dart';
 import 'package:nota/app/router/app_routes.dart';
+import 'package:preferences_service/preferences_service.dart'
+    show PreferencesScope;
 
 /// Manual test screen for verifying app-wide settings.
 ///

@@ -1,4 +1,4 @@
-import 'package:equatable/equatable.dart';
+import 'package:equatable/equatable.dart' show Equatable;
 import 'package:shared/src/models/note_color.dart';
 
 /// A single note entity.

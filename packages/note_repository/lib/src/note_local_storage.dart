@@ -1,10 +1,11 @@
-import 'dart:io';
+import 'dart:io' show File;
 
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:flutter/foundation.dart';
+import 'package:drift/native.dart' show NativeDatabase;
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart'
+    show getApplicationDocumentsDirectory;
 import 'package:shared/shared.dart';
 
 import 'mappers/domain_to_storage.dart';

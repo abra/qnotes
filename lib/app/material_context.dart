@@ -8,11 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nota/app/dependency_scope.dart';
-import 'package:nota/app/preferences_scope.dart';
 import 'package:nota/app/router/app_router.dart';
 import 'package:note_details/note_details.dart';
 import 'package:note_list/note_list.dart';
 import 'package:preferences_menu/preferences_menu.dart';
+import 'package:preferences_service/preferences_service.dart'
+    show PreferencesScope;
 import 'package:toastification/toastification.dart';
 
 /// Entry point for the application that creates [MaterialApp.router].

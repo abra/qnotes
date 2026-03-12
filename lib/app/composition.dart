@@ -10,7 +10,7 @@ import 'package:nota/app/config/supported_locales.dart';
 import 'package:nota/app/dependency_container.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:preferences_repository/preferences_repository.dart';
+import 'package:preferences_service/preferences_service.dart';
 
 /// A place where Application-Wide dependencies are initialized.
 ///

@@ -18,7 +18,8 @@ enum NoteColor {
   coral,
   mint,
   rose,
-  sand;
+  sand
+  ;
 
   static NoteColor from(String? value) => switch (value) {
     'red' => NoteColor.red,

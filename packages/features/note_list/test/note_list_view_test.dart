@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:note_list/src/note_list_bloc.dart';
-import 'package:preferences_repository/preferences_repository.dart';
+import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 
 import 'helpers/fake_note_repository.dart';

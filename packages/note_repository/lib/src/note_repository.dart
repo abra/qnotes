@@ -1,6 +1,6 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:shared/shared.dart';
-import 'package:uuid/uuid.dart';
+import 'package:uuid/uuid.dart' show Uuid;
 
 import 'note_local_storage.dart';
 import 'note_local_storage_exception.dart';

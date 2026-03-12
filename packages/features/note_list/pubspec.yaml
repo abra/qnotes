@@ -20,8 +20,8 @@ dependencies:
     path: ../../shared
   note_repository:
     path: ../../note_repository
-  preferences_repository:
-    path: ../../preferences_repository
+  preferences_service:
+    path: ../../preferences_service
   component_library:
     path: ../../component_library
   toastification: ^3.0.3

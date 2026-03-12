@@ -1,5 +1,5 @@
-import 'package:bloc_concurrency/bloc_concurrency.dart';
-import 'package:equatable/equatable.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart' show restartable;
+import 'package:equatable/equatable.dart' show Equatable;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/shared.dart';
 

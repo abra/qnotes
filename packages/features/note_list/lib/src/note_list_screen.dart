@@ -1,7 +1,7 @@
 import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:preferences_repository/preferences_repository.dart';
+import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 import 'package:toastification/toastification.dart';
 
@@ -14,14 +14,12 @@ class NoteListScreen extends StatelessWidget {
   const NoteListScreen({
     super.key,
     required this.noteRepository,
-    required this.preferencesService,
     this.onNotePressed,
     this.onAddPressed,
     this.onSettingsPressed,
   });
 
   final NoteRepository noteRepository;
-  final PreferencesService preferencesService;
   final Future<void> Function(Note)? onNotePressed;
   final Future<void> Function()? onAddPressed;
   final VoidCallback? onSettingsPressed;
@@ -32,7 +30,6 @@ class NoteListScreen extends StatelessWidget {
       create: (_) =>
           NoteListBloc(noteRepository: noteRepository)..add(NoteListStarted()),
       child: NoteListView(
-        preferencesService: preferencesService,
         onNotePressed: onNotePressed,
         onAddPressed: onAddPressed,
         onSettingsPressed: onSettingsPressed,
@@ -45,65 +42,57 @@ class NoteListScreen extends StatelessWidget {
 class NoteListView extends StatelessWidget {
   const NoteListView({
     super.key,
-    required this.preferencesService,
     this.onNotePressed,
     this.onAddPressed,
     this.onSettingsPressed,
   });
 
-  final PreferencesService preferencesService;
   final Future<void> Function(Note)? onNotePressed;
   final Future<void> Function()? onAddPressed;
   final VoidCallback? onSettingsPressed;
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<Preferences>(
-      stream: preferencesService.stream,
-      initialData: preferencesService.current,
-      builder: (context, snapshot) {
-        final viewMode = snapshot.data?.noteViewMode ?? NoteViewMode.grid;
-        final density =
-            snapshot.data?.noteListDensity ?? NoteListDensity.threeLines;
-        return BlocConsumer<NoteListBloc, NoteListState>(
-          listenWhen: (prev, curr) => prev.deleteError != curr.deleteError,
-          listener: (context, state) {
-            if (state.deleteError != null) {
-              final l10n = NoteListLocalizations.of(context)!;
-              toastification.show(
-                context: context,
-                type: ToastificationType.error,
-                style: ToastificationStyle.flat,
-                title: Text(l10n.noteDeleteFailed),
-                autoCloseDuration: const Duration(seconds: 3),
-                alignment: Alignment.topCenter,
-                animationBuilder: (context, animation, alignment, child) {
-                  return SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, -1),
-                      end: Offset.zero,
-                    ).animate(animation),
-                    child: child,
-                  );
-                },
+    final preferences = PreferencesScope.of(context);
+    final viewMode = preferences.noteViewMode;
+    final density = preferences.noteListDensity;
+    return BlocConsumer<NoteListBloc, NoteListState>(
+      listenWhen: (prev, curr) => prev.deleteError != curr.deleteError,
+      listener: (context, state) {
+        if (state.deleteError != null) {
+          final l10n = NoteListLocalizations.of(context)!;
+          toastification.show(
+            context: context,
+            type: ToastificationType.error,
+            style: ToastificationStyle.flat,
+            title: Text(l10n.noteDeleteFailed),
+            autoCloseDuration: const Duration(seconds: 3),
+            alignment: Alignment.topCenter,
+            animationBuilder: (context, animation, alignment, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, -1),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
               );
-            }
-          },
-          buildWhen: (prev, curr) =>
-              prev.status != curr.status ||
-              prev.notes != curr.notes ||
-              prev.selectedIds != curr.selectedIds ||
-              prev.query != curr.query,
-          builder: (context, state) {
-            return _NoteListScaffold(
-              state: state,
-              viewMode: viewMode,
-              density: density,
-              onNotePressed: onNotePressed,
-              onAddPressed: onAddPressed,
-              onSettingsPressed: onSettingsPressed,
-            );
-          },
+            },
+          );
+        }
+      },
+      buildWhen: (prev, curr) =>
+          prev.status != curr.status ||
+          prev.notes != curr.notes ||
+          prev.selectedIds != curr.selectedIds ||
+          prev.query != curr.query,
+      builder: (context, state) {
+        return _NoteListScaffold(
+          state: state,
+          viewMode: viewMode,
+          density: density,
+          onNotePressed: onNotePressed,
+          onAddPressed: onAddPressed,
+          onSettingsPressed: onSettingsPressed,
         );
       },
     );

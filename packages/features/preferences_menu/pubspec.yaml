@@ -13,8 +13,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
-  preferences_repository:
-    path: ../../preferences_repository
+  preferences_service:
+    path: ../../preferences_service
   shared:
     path: ../../shared
   component_library:

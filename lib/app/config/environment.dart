@@ -4,7 +4,7 @@
 // Falls back to prod in release mode and dev in debug mode when no
 // explicit ENVIRONMENT flag is passed at build time.
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show kReleaseMode;
 
 /// The environment.
 enum Environment {

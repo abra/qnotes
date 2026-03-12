@@ -18,8 +18,8 @@ dependencies:
   component_library:
     path: packages/component_library
 
-  preferences_repository:
-    path: packages/preferences_repository
+  preferences_service:
+    path: packages/preferences_service
 
   shared:
     path: packages/shared

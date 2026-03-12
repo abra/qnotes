@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:preferences_menu/preferences_menu.dart';
-import 'package:preferences_repository/preferences_repository.dart';
+import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
@@ -72,18 +72,11 @@ void main() {
       },
     );
 
-    testWidgets('shows drag handle', (tester) async {
+    testWidgets('shows close button on main page', (tester) async {
       final service = await _createService();
       await tester.pumpWidget(_buildSheet(service));
 
-      final containers = tester
-          .widgetList<Container>(find.byType(Container))
-          .where((c) {
-            final box = c.constraints;
-            return box != null && box.maxWidth == 32 && box.maxHeight == 4;
-          })
-          .toList();
-      expect(containers, isNotEmpty);
+      expect(find.byIcon(Icons.close), findsOneWidget);
     });
 
     testWidgets('updates theme preference on segment tap', (tester) async {
@@ -121,7 +114,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Language'), findsOneWidget);
-      expect(find.byType(TextField), findsOneWidget);
+      expect(find.text('English'), findsOneWidget);
+      expect(find.text('Русский'), findsOneWidget);
     });
 
     testWidgets('updates locale to RU via language page', (tester) async {
@@ -130,8 +124,6 @@ void main() {
 
       await tester.tap(find.text('English'));
       await tester.pumpAndSettle();
-      await tester.enterText(find.byType(TextField), 'ru');
-      await tester.pump();
       await tester.tap(find.text('Русский'));
       await tester.pumpAndSettle();
 
