@@ -30,8 +30,6 @@ class PreferencesService {
 
   Preferences get current => _current;
 
-  // Future<void> dispose() => _controller.close();
-
   Future<void> update(Preferences Function(Preferences) transform) async {
     _current = transform(_current);
     await _save(_prefs, _current);

@@ -124,7 +124,6 @@ class PlaygroundScreen extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    // TODO: remove debug logging before release
                     dependencies.logger.debug(
                       'PlaygroundScreen: push ${AppRoutes.newNote}',
                     );
@@ -135,7 +134,6 @@ class PlaygroundScreen extends StatelessWidget {
                 const SizedBox(height: Spacing.small),
                 ElevatedButton(
                   onPressed: () {
-                    // TODO: remove debug logging before release
                     dependencies.logger.debug(
                       'PlaygroundScreen: push ${AppRoutes.noteEditor('42')}',
                     );
