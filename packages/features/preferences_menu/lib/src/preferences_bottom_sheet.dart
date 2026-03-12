@@ -15,6 +15,8 @@ enum _Page { main, language }
 // PreferencesBottomSheet
 // ---------------------------------------------------------------------------
 
+/// Bottom sheet with app preferences. Manages navigation between
+/// the main settings page and the language selection page.
 class PreferencesBottomSheet extends StatefulWidget {
   const PreferencesBottomSheet({
     super.key,
@@ -93,6 +95,8 @@ class _PreferencesBottomSheetState extends State<PreferencesBottomSheet> {
 // Main page
 // ---------------------------------------------------------------------------
 
+/// Subscribes to [PreferencesService] stream and passes current
+/// preferences down to [_MainPageContent].
 class _MainPage extends StatelessWidget {
   const _MainPage({
     super.key,
@@ -123,6 +127,8 @@ class _MainPage extends StatelessWidget {
   }
 }
 
+/// Renders the main preferences page: theme, notes view,
+/// list density and language controls.
 class _MainPageContent extends StatelessWidget {
   const _MainPageContent({
     required this.prefs,
@@ -279,6 +285,8 @@ class _MainPageContent extends StatelessWidget {
 // Language page
 // ---------------------------------------------------------------------------
 
+/// Scrollable list of supported languages with a checkmark
+/// on the currently selected one.
 class _LanguagePage extends StatelessWidget {
   const _LanguagePage({
     super.key,
@@ -364,6 +372,7 @@ class _LanguagePage extends StatelessWidget {
 // Shared widgets
 // ---------------------------------------------------------------------------
 
+/// A single row with a label on the left and a control widget on the right.
 class _PreferenceRow extends StatelessWidget {
   const _PreferenceRow({required this.label, required this.control});
 
