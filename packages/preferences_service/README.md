@@ -1,4 +1,4 @@
-# preferences_repository
+# preferences_service
 
 Manages user preferences: theme mode and locale.
 Persists to SharedPreferences automatically and streams changes via `PreferencesService`.
@@ -18,7 +18,7 @@ Persists to SharedPreferences automatically and streams changes via `Preferences
 
 ### Read preferences
 
-Preferences are provided to the widget tree via `PreferencesScope` (lives in `lib/app/`):
+Preferences are provided to the widget tree via `PreferencesScope` (in `packages/preferences_service`):
 
 ```dart
 final prefs = PreferencesScope.of(context);
@@ -46,12 +46,11 @@ called `PreferencesScope.of(context)`.
 
 `PreferencesService` is created in `composition.dart` and stored in
 `DependenciesContainer`.
-`PreferencesScope` (in `lib/app/`) is placed in `RootContext` and wraps the whole widget
-tree.
+`PreferencesScope` (in `packages/preferences_service`) is placed in `RootContext` and wraps the whole widget tree.
 
 ```
 DependenciesScope
-  └─ PreferencesScope     ← StreamBuilder + InheritedWidget (lib/app/)
+  └─ PreferencesScope     ← StreamBuilder + InheritedWidget (preferences_service)
        └─ MaterialContext ← reads theme/locale, passes to MaterialApp
             └─ your app
 ```
