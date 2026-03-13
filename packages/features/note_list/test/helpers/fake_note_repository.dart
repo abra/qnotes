@@ -1,3 +1,4 @@
+import 'package:note_repository/note_repository.dart';
 import 'package:shared/shared.dart';
 
 class FakeNoteRepository implements NoteRepository {

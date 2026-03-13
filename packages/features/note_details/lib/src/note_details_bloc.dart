@@ -2,6 +2,7 @@ import 'dart:math' show Random;
 
 import 'package:equatable/equatable.dart' show Equatable;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:note_repository/note_repository.dart';
 import 'package:shared/shared.dart';
 
 part 'note_details_event.dart';

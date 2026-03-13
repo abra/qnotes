@@ -70,7 +70,7 @@ Future<DependenciesContainer> createDependenciesContainer(
   final preferencesService = await PreferencesService.create(
     supportedCodes: SupportedLocales.codes,
   );
-  final noteRepository = NoteRepositoryImpl();
+  final noteRepository = NoteRepository();
 
   return DependenciesContainer(
     logger: logger,

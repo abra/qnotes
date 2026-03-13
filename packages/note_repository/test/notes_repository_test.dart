@@ -75,13 +75,13 @@ void main() {
     });
   });
 
-  group('NoteRepositoryImpl', () {
+  group('NoteRepository', () {
     late NoteLocalStorage storage;
-    late NoteRepositoryImpl repo;
+    late NoteRepository repo;
 
     setUp(() {
       storage = _openInMemory();
-      repo = NoteRepositoryImpl(localStorage: storage);
+      repo = NoteRepository(localStorage: storage);
     });
     tearDown(() => storage.close());
 

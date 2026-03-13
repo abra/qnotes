@@ -1,6 +1,7 @@
 import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:note_repository/note_repository.dart';
 import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 import 'package:toastification/toastification.dart';

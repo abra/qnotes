@@ -7,14 +7,13 @@ import 'note_local_storage_exception.dart';
 
 const _uuid = Uuid();
 
-/// Concrete implementation of [NoteRepository] backed by SQLite via drift.
-class NoteRepositoryImpl implements NoteRepository {
-  NoteRepositoryImpl({@visibleForTesting NoteLocalStorage? localStorage})
+/// SQLite-backed note repository.
+class NoteRepository {
+  NoteRepository({@visibleForTesting NoteLocalStorage? localStorage})
     : _storage = localStorage ?? NoteLocalStorage();
 
   final NoteLocalStorage _storage;
 
-  @override
   Future<List<Note>> getNotes() async {
     try {
       return await _storage.allNotes();
@@ -23,7 +22,6 @@ class NoteRepositoryImpl implements NoteRepository {
     }
   }
 
-  @override
   Future<Note?> getNoteById(String id) async {
     try {
       return await _storage.noteById(id);
@@ -32,7 +30,6 @@ class NoteRepositoryImpl implements NoteRepository {
     }
   }
 
-  @override
   Future<Note> createNote({
     String? title,
     required String content,
@@ -55,7 +52,6 @@ class NoteRepositoryImpl implements NoteRepository {
     return note;
   }
 
-  @override
   Future<Note> updateNote(Note note) async {
     final updated = note.copyWith(updatedAt: DateTime.now());
     try {
@@ -66,7 +62,6 @@ class NoteRepositoryImpl implements NoteRepository {
     return updated;
   }
 
-  @override
   Future<void> deleteNote(String id) async {
     try {
       await _storage.deleteNote(id);
@@ -75,7 +70,6 @@ class NoteRepositoryImpl implements NoteRepository {
     }
   }
 
-  @override
   Future<NoteColor?> getLastCreatedNoteColor() async {
     try {
       final raw = await _storage.lastCreatedNoteColor();
