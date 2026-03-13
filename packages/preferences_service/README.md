@@ -1,24 +1,24 @@
 # preferences_service
 
-Manages user preferences: theme mode and locale.
-Persists to SharedPreferences automatically and streams changes via `PreferencesService`.
+Streams `Preferences` changes and provides them to the widget tree via `PreferencesScope`.
+Persistence is handled by `preferences_repository`.
 
 ---
 
 ## What's included
 
-| Class                | Description                                                               |
-|----------------------|---------------------------------------------------------------------------|
-| `Preferences`        | Immutable model: `ThemeMode`, `Locale`, `NoteViewMode`, `NoteListDensity` |
-| `PreferencesService` | Loads from disk on startup, persists on update, streams changes           |
+| Class                | Description                                                     |
+|----------------------|-----------------------------------------------------------------|
+| `PreferencesService` | Loads from repository on startup, persists on update, streams changes |
+| `PreferencesScope`   | InheritedWidget — provides current `Preferences` to the subtree |
+
+The `Preferences` model lives in `preferences_repository`.
 
 ---
 
 ## Usage
 
 ### Read preferences
-
-Preferences are provided to the widget tree via `PreferencesScope` (in `packages/preferences_service`):
 
 ```dart
 final prefs = PreferencesScope.of(context);
@@ -30,27 +30,22 @@ prefs.locale     // Locale
 ### Update preferences
 
 ```dart
-// Theme mode
 PreferencesScope.update(context, (p) => p.copyWith(themeMode: ThemeMode.dark));
-
-// Locale
 PreferencesScope.update(context, (p) => p.copyWith(locale: const Locale('ru')));
 ```
 
-Changes are persisted to SharedPreferences immediately and streamed to all widgets that
-called `PreferencesScope.of(context)`.
+Changes are persisted immediately and streamed to all widgets that called `PreferencesScope.of(context)`.
 
 ---
 
 ## Wiring
 
-`PreferencesService` is created in `composition.dart` and stored in
-`DependenciesContainer`.
-`PreferencesScope` (in `packages/preferences_service`) is placed in `RootContext` and wraps the whole widget tree.
+`PreferencesService` is created in `composition.dart` and stored in `DependenciesContainer`.
+`PreferencesScope` is placed in `RootContext` and wraps the whole widget tree.
 
 ```
 DependenciesScope
-  └─ PreferencesScope     ← StreamBuilder + InheritedWidget (preferences_service)
+  └─ PreferencesScope     ← StreamBuilder + InheritedWidget
        └─ MaterialContext ← reads theme/locale, passes to MaterialApp
             └─ your app
 ```

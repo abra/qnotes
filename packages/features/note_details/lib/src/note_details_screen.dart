@@ -93,7 +93,11 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
           _contentController.text = state.content;
         }
         if (state.status == NoteDetailsStatus.saved && !_poppedByBack) {
-          widget.onBackPressed?.call();
+          if (Navigator.of(context).canPop()) {
+            Navigator.of(context).pop(true);
+          } else {
+            widget.onBackPressed?.call();
+          }
         }
         if (state.status == NoteDetailsStatus.failure) {
           final isNotFound = state.loadError is NoteNotFoundException;

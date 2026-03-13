@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nota/app/dependency_scope.dart';
 import 'package:nota/app/router/app_routes.dart';
-import 'package:preferences_service/preferences_service.dart'
-    show PreferencesScope;
+import 'package:preferences_service/preferences_service.dart';
 
 /// Manual test screen for verifying app-wide settings.
 ///
@@ -45,8 +44,7 @@ class PlaygroundScreen extends StatelessWidget {
               ],
               selected: {preferences.themeMode},
               onSelectionChanged: (value) {
-                PreferencesScope.update(
-                  context,
+                dependencies.preferencesService.update(
                   (p) => p.copyWith(themeMode: value.first),
                 );
               },
@@ -62,8 +60,7 @@ class PlaygroundScreen extends StatelessWidget {
               ],
               selected: {preferences.locale},
               onSelectionChanged: (value) {
-                PreferencesScope.update(
-                  context,
+                dependencies.preferencesService.update(
                   (p) => p.copyWith(locale: value.first),
                 );
               },

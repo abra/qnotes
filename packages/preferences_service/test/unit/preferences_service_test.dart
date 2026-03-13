@@ -3,7 +3,6 @@ import 'dart:ui' show Locale;
 import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:preferences_service/preferences_service.dart';
-import 'package:preferences_service/src/preferences_storage.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
@@ -91,7 +90,7 @@ void main() {
     });
 
     test('create() returns defaults when stored data is corrupted', () async {
-      await PreferencesStorage().setString('preferences', 'not valid json');
+      await PreferencesStorage().setString('app_preferences', 'not valid json');
 
       final service = await PreferencesService.create(
         supportedCodes: _supportedCodes,

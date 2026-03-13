@@ -203,6 +203,24 @@ void main() {
       );
 
       blocTest<NoteDetailsBloc, NoteDetailsState>(
+        'emits failure when state.note is null for existing note',
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(notes: [_existingNote]),
+          noteId: '42',
+        ),
+        seed: () => const NoteDetailsState(
+          isNew: false,
+          status: NoteDetailsStatus.success,
+          content: 'Some content',
+        ),
+        act: (bloc) => bloc.add(NoteDetailsSaved()),
+        verify: (bloc) {
+          expect(bloc.state.status, NoteDetailsStatus.failure);
+          expect(bloc.state.saveError, isA<StateError>());
+        },
+      );
+
+      blocTest<NoteDetailsBloc, NoteDetailsState>(
         'emits failure when updateNote throws',
         build: () {
           final r = FakeNoteRepository(notes: [_existingNote])

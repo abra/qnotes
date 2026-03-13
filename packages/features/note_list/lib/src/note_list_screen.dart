@@ -14,21 +14,25 @@ class NoteListScreen extends StatelessWidget {
   const NoteListScreen({
     super.key,
     required this.noteRepository,
+    required this.preferencesService,
     this.onNotePressed,
     this.onAddPressed,
     this.onSettingsPressed,
   });
 
   final NoteRepository noteRepository;
-  final Future<void> Function(Note)? onNotePressed;
-  final Future<void> Function()? onAddPressed;
+  final PreferencesService preferencesService;
+  final Future<bool> Function(Note)? onNotePressed;
+  final Future<bool> Function()? onAddPressed;
   final VoidCallback? onSettingsPressed;
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider<NoteListBloc>(
-      create: (_) =>
-          NoteListBloc(noteRepository: noteRepository)..add(NoteListStarted()),
+      create: (_) => NoteListBloc(
+        noteRepository: noteRepository,
+        preferencesService: preferencesService,
+      )..add(NoteListStarted()),
       child: NoteListView(
         onNotePressed: onNotePressed,
         onAddPressed: onAddPressed,
@@ -47,49 +51,32 @@ class NoteListView extends StatelessWidget {
     this.onSettingsPressed,
   });
 
-  final Future<void> Function(Note)? onNotePressed;
-  final Future<void> Function()? onAddPressed;
+  final Future<bool> Function(Note)? onNotePressed;
+  final Future<bool> Function()? onAddPressed;
   final VoidCallback? onSettingsPressed;
 
   @override
   Widget build(BuildContext context) {
-    final preferences = PreferencesScope.of(context);
-    final viewMode = preferences.noteViewMode;
-    final density = preferences.noteListDensity;
     return BlocConsumer<NoteListBloc, NoteListState>(
       listenWhen: (prev, curr) => prev.deleteError != curr.deleteError,
       listener: (context, state) {
         if (state.deleteError != null) {
           final l10n = NoteListLocalizations.of(context)!;
-          toastification.show(
-            context: context,
-            type: ToastificationType.error,
-            style: ToastificationStyle.flat,
-            title: Text(l10n.noteDeleteFailed),
-            autoCloseDuration: const Duration(seconds: 3),
-            alignment: Alignment.topCenter,
-            animationBuilder: (context, animation, alignment, child) {
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, -1),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
-              );
-            },
-          );
+          _showToast(context, ToastificationType.error, l10n.noteDeleteFailed);
         }
       },
       buildWhen: (prev, curr) =>
           prev.status != curr.status ||
           prev.notes != curr.notes ||
           prev.selectedIds != curr.selectedIds ||
-          prev.query != curr.query,
+          prev.query != curr.query ||
+          prev.noteViewMode != curr.noteViewMode ||
+          prev.noteListDensity != curr.noteListDensity,
       builder: (context, state) {
         return _NoteListScaffold(
           state: state,
-          viewMode: viewMode,
-          density: density,
+          viewMode: state.noteViewMode,
+          density: state.noteListDensity,
           onNotePressed: onNotePressed,
           onAddPressed: onAddPressed,
           onSettingsPressed: onSettingsPressed,
@@ -112,16 +99,16 @@ class _NoteListScaffold extends StatelessWidget {
   final NoteListState state;
   final NoteViewMode viewMode;
   final NoteListDensity density;
-  final Future<void> Function(Note)? onNotePressed;
-  final Future<void> Function()? onAddPressed;
+  final Future<bool> Function(Note)? onNotePressed;
+  final Future<bool> Function()? onAddPressed;
   final VoidCallback? onSettingsPressed;
 
   Future<void> _navigateAndRefresh(
     BuildContext context,
-    Future<void> Function() navigate,
+    Future<bool> Function() navigate,
   ) async {
-    await navigate();
-    if (context.mounted) {
+    final changed = await navigate();
+    if (changed && context.mounted) {
       context.read<NoteListBloc>().add(NoteListStarted());
     }
   }
@@ -130,45 +117,13 @@ class _NoteListScaffold extends StatelessWidget {
     final count = state.selectedIds.length;
     final l10n = NoteListLocalizations.of(context)!;
     context.read<NoteListBloc>().add(NoteListSelectedDeleted());
-    toastification.show(
-      context: context,
-      type: ToastificationType.success,
-      style: ToastificationStyle.flat,
-      title: Text(l10n.notesDeleted(count)),
-      autoCloseDuration: const Duration(seconds: 3),
-      alignment: Alignment.topCenter,
-      animationBuilder: (context, animation, alignment, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0, -1),
-            end: Offset.zero,
-          ).animate(animation),
-          child: child,
-        );
-      },
-    );
+    _showToast(context, ToastificationType.success, l10n.notesDeleted(count));
   }
 
   void _deleteNote(BuildContext context, String id) {
     final l10n = NoteListLocalizations.of(context)!;
     context.read<NoteListBloc>().add(NoteListNoteDeleted(id));
-    toastification.show(
-      context: context,
-      type: ToastificationType.success,
-      style: ToastificationStyle.flat,
-      title: Text(l10n.notesDeleted(1)),
-      autoCloseDuration: const Duration(seconds: 3),
-      alignment: Alignment.topCenter,
-      animationBuilder: (context, animation, alignment, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(0, -1),
-            end: Offset.zero,
-          ).animate(animation),
-          child: child,
-        );
-      },
-    );
+    _showToast(context, ToastificationType.success, l10n.notesDeleted(1));
   }
 
   @override
@@ -196,7 +151,22 @@ class _NoteListScaffold extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            if (state.status == NoteListStatus.loading)
+            if (state.status == NoteListStatus.failure)
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(l10n.loadFailed),
+                    const SizedBox(height: Spacing.medium),
+                    FilledButton(
+                      onPressed: () =>
+                          context.read<NoteListBloc>().add(NoteListStarted()),
+                      child: Text(l10n.retry),
+                    ),
+                  ],
+                ),
+              )
+            else if (state.status == NoteListStatus.loading)
               const Center(child: CircularProgressIndicator())
             else if (notes.isEmpty && !state.isSelectionMode)
               Center(child: Text(l10n.emptyState))
@@ -249,6 +219,26 @@ class _NoteListScaffold extends StatelessWidget {
       ),
     );
   }
+}
+
+void _showToast(BuildContext context, ToastificationType type, String message) {
+  toastification.show(
+    context: context,
+    type: type,
+    style: ToastificationStyle.flat,
+    title: Text(message),
+    autoCloseDuration: const Duration(seconds: 3),
+    alignment: Alignment.topCenter,
+    animationBuilder: (context, animation, alignment, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, -1),
+          end: Offset.zero,
+        ).animate(animation),
+        child: child,
+      );
+    },
+  );
 }
 
 class _BottomBar extends StatefulWidget {

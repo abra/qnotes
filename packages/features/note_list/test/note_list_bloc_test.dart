@@ -1,9 +1,15 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:note_list/src/note_list_bloc.dart';
+import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 
 import 'helpers/fake_note_repository.dart';
+
+class _MockPreferencesService extends Mock implements PreferencesService {}
 
 Note _note(String id, {String? title, String content = 'body'}) => Note(
   id: id,
@@ -16,11 +22,24 @@ Note _note(String id, {String? title, String content = 'body'}) => Note(
 void main() {
   group('NoteListBloc', () {
     late FakeNoteRepository repo;
+    late _MockPreferencesService mockPrefs;
+    late StreamController<Preferences> prefsController;
 
-    setUp(() => repo = FakeNoteRepository());
+    setUp(() {
+      repo = FakeNoteRepository();
+      mockPrefs = _MockPreferencesService();
+      prefsController = StreamController<Preferences>.broadcast();
+      when(() => mockPrefs.current).thenReturn(const Preferences());
+      when(() => mockPrefs.stream).thenAnswer((_) => prefsController.stream);
+    });
+
+    tearDown(() => prefsController.close());
 
     test('initial state', () {
-      final bloc = NoteListBloc(noteRepository: repo);
+      final bloc = NoteListBloc(
+        noteRepository: repo,
+        preferencesService: mockPrefs,
+      );
       expect(bloc.state, const NoteListState());
     });
 
@@ -29,8 +48,10 @@ void main() {
 
       blocTest<NoteListBloc, NoteListState>(
         'emits loading then success with notes',
-        build: () =>
-            NoteListBloc(noteRepository: FakeNoteRepository(notes: notes)),
+        build: () => NoteListBloc(
+          noteRepository: FakeNoteRepository(notes: notes),
+          preferencesService: mockPrefs,
+        ),
         act: (bloc) => bloc.add(NoteListStarted()),
         expect: () => [
           const NoteListState(status: NoteListStatus.loading),
@@ -42,7 +63,7 @@ void main() {
         'emits loading then failure on exception',
         build: () {
           final r = FakeNoteRepository()..shouldThrow = true;
-          return NoteListBloc(noteRepository: r);
+          return NoteListBloc(noteRepository: r, preferencesService: mockPrefs);
         },
         act: (bloc) => bloc.add(NoteListStarted()),
         expect: () => [
@@ -53,7 +74,10 @@ void main() {
 
       blocTest<NoteListBloc, NoteListState>(
         'emits success with empty list when no notes',
-        build: () => NoteListBloc(noteRepository: FakeNoteRepository()),
+        build: () => NoteListBloc(
+          noteRepository: FakeNoteRepository(),
+          preferencesService: mockPrefs,
+        ),
         act: (bloc) => bloc.add(NoteListStarted()),
         expect: () => [
           const NoteListState(status: NoteListStatus.loading),
@@ -69,6 +93,7 @@ void main() {
         'removes note from state',
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: List.of(notes)),
+          preferencesService: mockPrefs,
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -87,7 +112,8 @@ void main() {
     group('NoteListQueryChanged', () {
       blocTest<NoteListBloc, NoteListState>(
         'updates query in state',
-        build: () => NoteListBloc(noteRepository: repo),
+        build: () =>
+            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
         act: (bloc) => bloc.add(NoteListQueryChanged('hello')),
         wait: const Duration(milliseconds: 350),
         expect: () => [const NoteListState(query: 'hello')],

@@ -19,26 +19,13 @@ class PreferencesScope extends StatelessWidget {
       .dependOnInheritedWidgetOfExactType<_PreferencesInherited>()!
       .preferences;
 
-  /// Updates preferences without subscribing to changes.
-  static Future<void> update(
-    BuildContext context,
-    Preferences Function(Preferences) transform,
-  ) => context
-      .getInheritedWidgetOfExactType<_PreferencesInherited>()!
-      .service
-      .update(transform);
-
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Preferences>(
       stream: service.stream,
       initialData: service.current,
       builder: (context, snapshot) {
-        return _PreferencesInherited(
-          preferences: snapshot.data!,
-          service: service,
-          child: child,
-        );
+        return _PreferencesInherited(preferences: snapshot.data!, child: child);
       },
     );
   }
@@ -48,11 +35,9 @@ class _PreferencesInherited extends InheritedWidget {
   const _PreferencesInherited({
     required super.child,
     required this.preferences,
-    required this.service,
   });
 
   final Preferences preferences;
-  final PreferencesService service;
 
   @override
   bool updateShouldNotify(_PreferencesInherited old) =>

@@ -21,6 +21,8 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
 
   final NoteRepository _repository;
 
+  static final _random = Random();
+
   static final _colorChoices = NoteColor.values
       .where((c) => c != NoteColor.none)
       .toList();
@@ -29,7 +31,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     final candidates = last == null
         ? _colorChoices
         : _colorChoices.where((c) => c != last).toList();
-    return candidates[Random().nextInt(candidates.length)];
+    return candidates[_random.nextInt(candidates.length)];
   }
 
   Future<void> _onStarted(
@@ -108,8 +110,20 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
           color: state.color,
         );
       } else {
+        final note = state.note;
+        if (note == null) {
+          emit(
+            state.copyWith(
+              status: NoteDetailsStatus.failure,
+              saveError: StateError(
+                'Cannot update note: note is null in state',
+              ),
+            ),
+          );
+          return;
+        }
         await _repository.updateNote(
-          state.note!.copyWith(
+          note.copyWith(
             title: state.title.trim().isEmpty ? null : state.title.trim(),
             content: state.content.trim(),
             color: state.color,

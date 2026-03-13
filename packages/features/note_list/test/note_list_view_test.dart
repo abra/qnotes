@@ -3,11 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:note_list/src/note_list_bloc.dart';
 import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 
 import 'helpers/fake_note_repository.dart';
+
+class _MockPreferencesService extends Mock implements PreferencesService {}
 
 Note _note(String id, {String content = 'body', String? title}) => Note(
   id: id,
@@ -17,77 +20,37 @@ Note _note(String id, {String content = 'body', String? title}) => Note(
   updatedAt: DateTime(2024),
 );
 
-class _FakePreferencesService {
-  _FakePreferencesService([Preferences? initial])
-    : _current = initial ?? const Preferences(),
-      _controller = StreamController<Preferences>.broadcast();
-
-  Preferences _current;
-  final StreamController<Preferences> _controller;
-
-  Preferences get current => _current;
-
-  Stream<Preferences> get stream => _controller.stream;
-
-  void emit(Preferences p) {
-    _current = p;
-    _controller.add(p);
-  }
-}
-
-Widget _buildView({
-  required NoteListBloc bloc,
-  required _FakePreferencesService fakePrefs,
-}) {
-  // We build a tiny PreferencesService lookalike using a StreamBuilder seam.
-  // NoteListView requires PreferencesService.  Since we can't subclass it,
-  // we instead test NoteListView indirectly by pumping NoteListScreen and
-  // providing a real PreferencesService pre-initialized in memory
-  // (it uses SharedPreferences under the hood).
-  //
-  // For widget tests that don't need persistent storage we inject the BLoC
-  // directly via BlocProvider.value and bypass NoteListScreen.
+Widget _buildView({required NoteListBloc bloc}) {
   return MaterialApp(
     home: BlocProvider<NoteListBloc>.value(
       value: bloc,
-      child: _NoteListViewStub(fakePrefs: fakePrefs),
+      child: const _NoteListViewStub(),
     ),
   );
 }
 
-// A stub that mimics NoteListView's Scaffold structure without depending on
-// the real PreferencesService constructor while still using NoteListBloc.
 class _NoteListViewStub extends StatelessWidget {
-  const _NoteListViewStub({required this.fakePrefs});
-
-  final _FakePreferencesService fakePrefs;
+  const _NoteListViewStub();
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<NoteListBloc, NoteListState>(
       builder: (context, state) {
+        if (state.status == NoteListStatus.loading) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
         final notes = state.filteredNotes;
-        return StreamBuilder<Preferences>(
-          stream: fakePrefs.stream,
-          initialData: fakePrefs.current,
-          builder: (context, snapshot) {
-            final viewMode = snapshot.data?.noteViewMode ?? NoteViewMode.grid;
-            if (state.status == NoteListStatus.loading) {
-              return const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              );
-            }
-            return Scaffold(
-              appBar: AppBar(title: const Text('Nota')),
-              body: notes.isEmpty
-                  ? const Center(child: Text('No notes yet'))
-                  : Center(
-                      child: Text(
-                        viewMode == NoteViewMode.grid ? 'grid' : 'list',
-                      ),
-                    ),
-            );
-          },
+        return Scaffold(
+          appBar: AppBar(title: const Text('Nota')),
+          body: notes.isEmpty
+              ? const Center(child: Text('No notes yet'))
+              : Center(
+                  child: Text(
+                    state.noteViewMode == NoteViewMode.grid ? 'grid' : 'list',
+                  ),
+                ),
         );
       },
     );
@@ -97,18 +60,30 @@ class _NoteListViewStub extends StatelessWidget {
 void main() {
   group('NoteListView', () {
     late FakeNoteRepository repo;
-    late _FakePreferencesService fakePrefs;
+    late _MockPreferencesService mockPrefs;
+    late StreamController<Preferences> prefsController;
 
     setUp(() {
       repo = FakeNoteRepository();
-      fakePrefs = _FakePreferencesService();
+      mockPrefs = _MockPreferencesService();
+      prefsController = StreamController<Preferences>.broadcast();
+      when(() => mockPrefs.current).thenReturn(const Preferences());
+      when(() => mockPrefs.stream).thenAnswer((_) => prefsController.stream);
     });
 
-    testWidgets('shows loading indicator while loading', (tester) async {
-      final bloc = NoteListBloc(noteRepository: repo);
-      await tester.pumpWidget(_buildView(bloc: bloc, fakePrefs: fakePrefs));
+    tearDown(() => prefsController.close());
 
-      // Seed loading state manually
+    NoteListBloc makeBloc({Preferences? initial}) {
+      if (initial != null) {
+        when(() => mockPrefs.current).thenReturn(initial);
+      }
+      return NoteListBloc(noteRepository: repo, preferencesService: mockPrefs);
+    }
+
+    testWidgets('shows loading indicator while loading', (tester) async {
+      final bloc = makeBloc();
+      await tester.pumpWidget(_buildView(bloc: bloc));
+
       bloc.emit(const NoteListState(status: NoteListStatus.loading));
       await tester.pump();
 
@@ -116,8 +91,8 @@ void main() {
     });
 
     testWidgets('shows "No notes yet" when list is empty', (tester) async {
-      final bloc = NoteListBloc(noteRepository: repo);
-      await tester.pumpWidget(_buildView(bloc: bloc, fakePrefs: fakePrefs));
+      final bloc = makeBloc();
+      await tester.pumpWidget(_buildView(bloc: bloc));
 
       bloc.emit(const NoteListState(status: NoteListStatus.success));
       await tester.pump();
@@ -127,10 +102,8 @@ void main() {
 
     testWidgets('shows grid label when viewMode is grid', (tester) async {
       final notes = [_note('1'), _note('2')];
-      final bloc = NoteListBloc(
-        noteRepository: FakeNoteRepository(notes: List.of(notes)),
-      );
-      await tester.pumpWidget(_buildView(bloc: bloc, fakePrefs: fakePrefs));
+      final bloc = makeBloc();
+      await tester.pumpWidget(_buildView(bloc: bloc));
 
       bloc.emit(NoteListState(status: NoteListStatus.success, notes: notes));
       await tester.pump();
@@ -139,16 +112,19 @@ void main() {
     });
 
     testWidgets('shows list label when viewMode is list', (tester) async {
-      fakePrefs = _FakePreferencesService(
-        const Preferences(noteViewMode: NoteViewMode.list),
-      );
       final notes = [_note('1')];
-      final bloc = NoteListBloc(
-        noteRepository: FakeNoteRepository(notes: List.of(notes)),
+      final bloc = makeBloc(
+        initial: const Preferences(noteViewMode: NoteViewMode.list),
       );
-      await tester.pumpWidget(_buildView(bloc: bloc, fakePrefs: fakePrefs));
+      await tester.pumpWidget(_buildView(bloc: bloc));
 
-      bloc.emit(NoteListState(status: NoteListStatus.success, notes: notes));
+      bloc.emit(
+        NoteListState(
+          status: NoteListStatus.success,
+          notes: notes,
+          noteViewMode: NoteViewMode.list,
+        ),
+      );
       await tester.pump();
 
       expect(find.text('list'), findsOneWidget);
@@ -158,17 +134,15 @@ void main() {
       tester,
     ) async {
       final notes = [_note('1')];
-      final bloc = NoteListBloc(
-        noteRepository: FakeNoteRepository(notes: List.of(notes)),
-      );
-      await tester.pumpWidget(_buildView(bloc: bloc, fakePrefs: fakePrefs));
-
-      bloc.emit(NoteListState(status: NoteListStatus.success, notes: notes));
-      await tester.pump();
+      repo = FakeNoteRepository(notes: notes);
+      final bloc = makeBloc();
+      bloc.add(NoteListStarted());
+      await tester.pumpWidget(_buildView(bloc: bloc));
+      await tester.pumpAndSettle();
 
       expect(find.text('grid'), findsOneWidget);
 
-      fakePrefs.emit(const Preferences(noteViewMode: NoteViewMode.list));
+      prefsController.add(const Preferences(noteViewMode: NoteViewMode.list));
       await tester.pumpAndSettle();
 
       expect(find.text('list'), findsOneWidget);

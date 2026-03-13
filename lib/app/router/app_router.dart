@@ -10,19 +10,23 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
   dependencies.logger.debug('buildRouter: GoRouter created');
 
   return GoRouter(
-    debugLogDiagnostics: true,
+    debugLogDiagnostics: dependencies.config.isDev,
     initialLocation: AppRoutes.notes,
     routes: [
       GoRoute(
         path: AppRoutes.notes,
         builder: (context, state) => NoteListScreen(
           noteRepository: dependencies.noteRepository,
-          onAddPressed: () => context.push(AppRoutes.newNote),
-          onNotePressed: (note) => context.push(AppRoutes.noteEditor(note.id)),
+          preferencesService: dependencies.preferencesService,
+          onAddPressed: () async =>
+              await context.push<bool>(AppRoutes.newNote) ?? true,
+          onNotePressed: (note) async =>
+              await context.push<bool>(AppRoutes.noteEditor(note.id)) ?? true,
           onSettingsPressed: () => showModalBottomSheet<void>(
             context: context,
             isScrollControlled: true,
             builder: (_) => PreferencesMenu(
+              service: dependencies.preferencesService,
               supportedLanguages: dependencies.supportedLanguages,
             ),
           ),

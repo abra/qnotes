@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'note_list_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -33,4 +32,10 @@ class NoteListLocalizationsHi extends NoteListLocalizations {
 
   @override
   String get noteDeleteFailed => 'Failed to delete note';
+
+  @override
+  String get loadFailed => 'नोट्स लोड करने में विफल';
+
+  @override
+  String get retry => 'पुनः प्रयास करें';
 }

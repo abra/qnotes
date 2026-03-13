@@ -1,24 +1,45 @@
 import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 
 import 'l10n/preferences_localizations.dart';
+import 'preferences_cubit.dart';
 
 enum _Page { main, language }
 
-/// App preferences menu. Manages navigation between
-/// the main settings page and the language selection page.
-class PreferencesMenu extends StatefulWidget {
-  const PreferencesMenu({super.key, required this.supportedLanguages});
+/// App preferences menu. Creates [PreferencesCubit] and manages navigation
+/// between the main settings page and the language selection page.
+class PreferencesMenu extends StatelessWidget {
+  const PreferencesMenu({
+    super.key,
+    required this.service,
+    required this.supportedLanguages,
+  });
+
+  final PreferencesService service;
+  final List<SupportedLanguage> supportedLanguages;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => PreferencesCubit(service: service),
+      child: _PreferencesMenuView(supportedLanguages: supportedLanguages),
+    );
+  }
+}
+
+class _PreferencesMenuView extends StatefulWidget {
+  const _PreferencesMenuView({required this.supportedLanguages});
 
   final List<SupportedLanguage> supportedLanguages;
 
   @override
-  State<PreferencesMenu> createState() => _PreferencesMenuState();
+  State<_PreferencesMenuView> createState() => _PreferencesMenuViewState();
 }
 
-class _PreferencesMenuState extends State<PreferencesMenu> {
+class _PreferencesMenuViewState extends State<_PreferencesMenuView> {
   _Page _page = _Page.main;
 
   void _goToLanguage() => setState(() => _page = _Page.language);
@@ -42,13 +63,14 @@ class _PreferencesMenuState extends State<PreferencesMenu> {
                 )
               : _LanguagePage(
                   key: const ValueKey(_Page.language),
-                  selectedCode: PreferencesScope.of(
-                    context,
-                  ).locale.languageCode,
+                  selectedCode: context
+                      .read<PreferencesCubit>()
+                      .state
+                      .locale
+                      .languageCode,
                   supportedLanguages: widget.supportedLanguages,
                   onSelected: (code) {
-                    PreferencesScope.update(
-                      context,
+                    context.read<PreferencesCubit>().update(
                       (p) => p.copyWith(locale: Locale(code)),
                     );
                     _goToMain();
@@ -79,7 +101,7 @@ class _PreferencesMenuState extends State<PreferencesMenu> {
   }
 }
 
-/// Reads current [Preferences] from [PreferencesScope] and renders
+/// Reads current [Preferences] from [PreferencesCubit] and renders
 /// theme, notes view, list density and language controls.
 class _MainPage extends StatelessWidget {
   const _MainPage({
@@ -93,7 +115,7 @@ class _MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final prefs = PreferencesScope.of(context);
+    final prefs = context.watch<PreferencesCubit>().state;
     final l10n = PreferencesLocalizations.of(context)!;
     final selectedLanguage = supportedLanguages.firstWhere(
       (l) => l.code == prefs.locale.languageCode,
@@ -155,10 +177,9 @@ class _MainPage extends StatelessWidget {
                   ),
                 ],
                 selected: {prefs.themeMode},
-                onSelectionChanged: (value) => PreferencesScope.update(
-                  context,
-                  (p) => p.copyWith(themeMode: value.first),
-                ),
+                onSelectionChanged: (value) => context
+                    .read<PreferencesCubit>()
+                    .update((p) => p.copyWith(themeMode: value.first)),
               ),
             ),
             const SizedBox(height: Spacing.medium),
@@ -178,10 +199,9 @@ class _MainPage extends StatelessWidget {
                   ),
                 ],
                 selected: {prefs.noteViewMode},
-                onSelectionChanged: (value) => PreferencesScope.update(
-                  context,
-                  (p) => p.copyWith(noteViewMode: value.first),
-                ),
+                onSelectionChanged: (value) => context
+                    .read<PreferencesCubit>()
+                    .update((p) => p.copyWith(noteViewMode: value.first)),
               ),
             ),
             const SizedBox(height: Spacing.medium),
@@ -206,10 +226,9 @@ class _MainPage extends StatelessWidget {
                   ),
                 ],
                 selected: {prefs.noteListDensity},
-                onSelectionChanged: (value) => PreferencesScope.update(
-                  context,
-                  (p) => p.copyWith(noteListDensity: value.first),
-                ),
+                onSelectionChanged: (value) => context
+                    .read<PreferencesCubit>()
+                    .update((p) => p.copyWith(noteListDensity: value.first)),
               ),
             ),
             const SizedBox(height: Spacing.medium),

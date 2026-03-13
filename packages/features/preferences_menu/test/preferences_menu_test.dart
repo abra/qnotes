@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:preferences_menu/preferences_menu.dart';
@@ -24,10 +25,10 @@ Widget _buildMenu(PreferencesService service) {
       GlobalWidgetsLocalizations.delegate,
     ],
     supportedLocales: const [Locale('en'), Locale('ru')],
-    home: PreferencesScope(
-      service: service,
-      child: Scaffold(
-        body: PreferencesMenu(supportedLanguages: _testLanguages),
+    home: Scaffold(
+      body: PreferencesMenu(
+        service: service,
+        supportedLanguages: _testLanguages,
       ),
     ),
   );
@@ -142,11 +143,14 @@ void main() {
       expect(find.text('Preferences'), findsOneWidget);
     });
 
-    testWidgets('rebuilds when service emits new locale', (tester) async {
+    testWidgets('rebuilds when cubit emits new locale', (tester) async {
       final service = await _createService();
       await tester.pumpWidget(_buildMenu(service));
 
-      await service.update((p) => p.copyWith(locale: const Locale('ru')));
+      final cubit = tester
+          .element(find.byType(AnimatedSize))
+          .read<PreferencesCubit>();
+      await cubit.update((p) => p.copyWith(locale: const Locale('ru')));
       await tester.pump();
 
       expect(find.text('Русский'), findsOneWidget);
