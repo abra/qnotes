@@ -46,7 +46,6 @@ class NoteDetailsView extends StatefulWidget {
 class _NoteDetailsViewState extends State<NoteDetailsView> {
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
-  bool _poppedByBack = false;
 
   @override
   void initState() {
@@ -93,13 +92,6 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
           _titleController.text = state.title;
           _contentController.text = state.content;
         }
-        if (state.status == NoteDetailsStatus.saved && !_poppedByBack) {
-          if (Navigator.of(context).canPop()) {
-            Navigator.of(context).pop(true);
-          } else {
-            widget.onBackPressed?.call();
-          }
-        }
         if (state.status == NoteDetailsStatus.failure) {
           final isNotFound = state.loadError is NoteNotFoundException;
           toastification.show(
@@ -139,7 +131,6 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
         return PopScope(
           onPopInvokedWithResult: (didPop, _) {
             if (!didPop) return;
-            _poppedByBack = true;
             final status = context.read<NoteDetailsBloc>().state.status;
             if (status != NoteDetailsStatus.saving &&
                 status != NoteDetailsStatus.saved) {

@@ -23,8 +23,8 @@ class NoteListScreen extends StatelessWidget {
 
   final NoteRepository noteRepository;
   final PreferencesService preferencesService;
-  final Future<bool> Function(Note)? onNotePressed;
-  final Future<bool> Function()? onAddPressed;
+  final Future<void> Function(Note)? onNotePressed;
+  final Future<void> Function()? onAddPressed;
   final void Function(BuildContext)? onSettingsPressed;
 
   @override
@@ -52,8 +52,8 @@ class NoteListView extends StatelessWidget {
     this.onSettingsPressed,
   });
 
-  final Future<bool> Function(Note)? onNotePressed;
-  final Future<bool> Function()? onAddPressed;
+  final Future<void> Function(Note)? onNotePressed;
+  final Future<void> Function()? onAddPressed;
   final void Function(BuildContext)? onSettingsPressed;
 
   @override
@@ -100,16 +100,16 @@ class _NoteListScaffold extends StatelessWidget {
   final NoteListState state;
   final NoteViewMode viewMode;
   final NoteListDensity density;
-  final Future<bool> Function(Note)? onNotePressed;
-  final Future<bool> Function()? onAddPressed;
+  final Future<void> Function(Note)? onNotePressed;
+  final Future<void> Function()? onAddPressed;
   final void Function(BuildContext)? onSettingsPressed;
 
   Future<void> _navigateAndRefresh(
     BuildContext context,
-    Future<bool> Function() navigate,
+    Future<void> Function() navigate,
   ) async {
-    final changed = await navigate();
-    if (changed && context.mounted) {
+    await navigate();
+    if (context.mounted) {
       context.read<NoteListBloc>().add(NoteListStarted());
     }
   }
