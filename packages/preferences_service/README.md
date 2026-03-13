@@ -29,12 +29,18 @@ prefs.locale     // Locale
 
 ### Update preferences
 
+Updates go through `PreferencesCubit` (in the `preferences_menu` feature) or directly via `PreferencesService`:
+
 ```dart
-PreferencesScope.update(context, (p) => p.copyWith(themeMode: ThemeMode.dark));
-PreferencesScope.update(context, (p) => p.copyWith(locale: const Locale('ru')));
+// Via PreferencesCubit (in PreferencesMenu):
+context.read<PreferencesCubit>().update((p) => p.copyWith(themeMode: ThemeMode.dark));
+context.read<PreferencesCubit>().update((p) => p.copyWith(locale: const Locale('ru')));
+
+// Directly (outside feature widgets):
+await preferencesService.update((p) => p.copyWith(themeMode: ThemeMode.dark));
 ```
 
-Changes are persisted immediately and streamed to all widgets that called `PreferencesScope.of(context)`.
+Changes are persisted immediately and streamed to all listeners (`PreferencesScope`, `NoteListBloc`, etc.).
 
 ---
 

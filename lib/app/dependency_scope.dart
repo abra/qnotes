@@ -25,10 +25,7 @@ class DependenciesScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _DependenciesInherited(
-      dependencies: dependencies,
-      child: child,
-    );
+    return _DependenciesInherited(dependencies: dependencies, child: child);
   }
 }
 

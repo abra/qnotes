@@ -157,10 +157,7 @@ class PlaygroundScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: Spacing.xSmall),
                     child: Row(
                       children: [
-                        SizedBox(
-                          width: 120,
-                          child: Text(entry.$1),
-                        ),
+                        SizedBox(width: 120, child: Text(entry.$1)),
                         Container(
                           width: entry.$2,
                           height: 16,

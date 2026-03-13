@@ -12,10 +12,7 @@ import 'package:preferences_service/preferences_service.dart'
     show PreferencesScope;
 
 class RootContext extends StatelessWidget {
-  const RootContext({
-    required this.compositionResult,
-    super.key,
-  });
+  const RootContext({required this.compositionResult, super.key});
 
   final CompositionResult compositionResult;
 

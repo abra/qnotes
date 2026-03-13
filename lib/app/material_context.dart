@@ -32,9 +32,7 @@ class _MaterialContextState extends State<MaterialContext> {
   @override
   void initState() {
     super.initState();
-    _router = buildRouter(
-      dependencies: DependenciesScope.of(context),
-    );
+    _router = buildRouter(dependencies: DependenciesScope.of(context));
   }
 
   @override
