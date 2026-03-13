@@ -24,7 +24,7 @@ class NoteListScreen extends StatelessWidget {
   final PreferencesService preferencesService;
   final Future<bool> Function(Note)? onNotePressed;
   final Future<bool> Function()? onAddPressed;
-  final VoidCallback? onSettingsPressed;
+  final void Function(BuildContext)? onSettingsPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +53,7 @@ class NoteListView extends StatelessWidget {
 
   final Future<bool> Function(Note)? onNotePressed;
   final Future<bool> Function()? onAddPressed;
-  final VoidCallback? onSettingsPressed;
+  final void Function(BuildContext)? onSettingsPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +101,7 @@ class _NoteListScaffold extends StatelessWidget {
   final NoteListDensity density;
   final Future<bool> Function(Note)? onNotePressed;
   final Future<bool> Function()? onAddPressed;
-  final VoidCallback? onSettingsPressed;
+  final void Function(BuildContext)? onSettingsPressed;
 
   Future<void> _navigateAndRefresh(
     BuildContext context,
@@ -250,7 +250,7 @@ class _BottomBar extends StatefulWidget {
 
   final VoidCallback? onAddPressed;
   final ValueChanged<String>? onQueryChanged;
-  final VoidCallback? onSettingsPressed;
+  final void Function(BuildContext)? onSettingsPressed;
 
   @override
   State<_BottomBar> createState() => _BottomBarState();
@@ -373,7 +373,9 @@ class _BottomBarState extends State<_BottomBar> {
                   color: colorScheme.onSurfaceVariant,
                   size: _iconSize,
                 ),
-                onPressed: widget.onSettingsPressed,
+                onPressed: widget.onSettingsPressed == null
+                    ? null
+                    : () => widget.onSettingsPressed!(context),
               ),
             ),
             const SizedBox(width: Spacing.small),

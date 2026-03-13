@@ -19,11 +19,11 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
           noteRepository: dependencies.noteRepository,
           preferencesService: dependencies.preferencesService,
           onAddPressed: () async =>
-              await context.push<bool>(AppRoutes.newNote) ?? true,
+              await context.push<bool>(AppRoutes.newNote) ?? false,
           onNotePressed: (note) async =>
-              await context.push<bool>(AppRoutes.noteEditor(note.id)) ?? true,
-          onSettingsPressed: () => showModalBottomSheet<void>(
-            context: context,
+              await context.push<bool>(AppRoutes.noteEditor(note.id)) ?? false,
+          onSettingsPressed: (ctx) => showModalBottomSheet<void>(
+            context: ctx,
             isScrollControlled: true,
             builder: (_) => PreferencesMenu(
               service: dependencies.preferencesService,
