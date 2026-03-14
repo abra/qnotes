@@ -37,6 +37,7 @@ class NoteCard extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 0,
+      margin: EdgeInsets.zero,
       color: bgColor,
       surfaceTintColor: Colors.transparent,
       child: Stack(

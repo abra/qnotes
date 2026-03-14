@@ -59,23 +59,27 @@ class NotePagedListView extends StatelessWidget {
 
         if (isSelectionMode) return card;
 
-        return Dismissible(
-          key: ValueKey(note.id),
-          direction: DismissDirection.endToStart,
-          onDismissed: (_) => onNoteDeleted?.call(note.id),
-          background: Container(
-            alignment: Alignment.centerRight,
-            padding: const EdgeInsets.only(right: Spacing.large),
-            decoration: BoxDecoration(
+        return ClipRRect(
+          borderRadius: _dismissRadius,
+          child: Dismissible(
+            key: ValueKey(note.id),
+            direction: DismissDirection.endToStart,
+            onDismissed: (_) => onNoteDeleted?.call(note.id),
+            background: ColoredBox(
               color: Theme.of(context).colorScheme.error,
-              borderRadius: _dismissRadius,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: Spacing.large),
+                  child: Icon(
+                    Icons.delete_outline,
+                    color: Theme.of(context).colorScheme.onError,
+                  ),
+                ),
+              ),
             ),
-            child: Icon(
-              Icons.delete_outline,
-              color: Theme.of(context).colorScheme.onError,
-            ),
+            child: card,
           ),
-          child: card,
         );
       },
     );
