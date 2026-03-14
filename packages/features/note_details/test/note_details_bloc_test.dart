@@ -77,8 +77,10 @@ void main() {
     group('NoteDetailsTitleChanged', () {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'updates title in state',
-        build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          isNew: true,
+        ),
         act: (bloc) => bloc.add(NoteDetailsTitleChanged('New title')),
         expect: () => [const NoteDetailsState(title: 'New title')],
       );
@@ -87,8 +89,10 @@ void main() {
     group('NoteDetailsContentChanged', () {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'updates content in state',
-        build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          isNew: true,
+        ),
         act: (bloc) => bloc.add(NoteDetailsContentChanged('New content')),
         expect: () => [const NoteDetailsState(content: 'New content')],
       );
@@ -97,8 +101,10 @@ void main() {
     group('NoteDetailsColorChanged', () {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'updates color in state',
-        build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          isNew: true,
+        ),
         act: (bloc) => bloc.add(NoteDetailsColorChanged(NoteColor.blue)),
         expect: () => [const NoteDetailsState(color: NoteColor.blue)],
       );
@@ -107,16 +113,20 @@ void main() {
     group('NoteDetailsPinToggled', () {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'toggles isPinned from false to true',
-        build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          isNew: true,
+        ),
         act: (bloc) => bloc.add(NoteDetailsPinToggled()),
         expect: () => [const NoteDetailsState(isPinned: true)],
       );
 
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'toggles isPinned from true to false',
-        build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          isNew: true,
+        ),
         seed: () => const NoteDetailsState(isPinned: true),
         act: (bloc) => bloc.add(NoteDetailsPinToggled()),
         expect: () => [const NoteDetailsState(isPinned: false)],
@@ -126,8 +136,10 @@ void main() {
     group('NoteDetailsSaved — new note', () {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'does nothing when content is empty',
-        build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          isNew: true,
+        ),
         seed: () => const NoteDetailsState(title: 'T', content: '   '),
         act: (bloc) => bloc.add(NoteDetailsSaved()),
         expect: () => <NoteDetailsState>[],
@@ -135,10 +147,14 @@ void main() {
 
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'emits saved with created note in state',
-        build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
-        seed: () =>
-            const NoteDetailsState(content: 'Hello world', title: 'My title'),
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          isNew: true,
+        ),
+        seed: () => const NoteDetailsState(
+          content: 'Hello world',
+          title: 'My title',
+        ),
         act: (bloc) => bloc.add(NoteDetailsSaved()),
         verify: (bloc) {
           expect(bloc.state.status, NoteDetailsStatus.saved);
