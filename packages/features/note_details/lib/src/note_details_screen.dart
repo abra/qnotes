@@ -59,7 +59,8 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
 
   void _saveAndPop(BuildContext context) {
     final bloc = context.read<NoteDetailsBloc>();
-    final isEmpty = bloc.state.content.trim().isEmpty;
+    final isEmpty =
+        bloc.state.content.trim().isEmpty && bloc.state.title.trim().isEmpty;
     if (isEmpty) {
       if (!bloc.state.isNew) {
         bloc.add(NoteDetailsDeleteRequested());

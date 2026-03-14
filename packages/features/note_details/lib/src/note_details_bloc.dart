@@ -116,7 +116,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     NoteDetailsSaved event,
     Emitter<NoteDetailsState> emit,
   ) async {
-    if (state.content.trim().isEmpty) return;
+    if (state.content.trim().isEmpty && state.title.trim().isEmpty) return;
 
     emit(state.copyWith(status: NoteDetailsStatus.saving));
     try {
