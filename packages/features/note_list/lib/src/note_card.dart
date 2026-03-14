@@ -42,59 +42,74 @@ class NoteCard extends StatelessWidget {
       surfaceTintColor: Colors.transparent,
       child: Stack(
         children: [
-          SizedBox(
-            width: double.infinity,
-            child: InkWell(
-              onTap: onPressed,
-              onLongPress: onLongPress,
-              child: Padding(
-                padding: const EdgeInsets.all(Spacing.medium),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (note.title != null || note.isPinned) ...[
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (note.title != null)
-                            Expanded(
-                              child: Text(
-                                note.title!,
-                                style: Theme.of(context).textTheme.titleSmall
-                                    ?.copyWith(color: textColor),
-                                maxLines: titleMaxLines,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            )
-                          else
-                            const Spacer(),
-                          if (note.isPinned)
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                left: Spacing.xSmall,
-                              ),
-                              child: Icon(
-                                Icons.push_pin,
-                                size: 14,
-                                color: textColor.withValues(alpha: 0.6),
-                              ),
-                            ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final bounded = constraints.maxHeight.isFinite;
+              final contentText = Text(
+                note.content,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: textColor),
+                maxLines: contentMaxLines,
+                overflow: TextOverflow.ellipsis,
+              );
+              return SizedBox(
+                width: double.infinity,
+                height: bounded ? constraints.maxHeight : null,
+                child: InkWell(
+                  onTap: onPressed,
+                  onLongPress: onLongPress,
+                  child: Padding(
+                    padding: const EdgeInsets.all(Spacing.medium),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: bounded
+                          ? MainAxisSize.max
+                          : MainAxisSize.min,
+                      children: [
+                        if (note.title != null || note.isPinned) ...[
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (note.title != null)
+                                Expanded(
+                                  child: Text(
+                                    note.title!,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(color: textColor),
+                                    maxLines: titleMaxLines,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                )
+                              else
+                                const Spacer(),
+                              if (note.isPinned)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: Spacing.xSmall,
+                                  ),
+                                  child: Icon(
+                                    Icons.push_pin,
+                                    size: 14,
+                                    color: textColor.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: Spacing.xSmall),
                         ],
-                      ),
-                      const SizedBox(height: Spacing.xSmall),
-                    ],
-                    Text(
-                      note.content,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: textColor),
-                      maxLines: contentMaxLines,
-                      overflow: TextOverflow.ellipsis,
+                        if (bounded)
+                          Expanded(child: contentText)
+                        else
+                          contentText,
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
           if (isSelected)
             Positioned.fill(
