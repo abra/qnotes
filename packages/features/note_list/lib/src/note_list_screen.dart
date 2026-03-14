@@ -23,8 +23,8 @@ class NoteListScreen extends StatelessWidget {
 
   final NoteRepository noteRepository;
   final PreferencesService preferencesService;
-  final Future<void> Function(Note)? onNotePressed;
-  final Future<void> Function()? onAddPressed;
+  final Future<Note?> Function(Note)? onNotePressed;
+  final Future<Note?> Function()? onAddPressed;
   final void Function(BuildContext)? onSettingsPressed;
 
   @override
@@ -52,8 +52,8 @@ class NoteListView extends StatelessWidget {
     this.onSettingsPressed,
   });
 
-  final Future<void> Function(Note)? onNotePressed;
-  final Future<void> Function()? onAddPressed;
+  final Future<Note?> Function(Note)? onNotePressed;
+  final Future<Note?> Function()? onAddPressed;
   final void Function(BuildContext)? onSettingsPressed;
 
   @override
@@ -100,17 +100,25 @@ class _NoteListScaffold extends StatelessWidget {
   final NoteListState state;
   final NoteViewMode viewMode;
   final NoteListDensity density;
-  final Future<void> Function(Note)? onNotePressed;
-  final Future<void> Function()? onAddPressed;
+  final Future<Note?> Function(Note)? onNotePressed;
+  final Future<Note?> Function()? onAddPressed;
   final void Function(BuildContext)? onSettingsPressed;
 
-  Future<void> _navigateAndRefresh(
-    BuildContext context,
-    Future<void> Function() navigate,
-  ) async {
-    await navigate();
-    if (context.mounted) {
-      context.read<NoteListBloc>().add(NoteListStarted());
+  Future<void> _openNote(BuildContext context, Note note) async {
+    final updated = await onNotePressed!(note);
+    if (!context.mounted) return;
+    if (updated != null) {
+      context.read<NoteListBloc>().add(NoteListNoteUpdated(updated));
+    } else {
+      context.read<NoteListBloc>().add(NoteListNoteRemoved(note.id));
+    }
+  }
+
+  Future<void> _addNote(BuildContext context) async {
+    final created = await onAddPressed!();
+    if (!context.mounted) return;
+    if (created != null) {
+      context.read<NoteListBloc>().add(NoteListNoteAdded(created));
     }
   }
 
@@ -178,10 +186,7 @@ class _NoteListScaffold extends StatelessWidget {
                 isSelectionMode: state.isSelectionMode,
                 onNotePressed: onNotePressed == null
                     ? null
-                    : (note) => _navigateAndRefresh(
-                        context,
-                        () => onNotePressed!(note),
-                      ),
+                    : (note) => _openNote(context, note),
                 onNoteDeleted: (id) => _deleteNote(context, id),
                 onNoteLongPressed: (id) =>
                     bloc.add(NoteListSelectionToggled(id)),
@@ -194,10 +199,7 @@ class _NoteListScaffold extends StatelessWidget {
                 isSelectionMode: state.isSelectionMode,
                 onNotePressed: onNotePressed == null
                     ? null
-                    : (note) => _navigateAndRefresh(
-                        context,
-                        () => onNotePressed!(note),
-                      ),
+                    : (note) => _openNote(context, note),
                 onNoteDeleted: (id) => _deleteNote(context, id),
                 onNoteLongPressed: (id) =>
                     bloc.add(NoteListSelectionToggled(id)),
@@ -210,7 +212,7 @@ class _NoteListScaffold extends StatelessWidget {
                 child: _BottomBar(
                   onAddPressed: onAddPressed == null
                       ? null
-                      : () => _navigateAndRefresh(context, onAddPressed!),
+                      : () => _addNote(context),
                   onQueryChanged: (q) => bloc.add(NoteListQueryChanged(q)),
                   onSettingsPressed: onSettingsPressed,
                 ),
@@ -249,7 +251,7 @@ class _BottomBar extends StatefulWidget {
     this.onSettingsPressed,
   });
 
-  final VoidCallback? onAddPressed;
+  final Future<void> Function()? onAddPressed;
   final ValueChanged<String>? onQueryChanged;
   final void Function(BuildContext)? onSettingsPressed;
 

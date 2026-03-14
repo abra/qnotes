@@ -55,6 +55,9 @@ class FakeNoteRepository implements NoteRepository {
 
   @override
   Future<void> deleteNote(String id) async {
+    if (shouldThrow) {
+      throw const NoteStorageException(cause: 'deleteNote failed');
+    }
     _notes.removeWhere((n) => n.id == id);
   }
 

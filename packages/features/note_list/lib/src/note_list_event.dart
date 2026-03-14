@@ -43,3 +43,30 @@ class NoteListSelectedDeleted extends NoteListEvent {
   @override
   String toString() => 'NoteListSelectedDeleted()';
 }
+
+class NoteListNoteUpdated extends NoteListEvent {
+  NoteListNoteUpdated(this.note);
+
+  final Note note;
+
+  @override
+  String toString() => 'NoteListNoteUpdated(id: ${note.id})';
+}
+
+class NoteListNoteAdded extends NoteListEvent {
+  NoteListNoteAdded(this.note);
+
+  final Note note;
+
+  @override
+  String toString() => 'NoteListNoteAdded(id: ${note.id})';
+}
+
+class NoteListNoteRemoved extends NoteListEvent {
+  NoteListNoteRemoved(this.id);
+
+  final String id;
+
+  @override
+  String toString() => 'NoteListNoteRemoved(id: $id)';
+}

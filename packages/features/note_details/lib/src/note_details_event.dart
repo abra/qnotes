@@ -48,3 +48,8 @@ class NoteDetailsSaved extends NoteDetailsEvent {
   @override
   String toString() => 'NoteDetailsSaved()';
 }
+
+class NoteDetailsDeleteRequested extends NoteDetailsEvent {
+  @override
+  String toString() => 'NoteDetailsDeleteRequested()';
+}

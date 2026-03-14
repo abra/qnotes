@@ -146,18 +146,6 @@ abstract class NoteListLocalizations {
   /// In en, this message translates to:
   /// **'Failed to delete note'**
   String get noteDeleteFailed;
-
-  /// No description provided for @loadFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load notes'**
-  String get loadFailed;
-
-  /// No description provided for @retry.
-  ///
-  /// In en, this message translates to:
-  /// **'Retry'**
-  String get retry;
 }
 
 class _NoteListLocalizationsDelegate

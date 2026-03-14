@@ -134,24 +134,19 @@ void main() {
       );
 
       blocTest<NoteDetailsBloc, NoteDetailsState>(
-        'emits saving then saved for new note',
+        'emits saved with created note in state',
         build: () =>
             NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
         seed: () =>
             const NoteDetailsState(content: 'Hello world', title: 'My title'),
         act: (bloc) => bloc.add(NoteDetailsSaved()),
-        expect: () => [
-          const NoteDetailsState(
-            status: NoteDetailsStatus.saving,
-            content: 'Hello world',
-            title: 'My title',
-          ),
-          const NoteDetailsState(
-            status: NoteDetailsStatus.saved,
-            content: 'Hello world',
-            title: 'My title',
-          ),
-        ],
+        verify: (bloc) {
+          expect(bloc.state.status, NoteDetailsStatus.saved);
+          expect(bloc.state.isNew, isFalse);
+          expect(bloc.state.note, isNotNull);
+          expect(bloc.state.note!.content, 'Hello world');
+          expect(bloc.state.note!.title, 'My title');
+        },
       );
 
       blocTest<NoteDetailsBloc, NoteDetailsState>(
@@ -170,8 +165,13 @@ void main() {
     });
 
     group('NoteDetailsSaved — existing note', () {
+      final updatedNote = _existingNote.copyWith(
+        title: 'Updated title',
+        content: 'Updated content',
+      );
+
       blocTest<NoteDetailsBloc, NoteDetailsState>(
-        'emits saving then saved for existing note',
+        'emits saved with updated note in state',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(notes: [_existingNote]),
           noteId: '42',
@@ -194,7 +194,7 @@ void main() {
           ),
           NoteDetailsState(
             isNew: false,
-            note: _existingNote,
+            note: updatedNote,
             status: NoteDetailsStatus.saved,
             title: 'Updated title',
             content: 'Updated content',
@@ -235,6 +235,49 @@ void main() {
           content: 'C',
         ),
         act: (bloc) => bloc.add(NoteDetailsSaved()),
+        verify: (bloc) {
+          expect(bloc.state.status, NoteDetailsStatus.failure);
+          expect(bloc.state.saveError, isA<NoteStorageException>());
+        },
+      );
+    });
+
+    group('NoteDetailsDeleteRequested', () {
+      blocTest<NoteDetailsBloc, NoteDetailsState>(
+        'emits deleted when note exists in state',
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(notes: [_existingNote]),
+          noteId: '42',
+        ),
+        seed: () => NoteDetailsState(isNew: false, note: _existingNote),
+        act: (bloc) => bloc.add(NoteDetailsDeleteRequested()),
+        expect: () => [
+          NoteDetailsState(
+            isNew: false,
+            note: _existingNote,
+            status: NoteDetailsStatus.deleted,
+          ),
+        ],
+      );
+
+      blocTest<NoteDetailsBloc, NoteDetailsState>(
+        'does nothing when note is null in state',
+        build: () =>
+            NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
+        seed: () => const NoteDetailsState(isNew: false),
+        act: (bloc) => bloc.add(NoteDetailsDeleteRequested()),
+        expect: () => <NoteDetailsState>[],
+      );
+
+      blocTest<NoteDetailsBloc, NoteDetailsState>(
+        'emits failure when deleteNote throws',
+        build: () {
+          final r = FakeNoteRepository(notes: [_existingNote])
+            ..shouldThrow = true;
+          return NoteDetailsBloc(noteRepository: r, noteId: '42');
+        },
+        seed: () => NoteDetailsState(isNew: false, note: _existingNote),
+        act: (bloc) => bloc.add(NoteDetailsDeleteRequested()),
         verify: (bloc) {
           expect(bloc.state.status, NoteDetailsStatus.failure);
           expect(bloc.state.saveError, isA<NoteStorageException>());

@@ -32,10 +32,4 @@ class NoteListLocalizationsRu extends NoteListLocalizations {
 
   @override
   String get noteDeleteFailed => 'Не удалось удалить заметку';
-
-  @override
-  String get loadFailed => 'Не удалось загрузить заметки';
-
-  @override
-  String get retry => 'Повторить';
 }

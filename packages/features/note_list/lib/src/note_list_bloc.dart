@@ -22,6 +22,9 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
        ) {
     on<NoteListStarted>(_onStarted, transformer: restartable());
     on<NoteListNoteDeleted>(_onNoteDeleted);
+    on<NoteListNoteUpdated>(_onNoteUpdated);
+    on<NoteListNoteAdded>(_onNoteAdded);
+    on<NoteListNoteRemoved>(_onNoteRemoved);
     on<NoteListQueryChanged>(_onQueryChanged, transformer: restartable());
     on<NoteListSelectionToggled>(_onSelectionToggled);
     on<NoteListSelectionCleared>(_onSelectionCleared);
@@ -61,11 +64,38 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     try {
       await _repository.deleteNote(event.id);
       final notes = state.notes.where((n) => n.id != event.id).toList();
-      emit(state.copyWith(notes: notes));
+      emit(state.copyWith(notes: notes, deleteError: null));
     } on NoteStorageException catch (e, st) {
       addError(e, st);
       emit(state.copyWith(deleteError: e));
     }
+  }
+
+  void _onNoteUpdated(NoteListNoteUpdated event, Emitter<NoteListState> emit) {
+    final notes = [
+      for (final n in state.notes)
+        if (n.id == event.note.id) event.note else n,
+    ];
+    _sortNotes(notes);
+    emit(state.copyWith(notes: notes));
+  }
+
+  void _onNoteAdded(NoteListNoteAdded event, Emitter<NoteListState> emit) {
+    final notes = [...state.notes, event.note];
+    _sortNotes(notes);
+    emit(state.copyWith(notes: notes));
+  }
+
+  void _onNoteRemoved(NoteListNoteRemoved event, Emitter<NoteListState> emit) {
+    final notes = state.notes.where((n) => n.id != event.id).toList();
+    emit(state.copyWith(notes: notes));
+  }
+
+  static void _sortNotes(List<Note> notes) {
+    notes.sort((a, b) {
+      if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
+      return b.updatedAt.compareTo(a.updatedAt);
+    });
   }
 
   Future<void> _onQueryChanged(
@@ -104,7 +134,7 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     try {
       await Future.wait(ids.map(_repository.deleteNote));
       final notes = state.notes.where((n) => !ids.contains(n.id)).toList();
-      emit(state.copyWith(notes: notes, selectedIds: {}));
+      emit(state.copyWith(notes: notes, selectedIds: {}, deleteError: null));
     } on NoteStorageException catch (e, st) {
       addError(e, st);
       emit(state.copyWith(deleteError: e));

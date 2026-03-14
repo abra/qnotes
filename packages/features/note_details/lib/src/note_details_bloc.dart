@@ -18,6 +18,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     on<NoteDetailsColorChanged>(_onColorChanged);
     on<NoteDetailsPinToggled>(_onPinToggled);
     on<NoteDetailsSaved>(_onSaved);
+    on<NoteDetailsDeleteRequested>(_onDeleteRequested);
   }
 
   final NoteRepository _repository;
@@ -96,6 +97,21 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     emit(state.copyWith(isPinned: !state.isPinned));
   }
 
+  Future<void> _onDeleteRequested(
+    NoteDetailsDeleteRequested event,
+    Emitter<NoteDetailsState> emit,
+  ) async {
+    final note = state.note;
+    if (note == null) return;
+    try {
+      await _repository.deleteNote(note.id);
+      emit(state.copyWith(status: NoteDetailsStatus.deleted));
+    } on NoteStorageException catch (e, st) {
+      addError(e, st);
+      emit(state.copyWith(status: NoteDetailsStatus.failure, saveError: e));
+    }
+  }
+
   Future<void> _onSaved(
     NoteDetailsSaved event,
     Emitter<NoteDetailsState> emit,
@@ -104,8 +120,9 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
 
     emit(state.copyWith(status: NoteDetailsStatus.saving));
     try {
+      Note saved;
       if (state.isNew) {
-        await _repository.createNote(
+        saved = await _repository.createNote(
           title: state.title.trim().isEmpty ? null : state.title.trim(),
           content: state.content.trim(),
           color: state.color,
@@ -123,7 +140,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
           );
           return;
         }
-        await _repository.updateNote(
+        saved = await _repository.updateNote(
           note.copyWith(
             title: state.title.trim().isEmpty ? null : state.title.trim(),
             content: state.content.trim(),
@@ -132,7 +149,13 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
           ),
         );
       }
-      emit(state.copyWith(status: NoteDetailsStatus.saved));
+      emit(
+        state.copyWith(
+          status: NoteDetailsStatus.saved,
+          note: saved,
+          isNew: false,
+        ),
+      );
     } on NoteStorageException catch (e, st) {
       addError(e, st);
       emit(state.copyWith(status: NoteDetailsStatus.failure, saveError: e));

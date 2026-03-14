@@ -15,12 +15,10 @@ class NoteDetailsScreen extends StatelessWidget {
     super.key,
     required this.noteRepository,
     this.noteId,
-    this.onBackPressed,
   });
 
   final NoteRepository noteRepository;
   final String? noteId;
-  final VoidCallback? onBackPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +26,14 @@ class NoteDetailsScreen extends StatelessWidget {
       create: (_) =>
           NoteDetailsBloc(noteRepository: noteRepository, noteId: noteId)
             ..add(NoteDetailsStarted(noteId: noteId)),
-      child: NoteDetailsView(onBackPressed: onBackPressed),
+      child: const NoteDetailsView(),
     );
   }
 }
 
 @visibleForTesting
 class NoteDetailsView extends StatefulWidget {
-  const NoteDetailsView({super.key, this.onBackPressed});
-
-  final VoidCallback? onBackPressed;
+  const NoteDetailsView({super.key});
 
   @override
   State<NoteDetailsView> createState() => _NoteDetailsViewState();
@@ -61,8 +57,18 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     super.dispose();
   }
 
-  void _save(BuildContext context) {
-    context.read<NoteDetailsBloc>().add(NoteDetailsSaved());
+  void _saveAndPop(BuildContext context) {
+    final bloc = context.read<NoteDetailsBloc>();
+    final isEmpty = bloc.state.content.trim().isEmpty;
+    if (isEmpty) {
+      if (!bloc.state.isNew) {
+        bloc.add(NoteDetailsDeleteRequested());
+      } else {
+        Navigator.of(context).pop<Note?>(null);
+      }
+      return;
+    }
+    bloc.add(NoteDetailsSaved());
   }
 
   void _showColorPicker(BuildContext context, NoteColor selected) {
@@ -91,6 +97,12 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
         if (state.status == NoteDetailsStatus.success) {
           _titleController.text = state.title;
           _contentController.text = state.content;
+        }
+        if (state.status == NoteDetailsStatus.saved) {
+          Navigator.of(context).pop<Note?>(state.note);
+        }
+        if (state.status == NoteDetailsStatus.deleted) {
+          Navigator.of(context).pop<Note?>(null);
         }
         if (state.status == NoteDetailsStatus.failure) {
           final isNotFound = state.loadError is NoteNotFoundException;
@@ -129,13 +141,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
         final hintColor = textColor.withValues(alpha: 0.45);
 
         return PopScope(
+          canPop: false,
           onPopInvokedWithResult: (didPop, _) {
-            if (!didPop) return;
-            final status = context.read<NoteDetailsBloc>().state.status;
-            if (status != NoteDetailsStatus.saving &&
-                status != NoteDetailsStatus.saved) {
-              _save(context);
-            }
+            if (!didPop) _saveAndPop(context);
           },
           child: Scaffold(
             backgroundColor: hasColor
@@ -154,7 +162,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                       children: [
                         IconButton(
                           icon: Icon(Icons.arrow_back, color: textColor),
-                          onPressed: widget.onBackPressed,
+                          onPressed: () => _saveAndPop(context),
                           padding: EdgeInsets.zero,
                           visualDensity: VisualDensity.compact,
                         ),

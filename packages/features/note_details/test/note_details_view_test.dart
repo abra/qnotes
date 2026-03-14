@@ -17,7 +17,7 @@ final _existingNote = Note(
   updatedAt: DateTime(2024),
 );
 
-Widget _buildView(NoteDetailsBloc bloc, {VoidCallback? onBackPressed}) {
+Widget _buildView(NoteDetailsBloc bloc) {
   return MaterialApp(
     localizationsDelegates: const [
       NoteDetailsLocalizations.delegate,
@@ -27,7 +27,7 @@ Widget _buildView(NoteDetailsBloc bloc, {VoidCallback? onBackPressed}) {
     supportedLocales: const [Locale('en')],
     home: BlocProvider<NoteDetailsBloc>.value(
       value: bloc,
-      child: NoteDetailsView(onBackPressed: onBackPressed),
+      child: const NoteDetailsView(),
     ),
   );
 }
@@ -104,20 +104,49 @@ void main() {
       expect(find.byIcon(Icons.push_pin), findsOneWidget);
     });
 
-    testWidgets('calls onBackPressed when back button tapped', (tester) async {
-      var backCalled = false;
+    testWidgets('back button pops with null when content is empty', (
+      tester,
+    ) async {
+      Note? result;
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
         noteId: null,
       );
       await tester.pumpWidget(
-        _buildView(bloc, onBackPressed: () => backCalled = true),
+        MaterialApp(
+          localizationsDelegates: const [
+            NoteDetailsLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('en')],
+          home: BlocProvider<NoteDetailsBloc>.value(
+            value: bloc,
+            child: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () async {
+                  result = await Navigator.of(context).push<Note?>(
+                    MaterialPageRoute<Note?>(
+                      builder: (_) => BlocProvider<NoteDetailsBloc>.value(
+                        value: bloc,
+                        child: const NoteDetailsView(),
+                      ),
+                    ),
+                  );
+                },
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
       );
 
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
       await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      expect(backCalled, isTrue);
+      expect(result, isNull);
     });
   });
 }

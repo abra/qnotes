@@ -11,12 +11,19 @@ import 'helpers/fake_note_repository.dart';
 
 class _MockPreferencesService extends Mock implements PreferencesService {}
 
-Note _note(String id, {String? title, String content = 'body'}) => Note(
+Note _note(
+  String id, {
+  String? title,
+  String content = 'body',
+  bool isPinned = false,
+  DateTime? updatedAt,
+}) => Note(
   id: id,
   title: title,
   content: content,
+  isPinned: isPinned,
   createdAt: DateTime(2024),
-  updatedAt: DateTime(2024),
+  updatedAt: updatedAt ?? DateTime(2024),
 );
 
 void main() {
@@ -106,6 +113,135 @@ void main() {
             notes: [_note('1'), _note('3')],
           ),
         ],
+      );
+
+      blocTest<NoteListBloc, NoteListState>(
+        'clears deleteError on success',
+        build: () => NoteListBloc(
+          noteRepository: FakeNoteRepository(notes: List.of(notes)),
+          preferencesService: mockPrefs,
+        ),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: List.of(notes),
+          deleteError: const NoteStorageException(cause: 'previous error'),
+        ),
+        act: (bloc) => bloc.add(NoteListNoteDeleted('1')),
+        verify: (bloc) => expect(bloc.state.deleteError, isNull),
+      );
+    });
+
+    group('NoteListNoteUpdated', () {
+      final notes = [_note('1'), _note('2'), _note('3')];
+
+      blocTest<NoteListBloc, NoteListState>(
+        'replaces note with matching id',
+        build: () =>
+            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: List.of(notes),
+        ),
+        act: (bloc) =>
+            bloc.add(NoteListNoteUpdated(_note('2', content: 'updated'))),
+        expect: () => [
+          NoteListState(
+            status: NoteListStatus.success,
+            notes: [
+              _note('1'),
+              _note('2', content: 'updated'),
+              _note('3'),
+            ],
+          ),
+        ],
+      );
+
+      blocTest<NoteListBloc, NoteListState>(
+        'moves pinned note to top after update',
+        build: () =>
+            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: [_note('1'), _note('2')],
+        ),
+        act: (bloc) =>
+            bloc.add(NoteListNoteUpdated(_note('2', isPinned: true))),
+        verify: (bloc) => expect(bloc.state.notes.first.id, '2'),
+      );
+
+      blocTest<NoteListBloc, NoteListState>(
+        'sorts by updatedAt when both unpinned',
+        build: () =>
+            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: [
+            _note('1', updatedAt: DateTime(2024, 1, 1)),
+            _note('2', updatedAt: DateTime(2024, 1, 2)),
+          ],
+        ),
+        act: (bloc) => bloc.add(
+          NoteListNoteUpdated(_note('1', updatedAt: DateTime(2024, 1, 3))),
+        ),
+        verify: (bloc) => expect(bloc.state.notes.first.id, '1'),
+      );
+    });
+
+    group('NoteListNoteAdded', () {
+      blocTest<NoteListBloc, NoteListState>(
+        'adds note to list',
+        build: () =>
+            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        seed: () =>
+            NoteListState(status: NoteListStatus.success, notes: [_note('1')]),
+        act: (bloc) => bloc.add(NoteListNoteAdded(_note('2'))),
+        verify: (bloc) {
+          expect(bloc.state.notes, hasLength(2));
+          expect(bloc.state.notes.any((n) => n.id == '2'), isTrue);
+        },
+      );
+
+      blocTest<NoteListBloc, NoteListState>(
+        'places pinned note at top',
+        build: () =>
+            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        seed: () =>
+            NoteListState(status: NoteListStatus.success, notes: [_note('1')]),
+        act: (bloc) => bloc.add(NoteListNoteAdded(_note('2', isPinned: true))),
+        verify: (bloc) => expect(bloc.state.notes.first.id, '2'),
+      );
+    });
+
+    group('NoteListNoteRemoved', () {
+      final notes = [_note('1'), _note('2'), _note('3')];
+
+      blocTest<NoteListBloc, NoteListState>(
+        'removes note from list',
+        build: () =>
+            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: List.of(notes),
+        ),
+        act: (bloc) => bloc.add(NoteListNoteRemoved('2')),
+        expect: () => [
+          NoteListState(
+            status: NoteListStatus.success,
+            notes: [_note('1'), _note('3')],
+          ),
+        ],
+      );
+
+      blocTest<NoteListBloc, NoteListState>(
+        'ignores unknown id',
+        build: () =>
+            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: List.of(notes),
+        ),
+        act: (bloc) => bloc.add(NoteListNoteRemoved('999')),
+        verify: (bloc) => expect(bloc.state.notes, hasLength(3)),
       );
     });
 

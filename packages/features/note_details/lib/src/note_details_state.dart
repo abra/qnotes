@@ -1,6 +1,14 @@
 part of 'note_details_bloc.dart';
 
-enum NoteDetailsStatus { initial, loading, saving, success, saved, failure }
+enum NoteDetailsStatus {
+  initial,
+  loading,
+  saving,
+  success,
+  saved,
+  deleted,
+  failure,
+}
 
 class NoteDetailsState extends Equatable {
   const NoteDetailsState({

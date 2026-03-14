@@ -5,6 +5,7 @@ import 'package:nota/app/router/app_routes.dart';
 import 'package:note_details/note_details.dart';
 import 'package:note_list/note_list.dart';
 import 'package:preferences_menu/preferences_menu.dart';
+import 'package:shared/shared.dart';
 
 GoRouter buildRouter({required DependenciesContainer dependencies}) {
   dependencies.logger.debug('buildRouter: GoRouter created');
@@ -18,8 +19,9 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
         builder: (context, state) => NoteListScreen(
           noteRepository: dependencies.noteRepository,
           preferencesService: dependencies.preferencesService,
-          onAddPressed: () => context.push(AppRoutes.newNote),
-          onNotePressed: (note) => context.push(AppRoutes.noteEditor(note.id)),
+          onAddPressed: () => context.push<Note?>(AppRoutes.newNote),
+          onNotePressed: (note) =>
+              context.push<Note?>(AppRoutes.noteEditor(note.id)),
           onSettingsPressed: (ctx) => showModalBottomSheet<void>(
             context: ctx,
             isScrollControlled: true,
@@ -34,7 +36,6 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
             path: 'new',
             builder: (context, state) => NoteDetailsScreen(
               noteRepository: dependencies.noteRepository,
-              onBackPressed: () => context.pop(),
             ),
           ),
           GoRoute(
@@ -42,7 +43,6 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
             builder: (context, state) => NoteDetailsScreen(
               noteRepository: dependencies.noteRepository,
               noteId: state.pathParameters['id'],
-              onBackPressed: () => context.pop(),
             ),
           ),
         ],
