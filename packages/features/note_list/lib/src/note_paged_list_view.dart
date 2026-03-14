@@ -28,11 +28,16 @@ class NotePagedListView extends StatelessWidget {
 
   static const _dismissRadius = BorderRadius.all(Radius.circular(12));
 
-  int get _contentMaxLines => switch (density) {
-    NoteListDensity.twoLines => 1,
-    NoteListDensity.threeLines => 2,
-    NoteListDensity.fourLines => 3,
-  };
+  // When a note has no header (no title, not pinned) we give it one extra
+  // content line so the card height roughly matches a note that has a title.
+  int _contentMaxLines(Note note) {
+    final hasHeader = note.title != null || note.isPinned;
+    return switch (density) {
+      NoteListDensity.twoLines => hasHeader ? 1 : 2,
+      NoteListDensity.threeLines => hasHeader ? 2 : 3,
+      NoteListDensity.fourLines => hasHeader ? 3 : 4,
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +59,7 @@ class NotePagedListView extends StatelessWidget {
           note: note,
           isSelected: isSelected,
           titleMaxLines: 1,
-          contentMaxLines: _contentMaxLines,
+          contentMaxLines: _contentMaxLines(note),
           onPressed: isSelectionMode
               ? () => onNoteLongPressed?.call(note.id)
               : () => onNotePressed?.call(note),
@@ -64,7 +69,12 @@ class NotePagedListView extends StatelessWidget {
           onDeleted: () => onNoteDeleted?.call(note.id),
         );
 
-        if (isSelectionMode) return card;
+        final constrainedCard = ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: Spacing.xxxLarge),
+          child: card,
+        );
+
+        if (isSelectionMode) return constrainedCard;
 
         return ClipRRect(
           borderRadius: _dismissRadius,
@@ -85,7 +95,7 @@ class NotePagedListView extends StatelessWidget {
                 ),
               ),
             ),
-            child: card,
+            child: constrainedCard,
           ),
         );
       },
