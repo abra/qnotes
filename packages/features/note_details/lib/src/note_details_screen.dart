@@ -69,6 +69,19 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
       }
       return;
     }
+    // For existing notes, skip save if nothing actually changed
+    if (!bloc.state.isNew && bloc.state.note != null) {
+      final note = bloc.state.note!;
+      final unchanged =
+          bloc.state.title.trim() == (note.title ?? '') &&
+          bloc.state.content.trim() == note.content &&
+          bloc.state.color == note.color &&
+          bloc.state.isPinned == note.isPinned;
+      if (unchanged) {
+        Navigator.of(context).pop<Note?>(note);
+        return;
+      }
+    }
     bloc.add(NoteDetailsSaved());
   }
 
