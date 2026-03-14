@@ -4,5 +4,7 @@
   "notesDeleted": "{count, plural, one{已删除笔记} other{已删除 {count} 条笔记}}",
   "emptyState": "暂无笔记",
   "searchHint": "搜索",
-  "noteDeleteFailed": "Failed to delete note"
+  "noteDeleteFailed": "Failed to delete note",
+  "loadFailed": "加载笔记失败",
+  "retry": "重试"
 }

@@ -32,4 +32,10 @@ class NoteListLocalizationsHi extends NoteListLocalizations {
 
   @override
   String get noteDeleteFailed => 'Failed to delete note';
+
+  @override
+  String get loadFailed => 'नोट्स लोड नहीं हो सके';
+
+  @override
+  String get retry => 'पुनः प्रयास';
 }

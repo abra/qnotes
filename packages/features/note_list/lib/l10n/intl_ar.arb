@@ -4,5 +4,7 @@
   "notesDeleted": "{count, plural, one{تم حذف الملاحظة} other{تم حذف {count} ملاحظات}}",
   "emptyState": "لا توجد ملاحظات",
   "searchHint": "بحث",
-  "noteDeleteFailed": "Failed to delete note"
+  "noteDeleteFailed": "Failed to delete note",
+  "loadFailed": "فشل تحميل الملاحظات",
+  "retry": "إعادة المحاولة"
 }

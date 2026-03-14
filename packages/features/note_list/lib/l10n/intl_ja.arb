@@ -4,5 +4,7 @@
   "notesDeleted": "{count, plural, one{メモを削除しました} other{{count} 件のメモを削除しました}}",
   "emptyState": "メモがありません",
   "searchHint": "検索",
-  "noteDeleteFailed": "Failed to delete note"
+  "noteDeleteFailed": "Failed to delete note",
+  "loadFailed": "メモの読み込みに失敗しました",
+  "retry": "再試行"
 }

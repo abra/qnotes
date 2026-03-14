@@ -32,4 +32,10 @@ class NoteListLocalizationsZh extends NoteListLocalizations {
 
   @override
   String get noteDeleteFailed => 'Failed to delete note';
+
+  @override
+  String get loadFailed => '加载笔记失败';
+
+  @override
+  String get retry => '重试';
 }

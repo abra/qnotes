@@ -21,5 +21,9 @@
   "searchHint": "Search",
   "@searchHint": {},
   "noteDeleteFailed": "Failed to delete note",
-  "@noteDeleteFailed": {}
+  "@noteDeleteFailed": {},
+  "loadFailed": "Failed to load notes",
+  "@loadFailed": {},
+  "retry": "Retry",
+  "@retry": {}
 }

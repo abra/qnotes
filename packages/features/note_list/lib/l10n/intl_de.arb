@@ -4,5 +4,7 @@
   "notesDeleted": "{count, plural, one{Notiz gelöscht} other{{count} Notizen gelöscht}}",
   "emptyState": "Keine Notizen",
   "searchHint": "Suchen",
-  "noteDeleteFailed": "Failed to delete note"
+  "noteDeleteFailed": "Failed to delete note",
+  "loadFailed": "Notizen konnten nicht geladen werden",
+  "retry": "Erneut versuchen"
 }

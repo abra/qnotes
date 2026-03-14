@@ -4,5 +4,7 @@
   "notesDeleted": "{count, plural, one{नोट हटाया गया} other{{count} नोट हटाए गए}}",
   "emptyState": "अभी कोई नोट नहीं",
   "searchHint": "खोजें",
-  "noteDeleteFailed": "Failed to delete note"
+  "noteDeleteFailed": "Failed to delete note",
+  "loadFailed": "नोट्स लोड नहीं हो सके",
+  "retry": "पुनः प्रयास"
 }

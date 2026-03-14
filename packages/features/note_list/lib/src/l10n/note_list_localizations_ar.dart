@@ -32,4 +32,10 @@ class NoteListLocalizationsAr extends NoteListLocalizations {
 
   @override
   String get noteDeleteFailed => 'Failed to delete note';
+
+  @override
+  String get loadFailed => 'فشل تحميل الملاحظات';
+
+  @override
+  String get retry => 'إعادة المحاولة';
 }

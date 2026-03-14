@@ -4,5 +4,7 @@
   "notesDeleted": "{count, plural, one{Заметка удалена} other{{count} заметки удалены}}",
   "emptyState": "Нет заметок",
   "searchHint": "Поиск",
-  "noteDeleteFailed": "Не удалось удалить заметку"
+  "noteDeleteFailed": "Не удалось удалить заметку",
+  "loadFailed": "Не удалось загрузить заметки",
+  "retry": "Повторить"
 }
