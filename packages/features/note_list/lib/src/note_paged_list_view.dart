@@ -14,6 +14,7 @@ class NotePagedListView extends StatelessWidget {
     this.onNotePressed,
     this.onNoteDeleted,
     this.onNoteLongPressed,
+    this.bottomPadding = 0,
   });
 
   final List<Note> notes;
@@ -23,6 +24,7 @@ class NotePagedListView extends StatelessWidget {
   final ValueChanged<Note>? onNotePressed;
   final ValueChanged<String>? onNoteDeleted;
   final ValueChanged<String>? onNoteLongPressed;
+  final double bottomPadding;
 
   static const _dismissRadius = BorderRadius.all(Radius.circular(12));
 
@@ -35,7 +37,12 @@ class NotePagedListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      padding: const EdgeInsets.all(Spacing.medium),
+      padding: EdgeInsets.fromLTRB(
+        Spacing.medium,
+        Spacing.medium,
+        Spacing.medium,
+        Spacing.medium + bottomPadding,
+      ),
       itemCount: notes.length,
       separatorBuilder: (_, _) => const SizedBox(height: Spacing.small),
       itemBuilder: (context, index) {

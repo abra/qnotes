@@ -87,6 +87,10 @@ class NoteListView extends StatelessWidget {
   }
 }
 
+// Height of the floating bottom bar + its bottom offset, used as scroll
+// clearance so the last note is not hidden behind the bar.
+const double _bottomBarClearance = 80;
+
 class _NoteListScaffold extends StatelessWidget {
   const _NoteListScaffold({
     required this.state,
@@ -184,6 +188,7 @@ class _NoteListScaffold extends StatelessWidget {
                 notes: notes,
                 selectedIds: state.selectedIds,
                 isSelectionMode: state.isSelectionMode,
+                bottomPadding: state.isSelectionMode ? 0 : _bottomBarClearance,
                 onNotePressed: onNotePressed == null
                     ? null
                     : (note) => _openNote(context, note),
@@ -197,6 +202,7 @@ class _NoteListScaffold extends StatelessWidget {
                 density: density,
                 selectedIds: state.selectedIds,
                 isSelectionMode: state.isSelectionMode,
+                bottomPadding: state.isSelectionMode ? 0 : _bottomBarClearance,
                 onNotePressed: onNotePressed == null
                     ? null
                     : (note) => _openNote(context, note),

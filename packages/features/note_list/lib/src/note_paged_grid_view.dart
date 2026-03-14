@@ -13,6 +13,7 @@ class NotePagedGridView extends StatelessWidget {
     this.onNotePressed,
     this.onNoteDeleted,
     this.onNoteLongPressed,
+    this.bottomPadding = 0,
   });
 
   final List<Note> notes;
@@ -21,11 +22,17 @@ class NotePagedGridView extends StatelessWidget {
   final ValueChanged<Note>? onNotePressed;
   final ValueChanged<String>? onNoteDeleted;
   final ValueChanged<String>? onNoteLongPressed;
+  final double bottomPadding;
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.all(Spacing.medium),
+      padding: EdgeInsets.fromLTRB(
+        Spacing.medium,
+        Spacing.medium,
+        Spacing.medium,
+        Spacing.medium + bottomPadding,
+      ),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: Spacing.small,
