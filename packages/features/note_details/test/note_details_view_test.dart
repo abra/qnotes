@@ -32,8 +32,45 @@ Widget _buildView(NoteDetailsBloc bloc) {
   );
 }
 
+/// Builds an app that navigates to [NoteDetailsView] when 'open' is tapped.
+/// Returns the widget + captures the pop result in [result].
+Widget _buildNavigationView(
+  NoteDetailsBloc bloc,
+  void Function(Note?) capture,
+) {
+  return MaterialApp(
+    localizationsDelegates: const [
+      NoteDetailsLocalizations.delegate,
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+    ],
+    supportedLocales: const [Locale('en')],
+    home: BlocProvider<NoteDetailsBloc>.value(
+      value: bloc,
+      child: Builder(
+        builder: (context) => ElevatedButton(
+          onPressed: () async {
+            final result = await Navigator.of(context).push<Note?>(
+              MaterialPageRoute<Note?>(
+                builder: (_) => BlocProvider<NoteDetailsBloc>.value(
+                  value: bloc,
+                  child: const NoteDetailsView(),
+                ),
+              ),
+            );
+            capture(result);
+          },
+          child: const Text('open'),
+        ),
+      ),
+    ),
+  );
+}
+
 void main() {
   group('NoteDetailsView', () {
+    // --- AppBar title ---
+
     testWidgets('shows "New note" title for a new note', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
@@ -49,7 +86,6 @@ void main() {
         noteRepository: FakeNoteRepository(notes: [_existingNote]),
         isNew: false,
       );
-      // Seed success state directly
       bloc.emit(
         NoteDetailsState(
           isNew: false,
@@ -64,9 +100,9 @@ void main() {
       expect(find.text('Edit note'), findsOneWidget);
     });
 
-    testWidgets('renders back button, pin icon and color circle', (
-      tester,
-    ) async {
+    // --- Initial UI elements ---
+
+    testWidgets('renders back button, pin icon and color icon', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
         isNew: true,
@@ -75,12 +111,12 @@ void main() {
 
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
       expect(find.byIcon(Icons.push_pin_outlined), findsOneWidget);
-      // Color circle is a Container with BoxDecoration — just verify the
-      // GestureDetector that wraps it is present.
-      expect(find.byType(GestureDetector), findsWidgets);
+      expect(find.byIcon(Icons.palette_outlined), findsOneWidget);
     });
 
-    testWidgets('renders title and content text fields', (tester) async {
+    testWidgets('renders title and content text fields with hint text', (
+      tester,
+    ) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
         isNew: true,
@@ -88,11 +124,11 @@ void main() {
       await tester.pumpWidget(_buildView(bloc));
 
       expect(find.byType(TextField), findsNWidgets(2));
-      expect(find.text('Title'), findsOneWidget); // hint text
-      expect(find.text('Start typing...'), findsOneWidget); // hint text
+      expect(find.text('Title'), findsOneWidget);
+      expect(find.text('Start typing...'), findsOneWidget);
     });
 
-    testWidgets('shows pin filled icon when note is pinned', (tester) async {
+    testWidgets('shows filled pin icon when note is pinned', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
         isNew: true,
@@ -104,7 +140,37 @@ void main() {
       expect(find.byIcon(Icons.push_pin), findsOneWidget);
     });
 
-    testWidgets('back button pops with null when content is empty', (
+    // --- Text field interactions ---
+
+    testWidgets('typing in title field updates bloc state', (tester) async {
+      final bloc = NoteDetailsBloc(
+        noteRepository: FakeNoteRepository(),
+        isNew: true,
+      );
+      await tester.pumpWidget(_buildView(bloc));
+
+      await tester.enterText(find.byType(TextField).first, 'Hello title');
+      await tester.pump();
+
+      expect(bloc.state.title, 'Hello title');
+    });
+
+    testWidgets('typing in content field updates bloc state', (tester) async {
+      final bloc = NoteDetailsBloc(
+        noteRepository: FakeNoteRepository(),
+        isNew: true,
+      );
+      await tester.pumpWidget(_buildView(bloc));
+
+      await tester.enterText(find.byType(TextField).last, 'Hello content');
+      await tester.pump();
+
+      expect(bloc.state.content, 'Hello content');
+    });
+
+    // --- Back button navigation ---
+
+    testWidgets('back button pops with null when both fields are empty', (
       tester,
     ) async {
       Note? result;
@@ -112,34 +178,7 @@ void main() {
         noteRepository: FakeNoteRepository(),
         isNew: true,
       );
-      await tester.pumpWidget(
-        MaterialApp(
-          localizationsDelegates: const [
-            NoteDetailsLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('en')],
-          home: BlocProvider<NoteDetailsBloc>.value(
-            value: bloc,
-            child: Builder(
-              builder: (context) => ElevatedButton(
-                onPressed: () async {
-                  result = await Navigator.of(context).push<Note?>(
-                    MaterialPageRoute<Note?>(
-                      builder: (_) => BlocProvider<NoteDetailsBloc>.value(
-                        value: bloc,
-                        child: const NoteDetailsView(),
-                      ),
-                    ),
-                  );
-                },
-                child: const Text('open'),
-              ),
-            ),
-          ),
-        ),
-      );
+      await tester.pumpWidget(_buildNavigationView(bloc, (n) => result = n));
 
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
@@ -147,6 +186,76 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(result, isNull);
+    });
+
+    testWidgets('back button with title only saves note', (tester) async {
+      Note? result;
+      final bloc = NoteDetailsBloc(
+        noteRepository: FakeNoteRepository(),
+        isNew: true,
+      );
+      await tester.pumpWidget(_buildNavigationView(bloc, (n) => result = n));
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField).first, 'Title only');
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.title, 'Title only');
+      expect(result!.content, '');
+    });
+
+    testWidgets('back button with content only saves note', (tester) async {
+      Note? result;
+      final bloc = NoteDetailsBloc(
+        noteRepository: FakeNoteRepository(),
+        isNew: true,
+      );
+      await tester.pumpWidget(_buildNavigationView(bloc, (n) => result = n));
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField).last, 'Content only');
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.title, isNull);
+      expect(result!.content, 'Content only');
+    });
+
+    testWidgets('back button with both fields filled saves note', (
+      tester,
+    ) async {
+      Note? result;
+      final bloc = NoteDetailsBloc(
+        noteRepository: FakeNoteRepository(),
+        isNew: true,
+      );
+      await tester.pumpWidget(_buildNavigationView(bloc, (n) => result = n));
+
+      await tester.tap(find.text('open'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField).first, 'My title');
+      await tester.pump();
+      await tester.enterText(find.byType(TextField).last, 'My content');
+      await tester.pump();
+
+      await tester.tap(find.byIcon(Icons.arrow_back));
+      await tester.pumpAndSettle();
+
+      expect(result, isNotNull);
+      expect(result!.title, 'My title');
+      expect(result!.content, 'My content');
     });
   });
 }

@@ -135,14 +135,29 @@ void main() {
 
     group('NoteDetailsSaved — new note', () {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
-        'does nothing when content is empty',
+        'does nothing when both title and content are empty',
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          isNew: true,
+        ),
+        seed: () => const NoteDetailsState(title: '   ', content: '   '),
+        act: (bloc) => bloc.add(NoteDetailsSaved()),
+        expect: () => <NoteDetailsState>[],
+      );
+
+      blocTest<NoteDetailsBloc, NoteDetailsState>(
+        'saves when title is present and content is empty',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(),
           isNew: true,
         ),
         seed: () => const NoteDetailsState(title: 'T', content: '   '),
         act: (bloc) => bloc.add(NoteDetailsSaved()),
-        expect: () => <NoteDetailsState>[],
+        verify: (bloc) {
+          expect(bloc.state.status, NoteDetailsStatus.saved);
+          expect(bloc.state.note?.title, 'T');
+          expect(bloc.state.note?.content, '');
+        },
       );
 
       blocTest<NoteDetailsBloc, NoteDetailsState>(
