@@ -24,7 +24,7 @@ class NoteDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<NoteDetailsBloc>(
       create: (_) =>
-          NoteDetailsBloc(noteRepository: noteRepository, noteId: noteId)
+          NoteDetailsBloc(noteRepository: noteRepository, isNew: noteId == null)
             ..add(NoteDetailsStarted(noteId: noteId)),
       child: const NoteDetailsView(),
     );

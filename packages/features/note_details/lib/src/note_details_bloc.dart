@@ -9,9 +9,9 @@ part 'note_details_event.dart';
 part 'note_details_state.dart';
 
 class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
-  NoteDetailsBloc({required NoteRepository noteRepository, String? noteId})
+  NoteDetailsBloc({required NoteRepository noteRepository, required bool isNew})
     : _repository = noteRepository,
-      super(NoteDetailsState(isNew: noteId == null)) {
+      super(NoteDetailsState(isNew: isNew)) {
     on<NoteDetailsStarted>(_onStarted);
     on<NoteDetailsTitleChanged>(_onTitleChanged);
     on<NoteDetailsContentChanged>(_onContentChanged);

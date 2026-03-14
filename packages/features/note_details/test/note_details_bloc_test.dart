@@ -21,7 +21,7 @@ void main() {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'emits state with auto-picked color for new note',
         build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
+            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
         act: (bloc) => bloc.add(NoteDetailsStarted(noteId: null)),
         verify: (bloc) {
           expect(bloc.state.color, isNot(NoteColor.none));
@@ -32,7 +32,7 @@ void main() {
         'emits loading then success for existing note',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(notes: [_existingNote]),
-          noteId: '42',
+          isNew: false,
         ),
         act: (bloc) => bloc.add(NoteDetailsStarted(noteId: '42')),
         expect: () => [
@@ -51,7 +51,7 @@ void main() {
         'emits failure when note not found',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(),
-          noteId: 'missing',
+          isNew: false,
         ),
         act: (bloc) => bloc.add(NoteDetailsStarted(noteId: 'missing')),
         verify: (bloc) {
@@ -64,7 +64,7 @@ void main() {
         'emits failure on repository exception',
         build: () {
           final r = FakeNoteRepository()..shouldThrow = true;
-          return NoteDetailsBloc(noteRepository: r, noteId: '99');
+          return NoteDetailsBloc(noteRepository: r, isNew: false);
         },
         act: (bloc) => bloc.add(NoteDetailsStarted(noteId: '99')),
         verify: (bloc) {
@@ -78,7 +78,7 @@ void main() {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'updates title in state',
         build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
+            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
         act: (bloc) => bloc.add(NoteDetailsTitleChanged('New title')),
         expect: () => [const NoteDetailsState(title: 'New title')],
       );
@@ -88,7 +88,7 @@ void main() {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'updates content in state',
         build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
+            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
         act: (bloc) => bloc.add(NoteDetailsContentChanged('New content')),
         expect: () => [const NoteDetailsState(content: 'New content')],
       );
@@ -98,7 +98,7 @@ void main() {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'updates color in state',
         build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
+            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
         act: (bloc) => bloc.add(NoteDetailsColorChanged(NoteColor.blue)),
         expect: () => [const NoteDetailsState(color: NoteColor.blue)],
       );
@@ -108,7 +108,7 @@ void main() {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'toggles isPinned from false to true',
         build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
+            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
         act: (bloc) => bloc.add(NoteDetailsPinToggled()),
         expect: () => [const NoteDetailsState(isPinned: true)],
       );
@@ -116,7 +116,7 @@ void main() {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'toggles isPinned from true to false',
         build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
+            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
         seed: () => const NoteDetailsState(isPinned: true),
         act: (bloc) => bloc.add(NoteDetailsPinToggled()),
         expect: () => [const NoteDetailsState(isPinned: false)],
@@ -127,7 +127,7 @@ void main() {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'does nothing when content is empty',
         build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
+            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
         seed: () => const NoteDetailsState(title: 'T', content: '   '),
         act: (bloc) => bloc.add(NoteDetailsSaved()),
         expect: () => <NoteDetailsState>[],
@@ -136,7 +136,7 @@ void main() {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'emits saved with created note in state',
         build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
+            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
         seed: () =>
             const NoteDetailsState(content: 'Hello world', title: 'My title'),
         act: (bloc) => bloc.add(NoteDetailsSaved()),
@@ -153,7 +153,7 @@ void main() {
         'emits failure when createNote throws',
         build: () {
           final r = FakeNoteRepository()..shouldThrow = true;
-          return NoteDetailsBloc(noteRepository: r, noteId: null);
+          return NoteDetailsBloc(noteRepository: r, isNew: true);
         },
         seed: () => const NoteDetailsState(content: 'content'),
         act: (bloc) => bloc.add(NoteDetailsSaved()),
@@ -174,7 +174,7 @@ void main() {
         'emits saved with updated note in state',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(notes: [_existingNote]),
-          noteId: '42',
+          isNew: false,
         ),
         seed: () => NoteDetailsState(
           isNew: false,
@@ -206,7 +206,7 @@ void main() {
         'emits failure when state.note is null for existing note',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(notes: [_existingNote]),
-          noteId: '42',
+          isNew: false,
         ),
         seed: () => const NoteDetailsState(
           isNew: false,
@@ -225,7 +225,7 @@ void main() {
         build: () {
           final r = FakeNoteRepository(notes: [_existingNote])
             ..shouldThrow = true;
-          return NoteDetailsBloc(noteRepository: r, noteId: '42');
+          return NoteDetailsBloc(noteRepository: r, isNew: false);
         },
         seed: () => NoteDetailsState(
           isNew: false,
@@ -247,7 +247,7 @@ void main() {
         'emits deleted when note exists in state',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(notes: [_existingNote]),
-          noteId: '42',
+          isNew: false,
         ),
         seed: () => NoteDetailsState(isNew: false, note: _existingNote),
         act: (bloc) => bloc.add(NoteDetailsDeleteRequested()),
@@ -263,7 +263,7 @@ void main() {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'does nothing when note is null in state',
         build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), noteId: null),
+            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
         seed: () => const NoteDetailsState(isNew: false),
         act: (bloc) => bloc.add(NoteDetailsDeleteRequested()),
         expect: () => <NoteDetailsState>[],
@@ -274,7 +274,7 @@ void main() {
         build: () {
           final r = FakeNoteRepository(notes: [_existingNote])
             ..shouldThrow = true;
-          return NoteDetailsBloc(noteRepository: r, noteId: '42');
+          return NoteDetailsBloc(noteRepository: r, isNew: false);
         },
         seed: () => NoteDetailsState(isNew: false, note: _existingNote),
         act: (bloc) => bloc.add(NoteDetailsDeleteRequested()),

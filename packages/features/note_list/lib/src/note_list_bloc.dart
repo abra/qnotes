@@ -45,7 +45,6 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     } on NoteStorageException catch (e, st) {
       addError(e, st);
       emit(state.copyWith(status: NoteListStatus.failure));
-      return;
     }
 
     await emit.forEach<Preferences>(

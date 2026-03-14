@@ -1,6 +1,7 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:note_repository/note_repository.dart';
+import 'package:note_repository/src/note_local_storage.dart';
 import 'package:shared/shared.dart';
 
 NoteLocalStorage _openInMemory() =>

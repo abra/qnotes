@@ -37,7 +37,7 @@ void main() {
     testWidgets('shows "New note" title for a new note', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        noteId: null,
+        isNew: true,
       );
       await tester.pumpWidget(_buildView(bloc));
 
@@ -47,7 +47,7 @@ void main() {
     testWidgets('shows "Edit note" title for an existing note', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(notes: [_existingNote]),
-        noteId: '1',
+        isNew: false,
       );
       // Seed success state directly
       bloc.emit(
@@ -69,7 +69,7 @@ void main() {
     ) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        noteId: null,
+        isNew: true,
       );
       await tester.pumpWidget(_buildView(bloc));
 
@@ -83,7 +83,7 @@ void main() {
     testWidgets('renders title and content text fields', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        noteId: null,
+        isNew: true,
       );
       await tester.pumpWidget(_buildView(bloc));
 
@@ -95,7 +95,7 @@ void main() {
     testWidgets('shows pin filled icon when note is pinned', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        noteId: null,
+        isNew: true,
       );
       bloc.emit(const NoteDetailsState(isPinned: true));
       await tester.pumpWidget(_buildView(bloc));
@@ -110,7 +110,7 @@ void main() {
       Note? result;
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        noteId: null,
+        isNew: true,
       );
       await tester.pumpWidget(
         MaterialApp(
