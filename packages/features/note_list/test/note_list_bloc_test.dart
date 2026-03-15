@@ -7,6 +7,7 @@ import 'package:note_list/src/note_list_bloc.dart';
 import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 
+import 'helpers/fake_image_service.dart';
 import 'helpers/fake_note_repository.dart';
 
 class _MockPreferencesService extends Mock implements PreferencesService {}
@@ -46,6 +47,7 @@ void main() {
       final bloc = NoteListBloc(
         noteRepository: repo,
         preferencesService: mockPrefs,
+        imageService: FakeImageService(),
       );
       expect(bloc.state, const NoteListState());
     });
@@ -58,6 +60,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: notes),
           preferencesService: mockPrefs,
+          imageService: FakeImageService(),
         ),
         act: (bloc) => bloc.add(NoteListStarted()),
         expect: () => [
@@ -70,7 +73,11 @@ void main() {
         'emits loading then failure on exception',
         build: () {
           final r = FakeNoteRepository()..shouldThrow = true;
-          return NoteListBloc(noteRepository: r, preferencesService: mockPrefs);
+          return NoteListBloc(
+            noteRepository: r,
+            preferencesService: mockPrefs,
+            imageService: FakeImageService(),
+          );
         },
         act: (bloc) => bloc.add(NoteListStarted()),
         expect: () => [
@@ -84,6 +91,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(),
           preferencesService: mockPrefs,
+          imageService: FakeImageService(),
         ),
         act: (bloc) => bloc.add(NoteListStarted()),
         expect: () => [
@@ -101,6 +109,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: List.of(notes)),
           preferencesService: mockPrefs,
+          imageService: FakeImageService(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -120,6 +129,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: List.of(notes)),
           preferencesService: mockPrefs,
+          imageService: FakeImageService(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -136,8 +146,11 @@ void main() {
 
       blocTest<NoteListBloc, NoteListState>(
         'replaces note with matching id',
-        build: () =>
-            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        build: () => NoteListBloc(
+          noteRepository: repo,
+          preferencesService: mockPrefs,
+          imageService: FakeImageService(),
+        ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
           notes: List.of(notes),
@@ -158,8 +171,11 @@ void main() {
 
       blocTest<NoteListBloc, NoteListState>(
         'moves pinned note to top after update',
-        build: () =>
-            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        build: () => NoteListBloc(
+          noteRepository: repo,
+          preferencesService: mockPrefs,
+          imageService: FakeImageService(),
+        ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
           notes: [_note('1'), _note('2')],
@@ -171,8 +187,11 @@ void main() {
 
       blocTest<NoteListBloc, NoteListState>(
         'sorts by createdAt when both unpinned',
-        build: () =>
-            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        build: () => NoteListBloc(
+          noteRepository: repo,
+          preferencesService: mockPrefs,
+          imageService: FakeImageService(),
+        ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
           notes: [
@@ -190,8 +209,11 @@ void main() {
     group('NoteListNoteAdded', () {
       blocTest<NoteListBloc, NoteListState>(
         'adds note to list',
-        build: () =>
-            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        build: () => NoteListBloc(
+          noteRepository: repo,
+          preferencesService: mockPrefs,
+          imageService: FakeImageService(),
+        ),
         seed: () =>
             NoteListState(status: NoteListStatus.success, notes: [_note('1')]),
         act: (bloc) => bloc.add(NoteListNoteAdded(_note('2'))),
@@ -203,8 +225,11 @@ void main() {
 
       blocTest<NoteListBloc, NoteListState>(
         'places pinned note at top',
-        build: () =>
-            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        build: () => NoteListBloc(
+          noteRepository: repo,
+          preferencesService: mockPrefs,
+          imageService: FakeImageService(),
+        ),
         seed: () =>
             NoteListState(status: NoteListStatus.success, notes: [_note('1')]),
         act: (bloc) => bloc.add(NoteListNoteAdded(_note('2', isPinned: true))),
@@ -217,8 +242,11 @@ void main() {
 
       blocTest<NoteListBloc, NoteListState>(
         'removes note from list',
-        build: () =>
-            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        build: () => NoteListBloc(
+          noteRepository: repo,
+          preferencesService: mockPrefs,
+          imageService: FakeImageService(),
+        ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
           notes: List.of(notes),
@@ -234,8 +262,11 @@ void main() {
 
       blocTest<NoteListBloc, NoteListState>(
         'ignores unknown id',
-        build: () =>
-            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        build: () => NoteListBloc(
+          noteRepository: repo,
+          preferencesService: mockPrefs,
+          imageService: FakeImageService(),
+        ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
           notes: List.of(notes),
@@ -248,8 +279,11 @@ void main() {
     group('NoteListQueryChanged', () {
       blocTest<NoteListBloc, NoteListState>(
         'updates query in state',
-        build: () =>
-            NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
+        build: () => NoteListBloc(
+          noteRepository: repo,
+          preferencesService: mockPrefs,
+          imageService: FakeImageService(),
+        ),
         act: (bloc) => bloc.add(NoteListQueryChanged('hello')),
         wait: const Duration(milliseconds: 350),
         expect: () => [const NoteListState(query: 'hello')],

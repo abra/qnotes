@@ -1,6 +1,7 @@
 import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_service/image_service.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
@@ -16,6 +17,7 @@ class NoteListScreen extends StatelessWidget {
     super.key,
     required this.noteRepository,
     required this.preferencesService,
+    required this.imageService,
     this.onNotePressed,
     this.onAddPressed,
     this.onSettingsPressed,
@@ -23,6 +25,7 @@ class NoteListScreen extends StatelessWidget {
 
   final NoteRepository noteRepository;
   final PreferencesService preferencesService;
+  final ImageService imageService;
   final Future<Note?> Function(Note)? onNotePressed;
   final Future<Note?> Function()? onAddPressed;
   final void Function(BuildContext)? onSettingsPressed;
@@ -33,6 +36,7 @@ class NoteListScreen extends StatelessWidget {
       create: (_) => NoteListBloc(
         noteRepository: noteRepository,
         preferencesService: preferencesService,
+        imageService: imageService,
       )..add(NoteListStarted()),
       child: NoteListView(
         onNotePressed: onNotePressed,

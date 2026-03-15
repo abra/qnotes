@@ -64,8 +64,7 @@ class NoteCard extends StatelessWidget {
                   onLongPress: onLongPress,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize:
-                        bounded ? MainAxisSize.max : MainAxisSize.min,
+                    mainAxisSize: bounded ? MainAxisSize.max : MainAxisSize.min,
                     children: [
                       if (firstImage != null)
                         SizedBox(

@@ -2,6 +2,7 @@ import 'dart:math' show Random;
 
 import 'package:equatable/equatable.dart' show Equatable;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_service/image_service.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:shared/shared.dart';
 
@@ -9,9 +10,13 @@ part 'note_details_event.dart';
 part 'note_details_state.dart';
 
 class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
-  NoteDetailsBloc({required NoteRepository noteRepository, required bool isNew})
-    : _repository = noteRepository,
-      super(NoteDetailsState(isNew: isNew)) {
+  NoteDetailsBloc({
+    required NoteRepository noteRepository,
+    required ImageService imageService,
+    required bool isNew,
+  }) : _repository = noteRepository,
+       _imageService = imageService,
+       super(NoteDetailsState(isNew: isNew)) {
     on<NoteDetailsStarted>(_onStarted);
     on<NoteDetailsTitleChanged>(_onTitleChanged);
     on<NoteDetailsContentChanged>(_onContentChanged);
@@ -22,6 +27,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
   }
 
   final NoteRepository _repository;
+  final ImageService _imageService;
 
   static final _random = Random();
 
@@ -105,6 +111,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     if (note == null) return;
     try {
       await _repository.deleteNote(note.id);
+      await _imageService.deleteImagesFromContent(note.content);
       emit(state.copyWith(status: NoteDetailsStatus.deleted));
     } on NoteStorageException catch (e, st) {
       addError(e, st);

@@ -23,6 +23,8 @@ dependencies:
     path: ../../component_library
   toastification: ^3.0.3
   flutter_quill: ^11.5.0
+  image_service:
+    path: ../../image_service
 
 dev_dependencies:
   flutter_test:

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:note_details/src/note_details_bloc.dart';
 import 'package:shared/shared.dart';
 
+import 'helpers/fake_image_service.dart';
 import 'helpers/fake_note_repository.dart';
 
 final _existingNote = Note(
@@ -20,8 +21,11 @@ void main() {
     group('NoteDetailsStarted', () {
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'emits state with auto-picked color for new note',
-        build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
+          isNew: true,
+        ),
         act: (bloc) => bloc.add(NoteDetailsStarted(noteId: null)),
         verify: (bloc) {
           expect(bloc.state.color, isNot(NoteColor.none));
@@ -32,6 +36,7 @@ void main() {
         'emits loading then success for existing note',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(notes: [_existingNote]),
+          imageService: FakeImageService(),
           isNew: false,
         ),
         act: (bloc) => bloc.add(NoteDetailsStarted(noteId: '42')),
@@ -51,6 +56,7 @@ void main() {
         'emits failure when note not found',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
           isNew: false,
         ),
         act: (bloc) => bloc.add(NoteDetailsStarted(noteId: 'missing')),
@@ -64,7 +70,11 @@ void main() {
         'emits failure on repository exception',
         build: () {
           final r = FakeNoteRepository()..shouldThrow = true;
-          return NoteDetailsBloc(noteRepository: r, isNew: false);
+          return NoteDetailsBloc(
+            noteRepository: r,
+            imageService: FakeImageService(),
+            isNew: false,
+          );
         },
         act: (bloc) => bloc.add(NoteDetailsStarted(noteId: '99')),
         verify: (bloc) {
@@ -79,6 +89,7 @@ void main() {
         'updates title in state',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
           isNew: true,
         ),
         act: (bloc) => bloc.add(NoteDetailsTitleChanged('New title')),
@@ -91,6 +102,7 @@ void main() {
         'updates content in state',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
           isNew: true,
         ),
         act: (bloc) => bloc.add(NoteDetailsContentChanged('New content')),
@@ -103,6 +115,7 @@ void main() {
         'updates color in state',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
           isNew: true,
         ),
         act: (bloc) => bloc.add(NoteDetailsColorChanged(NoteColor.blue)),
@@ -115,6 +128,7 @@ void main() {
         'toggles isPinned from false to true',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
           isNew: true,
         ),
         act: (bloc) => bloc.add(NoteDetailsPinToggled()),
@@ -125,6 +139,7 @@ void main() {
         'toggles isPinned from true to false',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
           isNew: true,
         ),
         seed: () => const NoteDetailsState(isPinned: true),
@@ -138,6 +153,7 @@ void main() {
         'does nothing when both title and content are empty',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
           isNew: true,
         ),
         seed: () => const NoteDetailsState(title: '   ', content: '   '),
@@ -149,6 +165,7 @@ void main() {
         'saves when title is present and content is empty',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
           isNew: true,
         ),
         seed: () => const NoteDetailsState(title: 'T', content: '   '),
@@ -164,6 +181,7 @@ void main() {
         'emits saved with created note in state',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
           isNew: true,
         ),
         seed: () => const NoteDetailsState(
@@ -184,7 +202,11 @@ void main() {
         'emits failure when createNote throws',
         build: () {
           final r = FakeNoteRepository()..shouldThrow = true;
-          return NoteDetailsBloc(noteRepository: r, isNew: true);
+          return NoteDetailsBloc(
+            noteRepository: r,
+            imageService: FakeImageService(),
+            isNew: true,
+          );
         },
         seed: () => const NoteDetailsState(content: 'content'),
         act: (bloc) => bloc.add(NoteDetailsSaved()),
@@ -205,6 +227,7 @@ void main() {
         'emits saved with updated note in state',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(notes: [_existingNote]),
+          imageService: FakeImageService(),
           isNew: false,
         ),
         seed: () => NoteDetailsState(
@@ -237,6 +260,7 @@ void main() {
         'emits failure when state.note is null for existing note',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(notes: [_existingNote]),
+          imageService: FakeImageService(),
           isNew: false,
         ),
         seed: () => const NoteDetailsState(
@@ -256,7 +280,11 @@ void main() {
         build: () {
           final r = FakeNoteRepository(notes: [_existingNote])
             ..shouldThrow = true;
-          return NoteDetailsBloc(noteRepository: r, isNew: false);
+          return NoteDetailsBloc(
+            noteRepository: r,
+            imageService: FakeImageService(),
+            isNew: false,
+          );
         },
         seed: () => NoteDetailsState(
           isNew: false,
@@ -278,6 +306,7 @@ void main() {
         'emits deleted when note exists in state',
         build: () => NoteDetailsBloc(
           noteRepository: FakeNoteRepository(notes: [_existingNote]),
+          imageService: FakeImageService(),
           isNew: false,
         ),
         seed: () => NoteDetailsState(isNew: false, note: _existingNote),
@@ -293,8 +322,11 @@ void main() {
 
       blocTest<NoteDetailsBloc, NoteDetailsState>(
         'does nothing when note is null in state',
-        build: () =>
-            NoteDetailsBloc(noteRepository: FakeNoteRepository(), isNew: true),
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
+          isNew: true,
+        ),
         seed: () => const NoteDetailsState(isNew: false),
         act: (bloc) => bloc.add(NoteDetailsDeleteRequested()),
         expect: () => <NoteDetailsState>[],
@@ -305,7 +337,11 @@ void main() {
         build: () {
           final r = FakeNoteRepository(notes: [_existingNote])
             ..shouldThrow = true;
-          return NoteDetailsBloc(noteRepository: r, isNew: false);
+          return NoteDetailsBloc(
+            noteRepository: r,
+            imageService: FakeImageService(),
+            isNew: false,
+          );
         },
         seed: () => NoteDetailsState(isNew: false, note: _existingNote),
         act: (bloc) => bloc.add(NoteDetailsDeleteRequested()),

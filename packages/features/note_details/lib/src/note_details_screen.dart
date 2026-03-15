@@ -1,6 +1,7 @@
 import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_service/image_service.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:shared/shared.dart';
 import 'package:toastification/toastification.dart';
@@ -14,10 +15,12 @@ class NoteDetailsScreen extends StatelessWidget {
   const NoteDetailsScreen({
     super.key,
     required this.noteRepository,
+    required this.imageService,
     this.noteId,
   });
 
   final NoteRepository noteRepository;
+  final ImageService imageService;
   final String? noteId;
 
   @override
@@ -25,6 +28,7 @@ class NoteDetailsScreen extends StatelessWidget {
     return BlocProvider<NoteDetailsBloc>(
       create: (_) => NoteDetailsBloc(
         noteRepository: noteRepository,
+        imageService: imageService,
         isNew: noteId == null,
       )..add(NoteDetailsStarted(noteId: noteId)),
       child: const NoteDetailsView(),

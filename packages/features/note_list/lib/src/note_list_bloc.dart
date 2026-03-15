@@ -1,6 +1,7 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart' show restartable;
 import 'package:equatable/equatable.dart' show Equatable;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_service/image_service.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
@@ -12,7 +13,9 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
   NoteListBloc({
     required NoteRepository noteRepository,
     required PreferencesService preferencesService,
+    required ImageService imageService,
   }) : _repository = noteRepository,
+       _imageService = imageService,
        _preferencesStream = preferencesService.stream,
        super(
          NoteListState(
@@ -32,6 +35,7 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
   }
 
   final NoteRepository _repository;
+  final ImageService _imageService;
   final Stream<Preferences> _preferencesStream;
 
   Future<void> _onStarted(
@@ -61,7 +65,11 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     Emitter<NoteListState> emit,
   ) async {
     try {
+      final note = state.notes.where((n) => n.id == event.id).firstOrNull;
       await _repository.deleteNote(event.id);
+      if (note != null) {
+        await _imageService.deleteImagesFromContent(note.content);
+      }
       final notes = state.notes.where((n) => n.id != event.id).toList();
       emit(state.copyWith(notes: notes, deleteError: null));
     } on NoteStorageException catch (e, st) {
@@ -130,8 +138,12 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     Emitter<NoteListState> emit,
   ) async {
     final ids = Set<String>.of(state.selectedIds);
+    final toDelete = state.notes.where((n) => ids.contains(n.id)).toList();
     try {
       await Future.wait(ids.map(_repository.deleteNote));
+      await Future.wait(
+        toDelete.map((n) => _imageService.deleteImagesFromContent(n.content)),
+      );
       final notes = state.notes.where((n) => !ids.contains(n.id)).toList();
       emit(state.copyWith(notes: notes, selectedIds: {}, deleteError: null));
     } on NoteStorageException catch (e, st) {

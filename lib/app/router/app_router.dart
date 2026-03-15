@@ -19,6 +19,7 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
         builder: (context, state) => NoteListScreen(
           noteRepository: dependencies.noteRepository,
           preferencesService: dependencies.preferencesService,
+          imageService: dependencies.imageService,
           onAddPressed: () => context.push<Note?>(
             AppRoutes.newNote,
           ),
@@ -39,12 +40,14 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
             path: 'new',
             builder: (context, state) => NoteDetailsScreen(
               noteRepository: dependencies.noteRepository,
+              imageService: dependencies.imageService,
             ),
           ),
           GoRoute(
             path: ':id',
             builder: (context, state) => NoteDetailsScreen(
               noteRepository: dependencies.noteRepository,
+              imageService: dependencies.imageService,
               noteId: state.pathParameters['id'],
             ),
           ),
