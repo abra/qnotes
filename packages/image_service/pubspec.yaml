@@ -1,0 +1,16 @@
+name: image_service
+description: "Manages image files for note content: save, delete, lifecycle."
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ^3.11.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  shared:
+    path: ../shared

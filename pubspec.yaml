@@ -27,6 +27,9 @@ dependencies:
   note_repository:
     path: packages/note_repository
 
+  image_service:
+    path: packages/image_service
+
   note_list:
     path: packages/features/note_list
 

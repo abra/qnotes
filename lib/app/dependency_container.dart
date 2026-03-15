@@ -6,6 +6,7 @@
 
 import 'dart:ui' show Locale;
 
+import 'package:image_service/image_service.dart';
 import 'package:monitoring/monitoring.dart';
 import 'package:nota/app/config/application_config.dart';
 import 'package:note_repository/note_repository.dart';
@@ -22,6 +23,7 @@ class DependenciesContainer {
     required this.packageInfo,
     required this.preferencesService,
     required this.noteRepository,
+    required this.imageService,
     required this.supportedLanguages,
     required this.supportedLocales,
   });
@@ -32,6 +34,7 @@ class DependenciesContainer {
   final PackageInfo packageInfo;
   final PreferencesService preferencesService;
   final NoteRepository noteRepository;
+  final ImageService imageService;
   final List<SupportedLanguage> supportedLanguages;
   final List<Locale> supportedLocales;
 }
