@@ -198,8 +198,8 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     );
   }
 
-  static const double _toolbarClearance = 60;
-  static const double _toolbarClearanceExpanded = 128;
+  static const double _toolbarClearance = 50;
+  static const double _toolbarClearanceExpanded = 115;
 
   @override
   Widget build(BuildContext context) {
