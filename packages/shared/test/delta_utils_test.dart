@@ -110,17 +110,11 @@ void main() {
     });
 
     test('returns first image path from Delta', () {
-      expect(
-        DeltaUtils.firstImagePath(multiImageDelta),
-        '/img/first.jpg',
-      );
+      expect(DeltaUtils.firstImagePath(multiImageDelta), '/img/first.jpg');
     });
 
     test('returns image path when only image present', () {
-      expect(
-        DeltaUtils.firstImagePath(imageOnlyDelta),
-        '/path/to/image.jpg',
-      );
+      expect(DeltaUtils.firstImagePath(imageOnlyDelta), '/path/to/image.jpg');
     });
   });
 
@@ -134,10 +128,10 @@ void main() {
     });
 
     test('returns all image paths', () {
-      expect(
-        DeltaUtils.allImagePaths(multiImageDelta),
-        ['/img/first.jpg', '/img/second.jpg'],
-      );
+      expect(DeltaUtils.allImagePaths(multiImageDelta), [
+        '/img/first.jpg',
+        '/img/second.jpg',
+      ]);
     });
   });
 

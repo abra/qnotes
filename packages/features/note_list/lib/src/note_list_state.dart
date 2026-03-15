@@ -32,7 +32,7 @@ class NoteListState extends Equatable {
         .where(
           (n) =>
               (n.title?.toLowerCase().contains(q) ?? false) ||
-              n.content.toLowerCase().contains(q),
+              DeltaUtils.toPlainText(n.content).toLowerCase().contains(q),
         )
         .toList();
   }

@@ -46,7 +46,7 @@ class NoteCard extends StatelessWidget {
             builder: (context, constraints) {
               final bounded = constraints.maxHeight.isFinite;
               final contentText = Text(
-                note.content,
+                DeltaUtils.toPlainText(note.content),
                 style: Theme.of(
                   context,
                 ).textTheme.bodySmall?.copyWith(color: textColor),
