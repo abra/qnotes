@@ -128,9 +128,9 @@ class _MainPage extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
-          Spacing.mediumLarge,
-          Spacing.small,
-          Spacing.mediumLarge,
+          Spacing.large,
+          Spacing.large,
+          Spacing.large,
           Spacing.mediumLarge,
         ),
         child: Column(
@@ -276,9 +276,9 @@ class _LanguagePage extends StatelessWidget {
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
-          Spacing.mediumLarge,
-          Spacing.small,
-          Spacing.mediumLarge,
+          Spacing.large,
+          Spacing.large,
+          Spacing.large,
           Spacing.mediumLarge,
         ),
         child: Column(

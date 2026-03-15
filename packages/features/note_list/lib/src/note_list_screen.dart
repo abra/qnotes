@@ -212,8 +212,8 @@ class _NoteListScaffold extends StatelessWidget {
               ),
             if (!state.isSelectionMode)
               Positioned(
-                left: Spacing.medium,
-                right: Spacing.medium,
+                left: Spacing.mediumLarge,
+                right: Spacing.mediumLarge,
                 bottom: Spacing.mediumLarge,
                 child: _BottomBar(
                   onAddPressed: onAddPressed == null
