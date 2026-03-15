@@ -16,14 +16,14 @@ Note _note(
   String? title,
   String content = 'body',
   bool isPinned = false,
-  DateTime? updatedAt,
+  DateTime? createdAt,
 }) => Note(
   id: id,
   title: title,
   content: content,
   isPinned: isPinned,
-  createdAt: DateTime(2024),
-  updatedAt: updatedAt ?? DateTime(2024),
+  createdAt: createdAt ?? DateTime(2024),
+  updatedAt: DateTime(2024),
 );
 
 void main() {
@@ -170,18 +170,18 @@ void main() {
       );
 
       blocTest<NoteListBloc, NoteListState>(
-        'sorts by updatedAt when both unpinned',
+        'sorts by createdAt when both unpinned',
         build: () =>
             NoteListBloc(noteRepository: repo, preferencesService: mockPrefs),
         seed: () => NoteListState(
           status: NoteListStatus.success,
           notes: [
-            _note('1', updatedAt: DateTime(2024, 1, 1)),
-            _note('2', updatedAt: DateTime(2024, 1, 2)),
+            _note('1', createdAt: DateTime(2024, 1, 1)),
+            _note('2', createdAt: DateTime(2024, 1, 2)),
           ],
         ),
         act: (bloc) => bloc.add(
-          NoteListNoteUpdated(_note('1', updatedAt: DateTime(2024, 1, 3))),
+          NoteListNoteUpdated(_note('1', createdAt: DateTime(2024, 1, 3))),
         ),
         verify: (bloc) => expect(bloc.state.notes.first.id, '1'),
       );

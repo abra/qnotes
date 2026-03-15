@@ -42,6 +42,20 @@ void main() {
         expect(copy.title, 'new title');
       });
 
+      test('clears title when null is passed explicitly', () {
+        final note = _note(title: 'existing title');
+        final copy = note.copyWith(title: null);
+
+        expect(copy.title, isNull);
+      });
+
+      test('preserves title when not passed', () {
+        final note = _note(title: 'existing title');
+        final copy = note.copyWith(content: 'new content');
+
+        expect(copy.title, 'existing title');
+      });
+
       test('updates isPinned', () {
         final note = _note();
         final copy = note.copyWith(isPinned: true);

@@ -56,7 +56,7 @@ class NoteLocalStorage extends _$NoteLocalStorage {
       final rows =
           await (select(notesTable)..orderBy([
                 (t) => OrderingTerm.desc(t.isPinned),
-                (t) => OrderingTerm.desc(t.updatedAt),
+                (t) => OrderingTerm.desc(t.createdAt),
               ]))
               .get();
       return rows.map((r) => r.toDomainModel()).toList();

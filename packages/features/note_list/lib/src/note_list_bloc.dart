@@ -93,7 +93,7 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
   static void _sortNotes(List<Note> notes) {
     notes.sort((a, b) {
       if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
-      return b.updatedAt.compareTo(a.updatedAt);
+      return b.createdAt.compareTo(a.createdAt);
     });
   }
 
