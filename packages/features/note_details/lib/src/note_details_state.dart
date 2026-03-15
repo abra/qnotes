@@ -17,6 +17,7 @@ class NoteDetailsState extends Equatable {
     this.note,
     this.title = '',
     this.content = '',
+    this.originalContent,
     this.color = NoteColor.none,
     this.isPinned = false,
     this.loadError,
@@ -28,10 +29,17 @@ class NoteDetailsState extends Equatable {
   final Note? note;
   final String title;
   final String content;
+
+  /// The content as loaded from the repository, used to detect real changes.
+  final String? originalContent;
+
   final NoteColor color;
   final bool isPinned;
   final Object? loadError;
   final Object? saveError;
+
+  /// Whether the current content is empty (Delta-aware).
+  bool get isContentEmpty => DeltaUtils.isContentEmpty(content);
 
   NoteDetailsState copyWith({
     NoteDetailsStatus? status,
@@ -39,6 +47,7 @@ class NoteDetailsState extends Equatable {
     Note? note,
     String? title,
     String? content,
+    String? originalContent,
     NoteColor? color,
     bool? isPinned,
     Object? loadError,
@@ -49,6 +58,7 @@ class NoteDetailsState extends Equatable {
     note: note ?? this.note,
     title: title ?? this.title,
     content: content ?? this.content,
+    originalContent: originalContent ?? this.originalContent,
     color: color ?? this.color,
     isPinned: isPinned ?? this.isPinned,
     loadError: loadError,
@@ -62,6 +72,7 @@ class NoteDetailsState extends Equatable {
     note,
     title,
     content,
+    originalContent,
     color,
     isPinned,
     loadError,

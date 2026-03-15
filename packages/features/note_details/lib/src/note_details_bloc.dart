@@ -61,6 +61,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
           status: NoteDetailsStatus.success,
           title: note.title ?? '',
           content: note.content,
+          originalContent: note.content,
           color: note.color,
           isPinned: note.isPinned,
           note: note,
@@ -123,15 +124,19 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     NoteDetailsSaved event,
     Emitter<NoteDetailsState> emit,
   ) async {
-    if (state.content.trim().isEmpty && state.title.trim().isEmpty) return;
+    if (state.isContentEmpty && state.title.trim().isEmpty) return;
 
     emit(state.copyWith(status: NoteDetailsStatus.saving));
+    final title = state.title.trim().isEmpty ? null : state.title.trim();
+    final content = DeltaUtils.isDelta(state.content)
+        ? state.content
+        : state.content.trim();
     try {
       Note saved;
       if (state.isNew) {
         saved = await _repository.createNote(
-          title: state.title.trim().isEmpty ? null : state.title.trim(),
-          content: state.content.trim(),
+          title: title,
+          content: content,
           color: state.color,
         );
       } else {
@@ -149,8 +154,8 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
         }
         saved = await _repository.updateNote(
           note.copyWith(
-            title: state.title.trim().isEmpty ? null : state.title.trim(),
-            content: state.content.trim(),
+            title: title,
+            content: content,
             color: state.color,
             isPinned: state.isPinned,
           ),

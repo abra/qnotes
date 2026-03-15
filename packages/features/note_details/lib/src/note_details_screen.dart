@@ -64,11 +64,10 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
 
   void _saveAndPop(BuildContext context) {
     final bloc = context.read<NoteDetailsBloc>();
-    final isEmpty =
-        bloc.state.content.trim().isEmpty && bloc.state.title.trim().isEmpty;
+    final state = bloc.state;
 
-    if (isEmpty) {
-      if (!bloc.state.isNew) {
+    if (state.isContentEmpty && state.title.trim().isEmpty) {
+      if (!state.isNew) {
         bloc.add(NoteDetailsDeleteRequested());
       } else {
         Navigator.of(context).pop<Note?>(null);
@@ -77,13 +76,13 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     }
 
     // For existing notes, skip save if nothing actually changed
-    if (!bloc.state.isNew && bloc.state.note != null) {
-      final note = bloc.state.note!;
+    if (!state.isNew && state.note != null) {
+      final note = state.note!;
       final unchanged =
-          bloc.state.title.trim() == (note.title ?? '') &&
-          bloc.state.content.trim() == note.content &&
-          bloc.state.color == note.color &&
-          bloc.state.isPinned == note.isPinned;
+          state.title.trim() == (note.title ?? '') &&
+          state.content == (state.originalContent ?? note.content) &&
+          state.color == note.color &&
+          state.isPinned == note.isPinned;
       if (unchanged) {
         Navigator.of(context).pop<Note?>(note);
         return;

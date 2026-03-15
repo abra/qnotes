@@ -48,6 +48,7 @@ void main() {
             note: _existingNote,
             title: 'My note',
             content: 'Some content',
+            originalContent: 'Some content',
           ),
         ],
       );
