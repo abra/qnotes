@@ -149,7 +149,7 @@ class _NoteListScaffold extends StatelessWidget {
       appBar: state.isSelectionMode
           ? AppBar(
               scrolledUnderElevation: 8,
-              shadowColor: Colors.black.withValues(alpha: 0.08),
+              shadowColor: Colors.black.withValues(alpha: 0.3),
               leading: IconButton(
                 icon: const Icon(Icons.close),
                 onPressed: () => bloc.add(NoteListSelectionCleared()),
@@ -164,7 +164,7 @@ class _NoteListScaffold extends StatelessWidget {
             )
           : AppBar(
               scrolledUnderElevation: 8,
-              shadowColor: Colors.black.withValues(alpha: 0.08),
+              shadowColor: Colors.black.withValues(alpha: 0.3),
               title: Row(
                 mainAxisSize: MainAxisSize.min,
                 spacing: Spacing.small,
@@ -392,7 +392,7 @@ class _BottomBarState extends State<_BottomBar> {
               child: VerticalDivider(
                 width: Spacing.medium,
                 thickness: 0.5,
-                color: colorScheme.onSurface.withValues(alpha: 0.2),
+                color: colorScheme.onSurface.withValues(alpha: 0.3),
               ),
             ),
             DecoratedBox(

@@ -175,7 +175,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
               surfaceTintColor: Colors.transparent,
               elevation: 0,
               scrolledUnderElevation: 8,
-              shadowColor: Colors.black.withValues(alpha: 0.08),
+              shadowColor: Colors.black.withValues(alpha: 0.3),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () => _saveAndPop(context),
