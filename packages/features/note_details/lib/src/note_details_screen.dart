@@ -160,7 +160,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
             ? state.color.forBrightness(brightness)
             : null;
         final appBarForeground = hasColor
-            ? CatppuccinLatte.text
+            ? state.color.onColor
             : Theme.of(context).colorScheme.onSurface;
 
         return PopScope(

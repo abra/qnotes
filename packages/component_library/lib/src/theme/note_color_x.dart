@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared/shared.dart';
 
+import 'catppuccin.dart';
+
 /// Maps [NoteColor] domain values to Flutter [Color].
 extension NoteColorX on NoteColor {
   Color get color => switch (this) {
@@ -23,4 +25,8 @@ extension NoteColorX on NoteColor {
   };
 
   Color forBrightness(Brightness brightness) => color;
+
+  /// Returns a legible text/icon color for content drawn on top of this
+  /// note color.
+  Color get onColor => CatppuccinLatte.text;
 }

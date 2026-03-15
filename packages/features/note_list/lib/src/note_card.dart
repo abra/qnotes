@@ -31,7 +31,7 @@ class NoteCard extends StatelessWidget {
         : (brightness == Brightness.light ? Colors.white : null);
 
     final textColor = hasColor
-        ? CatppuccinLatte.text
+        ? note.color.onColor
         : Theme.of(context).colorScheme.onSurface;
 
     return Card(
