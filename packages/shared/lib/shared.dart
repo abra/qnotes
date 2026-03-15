@@ -10,3 +10,4 @@ export 'src/models/note_color.dart';
 export 'src/models/note_list_density.dart';
 export 'src/models/note_view_mode.dart';
 export 'src/models/supported_language.dart';
+export 'src/utils/delta_utils.dart';
