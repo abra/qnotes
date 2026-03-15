@@ -23,9 +23,10 @@ class NoteDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider<NoteDetailsBloc>(
-      create: (_) =>
-          NoteDetailsBloc(noteRepository: noteRepository, isNew: noteId == null)
-            ..add(NoteDetailsStarted(noteId: noteId)),
+      create: (_) => NoteDetailsBloc(
+        noteRepository: noteRepository,
+        isNew: noteId == null,
+      )..add(NoteDetailsStarted(noteId: noteId)),
       child: const NoteDetailsView(),
     );
   }
@@ -61,6 +62,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     final bloc = context.read<NoteDetailsBloc>();
     final isEmpty =
         bloc.state.content.trim().isEmpty && bloc.state.title.trim().isEmpty;
+
     if (isEmpty) {
       if (!bloc.state.isNew) {
         bloc.add(NoteDetailsDeleteRequested());
@@ -69,6 +71,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
       }
       return;
     }
+
     // For existing notes, skip save if nothing actually changed
     if (!bloc.state.isNew && bloc.state.note != null) {
       final note = bloc.state.note!;
@@ -108,16 +111,20 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
           prev.isNew != curr.isNew,
       listener: (context, state) {
         final l10n = NoteDetailsLocalizations.of(context)!;
+
         if (state.status == NoteDetailsStatus.success) {
           _titleController.text = state.title;
           _contentController.text = state.content;
         }
+
         if (state.status == NoteDetailsStatus.saved) {
           Navigator.of(context).pop<Note?>(state.note);
         }
+
         if (state.status == NoteDetailsStatus.deleted) {
           Navigator.of(context).pop<Note?>(null);
         }
+
         if (state.status == NoteDetailsStatus.failure) {
           final isNotFound = state.loadError is NoteNotFoundException;
           toastification.show(
