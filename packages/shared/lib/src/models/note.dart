@@ -21,15 +21,17 @@ final class Note extends Equatable {
   final bool isPinned;
   final NoteColor color;
 
+  static const _absent = Object();
+
   Note copyWith({
-    String? title,
+    Object? title = _absent,
     String? content,
     DateTime? updatedAt,
     bool? isPinned,
     NoteColor? color,
   }) => Note(
     id: id,
-    title: title ?? this.title,
+    title: title == _absent ? this.title : title as String?,
     content: content ?? this.content,
     createdAt: createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
