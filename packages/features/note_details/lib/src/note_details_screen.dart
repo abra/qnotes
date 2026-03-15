@@ -156,14 +156,12 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
         final l10n = NoteDetailsLocalizations.of(context)!;
         final brightness = Theme.of(context).brightness;
         final hasColor = state.color != NoteColor.none;
-        final textColor = hasColor
-            ? CatppuccinLatte.text
-            : Theme.of(context).colorScheme.onSurface;
-        final hintColor = textColor.withValues(alpha: 0.45);
-
-        final noteColor = hasColor
+        final appBarColor = hasColor
             ? state.color.forBrightness(brightness)
             : null;
+        final appBarForeground = hasColor
+            ? CatppuccinLatte.text
+            : Theme.of(context).colorScheme.onSurface;
 
         return PopScope(
           canPop: false,
@@ -171,10 +169,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
             if (!didPop) _saveAndPop(context);
           },
           child: Scaffold(
-            backgroundColor: noteColor,
             appBar: AppBar(
-              backgroundColor: noteColor,
-              foregroundColor: textColor,
+              backgroundColor: appBarColor,
+              foregroundColor: appBarForeground,
               surfaceTintColor: Colors.transparent,
               elevation: 0,
               scrolledUnderElevation: 8,
@@ -186,7 +183,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
               centerTitle: true,
               title: Text(
                 state.isNew ? l10n.newNote : l10n.editNote,
-                style: Theme.of(context).textTheme.titleMedium,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: appBarForeground,
+                ),
               ),
               actions: [
                 IconButton(
@@ -227,11 +226,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                             context,
                           ).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: textColor,
                           ),
                       decoration: InputDecoration(
                         hintText: l10n.titleHint,
-                        hintStyle: TextStyle(color: hintColor),
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: EdgeInsets.zero,
@@ -256,12 +253,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                       onChanged: (v) => context.read<NoteDetailsBloc>().add(
                         NoteDetailsContentChanged(v),
                       ),
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodyLarge?.copyWith(color: textColor),
+                      style: Theme.of(context).textTheme.bodyLarge,
                       decoration: InputDecoration(
                         hintText: l10n.contentHint,
-                        hintStyle: TextStyle(color: hintColor),
                         border: InputBorder.none,
                         isDense: true,
                         contentPadding: EdgeInsets.zero,
