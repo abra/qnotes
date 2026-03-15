@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:component_library/component_library.dart';
@@ -51,6 +52,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
   late final TextEditingController _titleController;
   late QuillController _quillController;
   late final FocusNode _quillFocusNode;
+  StreamSubscription<DocChange>? _changesSub;
   bool _contentInitialized = false;
 
   @override
@@ -59,22 +61,26 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     _titleController = TextEditingController();
     _quillController = QuillController.basic();
     _quillFocusNode = FocusNode();
-    _quillController.addListener(_onQuillChanged);
+    _subscribeToChanges();
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _quillController.removeListener(_onQuillChanged);
+    _changesSub?.cancel();
     _quillController.dispose();
     _quillFocusNode.dispose();
     super.dispose();
   }
 
-  void _onQuillChanged() {
-    if (!mounted) return;
-    final json = jsonEncode(_quillController.document.toDelta().toJson());
-    context.read<NoteDetailsBloc>().add(NoteDetailsContentChanged(json));
+  void _subscribeToChanges() {
+    _changesSub?.cancel();
+    _changesSub = _quillController.changes.listen((change) {
+      if (!mounted) return;
+      if (change.source != ChangeSource.local) return;
+      final json = jsonEncode(_quillController.document.toDelta().toJson());
+      context.read<NoteDetailsBloc>().add(NoteDetailsContentChanged(json));
+    });
   }
 
   QuillController _controllerFromContent(String content) {
@@ -147,10 +153,10 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
           if (!_contentInitialized) {
             _contentInitialized = true;
             final newController = _controllerFromContent(state.content);
-            _quillController.removeListener(_onQuillChanged);
+            _changesSub?.cancel();
             _quillController.dispose();
             _quillController = newController;
-            _quillController.addListener(_onQuillChanged);
+            _subscribeToChanges();
           }
         }
 
