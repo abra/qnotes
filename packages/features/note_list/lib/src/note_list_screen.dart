@@ -160,7 +160,16 @@ class _NoteListScaffold extends StatelessWidget {
                 ),
               ],
             )
-          : AppBar(title: const Text('Nota')),
+          : AppBar(
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                spacing: Spacing.small,
+                children: const [
+                  NotaLogo(size: 22),
+                  Text('Nota'),
+                ],
+              ),
+            ),
       body: SafeArea(
         child: Stack(
           children: [
