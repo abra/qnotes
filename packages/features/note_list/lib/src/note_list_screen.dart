@@ -148,6 +148,7 @@ class _NoteListScaffold extends StatelessWidget {
     final bloc = context.read<NoteListBloc>();
     final notes = state.filteredNotes;
     final l10n = NoteListLocalizations.of(context)!;
+    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
 
     return Scaffold(
       appBar: state.isSelectionMode
@@ -226,6 +227,27 @@ class _NoteListScaffold extends StatelessWidget {
                 onNoteDeleted: (id) => _deleteNote(context, id),
                 onNoteLongPressed: (id) =>
                     bloc.add(NoteListSelectionToggled(id)),
+              ),
+            if (!state.isSelectionMode)
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                height: _bottomBarClearance,
+                child: IgnorePointer(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          scaffoldBg.withValues(alpha: 0),
+                          scaffoldBg,
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ),
             if (!state.isSelectionMode)
               Positioned(

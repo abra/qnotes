@@ -138,8 +138,8 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     Emitter<NoteListState> emit,
   ) async {
     final ids = Set<String>.of(state.selectedIds);
-    final toDelete = state.notes.where((n) => ids.contains(n.id)).toList();
     try {
+      final toDelete = state.notes.where((n) => ids.contains(n.id)).toList();
       await Future.wait(ids.map(_repository.deleteNote));
       await Future.wait(
         toDelete.map((n) => _imageService.deleteImagesFromContent(n.content)),

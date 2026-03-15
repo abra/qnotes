@@ -15,6 +15,19 @@ import 'note_details_bloc.dart';
 
 part 'note_color_picker.dart';
 
+// Parses note content into a Quill ops list.
+// Handles canonical {"ops":[...]} Delta, legacy bare [...] array, and plain text.
+List<dynamic> _opsFromContent(String content) {
+  try {
+    final decoded = jsonDecode(content);
+    if (decoded is Map) return decoded['ops'] as List<dynamic>;
+    if (decoded is List) return decoded; // legacy format (bare array)
+  } catch (_) {}
+  return [
+    {'insert': '${content.isEmpty ? '' : content}\n'},
+  ];
+}
+
 class NoteDetailsScreen extends StatelessWidget {
   const NoteDetailsScreen({
     super.key,
@@ -52,8 +65,10 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
   late final TextEditingController _titleController;
   late QuillController _quillController;
   late final FocusNode _quillFocusNode;
+  late final ScrollController _quillScrollController;
   StreamSubscription<DocChange>? _changesSub;
   bool _contentInitialized = false;
+  bool _secondaryPanelVisible = false;
 
   @override
   void initState() {
@@ -61,6 +76,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     _titleController = TextEditingController();
     _quillController = QuillController.basic();
     _quillFocusNode = FocusNode();
+    _quillScrollController = ScrollController();
     _subscribeToChanges();
   }
 
@@ -70,6 +86,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     _changesSub?.cancel();
     _quillController.dispose();
     _quillFocusNode.dispose();
+    _quillScrollController.dispose();
     super.dispose();
   }
 
@@ -78,19 +95,16 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     _changesSub = _quillController.changes.listen((change) {
       if (!mounted) return;
       if (change.source != ChangeSource.local) return;
-      final json = jsonEncode(_quillController.document.toDelta().toJson());
+      final json = jsonEncode({
+        'ops': _quillController.document.toDelta().toJson(),
+      });
       context.read<NoteDetailsBloc>().add(NoteDetailsContentChanged(json));
     });
   }
 
   QuillController _controllerFromContent(String content) {
-    final raw = DeltaUtils.isDelta(content)
-        ? content
-        : DeltaUtils.fromPlainText(content);
-    final ops =
-        (jsonDecode(raw) as Map<String, dynamic>)['ops'] as List<dynamic>;
     return QuillController(
-      document: Document.fromJson(ops),
+      document: Document.fromJson(_opsFromContent(content)),
       selection: const TextSelection.collapsed(offset: 0),
     );
   }
@@ -124,6 +138,53 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     bloc.add(NoteDetailsSaved());
   }
 
+  DefaultStyles _buildEditorStyles(BuildContext context) {
+    const noH = HorizontalSpacing(0, 0);
+    final bodyLarge = Theme.of(context).textTheme.bodyLarge!;
+    final body = bodyLarge.copyWith(decoration: TextDecoration.none);
+    final bodyWithHeight = body.copyWith(height: 1.5);
+    final hintColor = Theme.of(
+      context,
+    ).colorScheme.onSurface.withValues(alpha: 0.38);
+    return DefaultStyles(
+      paragraph: DefaultTextBlockStyle(
+        bodyWithHeight,
+        noH,
+        VerticalSpacing.zero,
+        VerticalSpacing.zero,
+        null,
+      ),
+      placeHolder: DefaultTextBlockStyle(
+        bodyWithHeight.copyWith(color: hintColor),
+        noH,
+        VerticalSpacing.zero,
+        VerticalSpacing.zero,
+        null,
+      ),
+      leading: DefaultTextBlockStyle(
+        body,
+        noH,
+        VerticalSpacing.zero,
+        VerticalSpacing.zero,
+        null,
+      ),
+      lists: DefaultListBlockStyle(
+        body,
+        noH,
+        VerticalSpacing.zero,
+        VerticalSpacing.zero,
+        null,
+        null,
+      ),
+      bold: bodyLarge.copyWith(fontWeight: FontWeight.bold),
+      italic: bodyLarge.copyWith(fontStyle: FontStyle.italic),
+      underline: bodyLarge.copyWith(decoration: TextDecoration.underline),
+      strikeThrough: bodyLarge.copyWith(
+        decoration: TextDecoration.lineThrough,
+      ),
+    );
+  }
+
   void _showColorPicker(BuildContext context, NoteColor selected) {
     showModalBottomSheet<void>(
       context: context,
@@ -135,6 +196,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
       ),
     );
   }
+
+  static const double _toolbarClearance = 60;
+  static const double _toolbarClearanceExpanded = 128;
 
   @override
   Widget build(BuildContext context) {
@@ -153,10 +217,17 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
           if (!_contentInitialized) {
             _contentInitialized = true;
             final newController = _controllerFromContent(state.content);
+            final oldController = _quillController;
             _changesSub?.cancel();
-            _quillController.dispose();
             _quillController = newController;
             _subscribeToChanges();
+            // Defer disposal: the old QuillEditor is still in the tree and
+            // holds a ChangeNotifier listener on oldController. Disposing it
+            // synchronously triggers a '_count == 0' assertion in debug mode.
+            // Disposing after the frame ensures the widget has rebuilt first.
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => oldController.dispose(),
+            );
           }
         }
 
@@ -205,6 +276,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
         final appBarForeground = hasColor
             ? state.color.onColor
             : Theme.of(context).colorScheme.onSurface;
+        final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
 
         return PopScope(
           canPop: false,
@@ -230,29 +302,12 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                   color: appBarForeground,
                 ),
               ),
-              actions: [
-                IconButton(
-                  icon: Icon(
-                    state.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                  ),
-                  onPressed: () => context.read<NoteDetailsBloc>().add(
-                    NoteDetailsPinToggled(),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    state.color == NoteColor.none
-                        ? Icons.palette_outlined
-                        : Icons.palette,
-                  ),
-                  onPressed: () => _showColorPicker(context, state.color),
-                ),
-              ],
             ),
-            body: Column(
-              children: [
-                Expanded(
-                  child: CustomScrollView(
+            body: SafeArea(
+              top: false,
+              child: Stack(
+                children: [
+                  CustomScrollView(
                     slivers: [
                       SliverPadding(
                         padding: const EdgeInsets.fromLTRB(
@@ -289,61 +344,78 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                       SliverFillRemaining(
                         hasScrollBody: false,
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(
+                          padding: EdgeInsets.fromLTRB(
                             Spacing.mediumLarge,
                             Spacing.small,
                             Spacing.mediumLarge,
-                            Spacing.medium,
+                            _secondaryPanelVisible
+                                ? _toolbarClearanceExpanded
+                                : _toolbarClearance,
                           ),
                           child: QuillEditor(
                             controller: _quillController,
                             focusNode: _quillFocusNode,
-                            scrollController: ScrollController(),
+                            scrollController: _quillScrollController,
                             config: QuillEditorConfig(
                               placeholder: l10n.contentHint,
                               scrollable: false,
                               expands: false,
                               padding: EdgeInsets.zero,
                               autoFocus: false,
-                              customStyles: DefaultStyles(
-                                paragraph: DefaultTextBlockStyle(
-                                  Theme.of(
-                                    context,
-                                  ).textTheme.bodyLarge!.copyWith(
-                                    decoration: TextDecoration.none,
-                                    height: 1.5,
-                                  ),
-                                  const HorizontalSpacing(0, 0),
-                                  const VerticalSpacing(0, 0),
-                                  const VerticalSpacing(0, 0),
-                                  null,
-                                ),
-                                placeHolder: DefaultTextBlockStyle(
-                                  Theme.of(
-                                    context,
-                                  ).textTheme.bodyLarge!.copyWith(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.38),
-                                    decoration: TextDecoration.none,
-                                    height: 1.5,
-                                  ),
-                                  const HorizontalSpacing(0, 0),
-                                  const VerticalSpacing(0, 0),
-                                  const VerticalSpacing(0, 0),
-                                  null,
-                                ),
-                              ),
+                              customStyles: _buildEditorStyles(context),
                             ),
                           ),
                         ),
                       ),
                     ],
                   ),
-                ),
-                _QuillToolbar(controller: _quillController),
-              ],
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: IgnorePointer(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeOut,
+                        height: _secondaryPanelVisible
+                            ? _toolbarClearanceExpanded
+                            : _toolbarClearance,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              scaffoldBg.withValues(alpha: 0),
+                              scaffoldBg,
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: Spacing.mediumLarge,
+                    right: Spacing.mediumLarge,
+                    bottom: Spacing.mediumLarge,
+                    child: _QuillToolbar(
+                      key: ObjectKey(_quillController),
+                      controller: _quillController,
+                      isPinned: state.isPinned,
+                      noteColor: state.color,
+                      isSecondaryVisible: _secondaryPanelVisible,
+                      onToggleSecondary: () => setState(
+                        () => _secondaryPanelVisible = !_secondaryPanelVisible,
+                      ),
+                      onPinToggled: () => context.read<NoteDetailsBloc>().add(
+                        NoteDetailsPinToggled(),
+                      ),
+                      onColorPressed: () =>
+                          _showColorPicker(context, state.color),
+                      onImagePressed: () {},
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -352,62 +424,290 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
   }
 }
 
-class _QuillToolbar extends StatelessWidget {
-  const _QuillToolbar({required this.controller});
+const _toolbarRadius = BorderRadius.all(Radius.circular(AppRadius.large));
+
+const _toolbarShadows = [
+  BoxShadow(
+    color: Color(0x0D000000),
+    blurRadius: 20,
+    offset: Offset(0, -4),
+  ),
+  BoxShadow(
+    color: Color(0x0D000000),
+    blurRadius: 20,
+    offset: Offset(0, 4),
+  ),
+  BoxShadow(
+    color: Color(0x0D000000),
+    blurRadius: 6,
+    offset: Offset(0, -1),
+  ),
+  BoxShadow(
+    color: Color(0x0D000000),
+    blurRadius: 6,
+    offset: Offset(0, 1),
+  ),
+];
+
+const _toolbarButtonStyle = ButtonStyle(
+  fixedSize: WidgetStatePropertyAll(Size(32, 32)),
+  padding: WidgetStatePropertyAll(EdgeInsets.zero),
+  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+);
+
+class _QuillToolbar extends StatefulWidget {
+  const _QuillToolbar({
+    super.key,
+    required this.controller,
+    required this.isPinned,
+    required this.noteColor,
+    required this.isSecondaryVisible,
+    required this.onToggleSecondary,
+    required this.onPinToggled,
+    required this.onColorPressed,
+    required this.onImagePressed,
+  });
 
   final QuillController controller;
+  final bool isPinned;
+  final NoteColor noteColor;
+  final bool isSecondaryVisible;
+  final VoidCallback onToggleSecondary;
+  final VoidCallback onPinToggled;
+  final VoidCallback onColorPressed;
+  final VoidCallback onImagePressed;
+
+  @override
+  State<_QuillToolbar> createState() => _QuillToolbarState();
+}
+
+class _QuillToolbarState extends State<_QuillToolbar>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _animController;
+  late final Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+      value: widget.isSecondaryVisible ? 1.0 : 0.0,
+    );
+    _animation = CurvedAnimation(
+      parent: _animController,
+      curve: Curves.easeOut,
+      reverseCurve: Curves.easeIn,
+    );
+  }
+
+  @override
+  void didUpdateWidget(_QuillToolbar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isSecondaryVisible != oldWidget.isSecondaryVisible) {
+      if (widget.isSecondaryVisible) {
+        _animController.forward();
+      } else {
+        _animController.reverse();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) => Align(
+            alignment: Alignment.topCenter,
+            heightFactor: _animation.value,
+            child: child,
+          ),
+          child: FadeTransition(
+            opacity: _animation,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: Spacing.small),
+              child: _SecondaryToolbar(
+                isPinned: widget.isPinned,
+                noteColor: widget.noteColor,
+                onPinToggled: widget.onPinToggled,
+                onColorPressed: widget.onColorPressed,
+                onImagePressed: widget.onImagePressed,
+              ),
+            ),
+          ),
+        ),
+        DecoratedBox(
+          decoration: const BoxDecoration(
+            color: Color(0x00000000),
+            borderRadius: _toolbarRadius,
+            boxShadow: _toolbarShadows,
+          ),
+          child: ClipRRect(
+            borderRadius: _toolbarRadius,
+            child: ColoredBox(
+              color: colorScheme.surface,
+              child: Padding(
+                padding: const EdgeInsets.all(Spacing.small),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: QuillSimpleToolbar(
+                        controller: widget.controller,
+                        config: QuillSimpleToolbarConfig(
+                          multiRowsDisplay: false,
+                          toolbarSize: 32,
+                          toolbarSectionSpacing: 0,
+                          color: Colors.transparent,
+                          buttonOptions: QuillSimpleToolbarButtonOptions(
+                            base: QuillToolbarBaseButtonOptions(
+                              iconTheme: QuillIconTheme(
+                                iconButtonUnselectedData: IconButtonData(
+                                  style: _toolbarButtonStyle,
+                                  color: colorScheme.onSurface,
+                                ),
+                                iconButtonSelectedData: IconButtonData(
+                                  style: _toolbarButtonStyle.copyWith(
+                                    backgroundColor:
+                                        const WidgetStatePropertyAll(
+                                          Colors.transparent,
+                                        ),
+                                  ),
+                                  color: colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          ),
+                          showBoldButton: true,
+                          showItalicButton: true,
+                          showUnderLineButton: true,
+                          showListNumbers: true,
+                          showListBullets: true,
+                          showListCheck: true,
+                          showUndo: true,
+                          showRedo: true,
+                          showDividers: false,
+                          showFontFamily: false,
+                          showFontSize: false,
+                          showStrikeThrough: false,
+                          showInlineCode: false,
+                          showHeaderStyle: false,
+                          showCodeBlock: false,
+                          showQuote: false,
+                          showIndent: false,
+                          showLink: false,
+                          showSearchButton: false,
+                          showColorButton: false,
+                          showBackgroundColorButton: false,
+                          showClearFormat: false,
+                          showSuperscript: false,
+                          showSubscript: false,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 28,
+                      child: VerticalDivider(
+                        width: Spacing.medium,
+                        thickness: 0.5,
+                        color: colorScheme.onSurface.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.more_vert,
+                        color: widget.isSecondaryVisible
+                            ? colorScheme.primary
+                            : colorScheme.onSurfaceVariant,
+                      ),
+                      style: _toolbarButtonStyle,
+                      onPressed: widget.onToggleSecondary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SecondaryToolbar extends StatelessWidget {
+  const _SecondaryToolbar({
+    required this.isPinned,
+    required this.noteColor,
+    required this.onPinToggled,
+    required this.onColorPressed,
+    required this.onImagePressed,
+  });
+
+  final bool isPinned;
+  final NoteColor noteColor;
+  final VoidCallback onPinToggled;
+  final VoidCallback onColorPressed;
+  final VoidCallback onImagePressed;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          top: BorderSide(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-          ),
-        ),
+      decoration: const BoxDecoration(
+        color: Color(0x00000000),
+        borderRadius: _toolbarRadius,
+        boxShadow: _toolbarShadows,
       ),
-      child: QuillSimpleToolbar(
-        controller: controller,
-        config: QuillSimpleToolbarConfig(
-          multiRowsDisplay: false,
+      child: ClipRRect(
+        borderRadius: _toolbarRadius,
+        child: ColoredBox(
           color: colorScheme.surface,
-          iconTheme: QuillIconTheme(
-            iconButtonUnselectedData: IconButtonData(
-              color: colorScheme.onSurface,
-            ),
-            iconButtonSelectedData: IconButtonData(
-              color: colorScheme.primary,
+          child: Padding(
+            padding: const EdgeInsets.all(Spacing.small),
+            child: Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                    color: isPinned
+                        ? colorScheme.primary
+                        : colorScheme.onSurfaceVariant,
+                  ),
+                  style: _toolbarButtonStyle,
+                  onPressed: onPinToggled,
+                ),
+                IconButton(
+                  icon: Icon(
+                    noteColor == NoteColor.none
+                        ? Icons.palette_outlined
+                        : Icons.palette,
+                    color: noteColor == NoteColor.none
+                        ? colorScheme.onSurfaceVariant
+                        : colorScheme.primary,
+                  ),
+                  style: _toolbarButtonStyle,
+                  onPressed: onColorPressed,
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.image_outlined,
+                    color: colorScheme.onSurfaceVariant,
+                  ),
+                  style: _toolbarButtonStyle,
+                  onPressed: onImagePressed,
+                ),
+              ],
             ),
           ),
-          showBoldButton: true,
-          showItalicButton: true,
-          showUnderLineButton: true,
-          showStrikeThrough: false,
-          showInlineCode: false,
-          showHeaderStyle: false,
-          showListBullets: true,
-          showListCheck: true,
-          showListNumbers: true,
-          showCodeBlock: false,
-          showQuote: false,
-          showIndent: false,
-          showLink: false,
-          showUndo: true,
-          showRedo: true,
-          showSearchButton: false,
-          showFontFamily: false,
-          showFontSize: false,
-          showAlignmentButtons: false,
-          showDirection: false,
-          showDividers: true,
-          showColorButton: false,
-          showBackgroundColorButton: false,
-          showClearFormat: false,
-          showSuperscript: false,
-          showSubscript: false,
         ),
       ),
     );

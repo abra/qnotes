@@ -6,6 +6,7 @@
 import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nota/app/dependency_scope.dart';
 import 'package:nota/app/router/app_router.dart';
@@ -64,6 +65,7 @@ class _MaterialContextState extends State<MaterialContext> {
             NoteListLocalizations.delegate,
             NoteDetailsLocalizations.delegate,
             PreferencesLocalizations.delegate,
+            FlutterQuillLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,

@@ -6,90 +6,81 @@ import 'dart:convert';
 /// - Legacy plain text (old notes)
 /// - Quill Delta JSON: `{"ops": [{"insert": "..."}, ...]}`
 abstract final class DeltaUtils {
-  /// Returns true if [content] is a valid Quill Delta JSON string.
-  static bool isDelta(String content) {
+  /// Extracts the ops list from [content], handling both formats:
+  /// - Canonical: `{"ops": [...]}`
+  /// - Legacy bare array: `[...]`
+  ///
+  /// Returns null if [content] is not a recognized Delta format.
+  static List<dynamic>? _extractOps(String content) {
     try {
       final decoded = jsonDecode(content);
-      if (decoded is! Map) return false;
-      final ops = decoded['ops'];
-      return ops is List;
-    } catch (_) {
-      return false;
-    }
+      if (decoded is Map) {
+        final ops = decoded['ops'];
+        if (ops is List) return ops;
+      } else if (decoded is List) {
+        return decoded;
+      }
+    } catch (_) {}
+    return null;
   }
+
+  /// Returns true if [content] is a valid Quill Delta JSON string.
+  ///
+  /// Accepts both canonical `{"ops":[...]}` and legacy bare `[...]` formats.
+  static bool isDelta(String content) => _extractOps(content) != null;
 
   /// Extracts plain text from [content].
   ///
   /// If [content] is a Delta JSON, concatenates all text inserts.
   /// If [content] is plain text, returns it as-is.
   static String toPlainText(String content) {
-    if (!isDelta(content)) return content;
-    try {
-      final decoded = jsonDecode(content) as Map;
-      final ops = decoded['ops'] as List;
-      final buffer = StringBuffer();
-      for (final op in ops) {
-        if (op is Map) {
-          final insert = op['insert'];
-          if (insert is String) buffer.write(insert);
-        }
+    final ops = _extractOps(content);
+    if (ops == null) return content;
+    final buffer = StringBuffer();
+    for (final op in ops) {
+      if (op is Map) {
+        final insert = op['insert'];
+        if (insert is String) buffer.write(insert);
       }
-      return buffer.toString().trimRight();
-    } catch (_) {
-      return content;
     }
+    return buffer.toString().trimRight();
   }
 
   /// Returns true if [content] has no meaningful text or embeds.
   static bool isContentEmpty(String content) {
-    if (!isDelta(content)) return content.trim().isEmpty;
+    final ops = _extractOps(content);
+    if (ops == null) return content.trim().isEmpty;
     final plain = toPlainText(content).trim();
     if (plain.isNotEmpty) return false;
-    // Check for non-text embeds (e.g. images)
-    try {
-      final decoded = jsonDecode(content) as Map;
-      final ops = decoded['ops'] as List;
-      return !ops.any((op) => op is Map && op['insert'] is Map);
-    } catch (_) {
-      return true;
-    }
+    return !ops.any((op) => op is Map && op['insert'] is Map);
   }
 
   /// Returns the file path of the first image embed in [content], or null.
   static String? firstImagePath(String content) {
-    if (!isDelta(content)) return null;
-    try {
-      final decoded = jsonDecode(content) as Map;
-      final ops = decoded['ops'] as List;
-      for (final op in ops) {
-        if (op is Map) {
-          final insert = op['insert'];
-          if (insert is Map && insert.containsKey('image')) {
-            final path = insert['image'];
-            if (path is String) return path;
-          }
+    final ops = _extractOps(content);
+    if (ops == null) return null;
+    for (final op in ops) {
+      if (op is Map) {
+        final insert = op['insert'];
+        if (insert is Map && insert.containsKey('image')) {
+          final path = insert['image'];
+          if (path is String) return path;
         }
       }
-    } catch (_) {}
+    }
     return null;
   }
 
   /// Returns all image paths embedded in [content].
   static List<String> allImagePaths(String content) {
-    if (!isDelta(content)) return [];
-    try {
-      final decoded = jsonDecode(content) as Map;
-      final ops = decoded['ops'] as List;
-      return [
-        for (final op in ops)
-          if (op is Map)
-            if (op['insert'] is Map &&
-                (op['insert'] as Map).containsKey('image'))
-              (op['insert'] as Map)['image'] as String,
-      ];
-    } catch (_) {
-      return [];
-    }
+    final ops = _extractOps(content);
+    if (ops == null) return [];
+    return [
+      for (final op in ops)
+        if (op is Map)
+          if (op['insert'] is Map && (op['insert'] as Map).containsKey('image'))
+            (op['insert'] as Map)['image'] as String,
+    ];
   }
 
   /// Wraps [plainText] into a minimal Quill Delta JSON string.

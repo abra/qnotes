@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:component_library/component_library.dart';
@@ -48,11 +49,14 @@ class NoteCard extends StatelessWidget {
             builder: (context, constraints) {
               final bounded = constraints.maxHeight.isFinite;
               final firstImage = DeltaUtils.firstImagePath(note.content);
-              final contentText = Text(
-                DeltaUtils.toPlainText(note.content),
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: textColor),
+              final contentStyle = Theme.of(
+                context,
+              ).textTheme.bodySmall!.copyWith(color: textColor);
+              final contentText = Text.rich(
+                TextSpan(
+                  style: contentStyle,
+                  children: _buildContentSpans(note.content, contentStyle),
+                ),
                 maxLines: contentMaxLines,
                 overflow: TextOverflow.ellipsis,
               );
@@ -160,4 +164,102 @@ class NoteCard extends StatelessWidget {
       ),
     );
   }
+}
+
+List<InlineSpan> _buildContentSpans(String content, TextStyle baseStyle) {
+  List<dynamic>? ops;
+  try {
+    final decoded = jsonDecode(content);
+    if (decoded is Map) ops = decoded['ops'] as List<dynamic>?;
+    if (decoded is List) ops = decoded as List<dynamic>;
+  } catch (_) {}
+  if (ops == null) return [TextSpan(text: content, style: baseStyle)];
+
+  final result = <InlineSpan>[];
+  final pendingLine = <InlineSpan>[];
+  int orderedCounter = 0;
+  bool firstLine = true;
+
+  void flushLine(Map<dynamic, dynamic>? blockAttrs) {
+    final listType = blockAttrs?['list'] as String?;
+    if (!firstLine) result.add(const TextSpan(text: '\n'));
+    firstLine = false;
+    String prefix = '';
+    switch (listType) {
+      case 'bullet':
+        prefix = '• ';
+        orderedCounter = 0;
+      case 'ordered':
+        orderedCounter++;
+        prefix = '$orderedCounter. ';
+      case 'checked':
+      case 'unchecked':
+        result.add(
+          WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: Icon(
+                listType == 'checked'
+                    ? Icons.check_box_rounded
+                    : Icons.check_box_outline_blank_rounded,
+                size: baseStyle.fontSize ?? 12,
+                color: baseStyle.color,
+              ),
+            ),
+          ),
+        );
+        orderedCounter = 0;
+        result.addAll(pendingLine);
+        pendingLine.clear();
+        return;
+      default:
+        orderedCounter = 0;
+    }
+    if (prefix.isNotEmpty) {
+      result.add(TextSpan(text: prefix, style: baseStyle));
+    }
+    result.addAll(pendingLine);
+    pendingLine.clear();
+  }
+
+  for (final op in ops) {
+    if (op is! Map) continue;
+    final insert = op['insert'];
+    final attrs = op['attributes'] as Map<dynamic, dynamic>?;
+    if (insert is! String) continue; // skip image embeds
+    if (insert == '\n') {
+      flushLine(attrs);
+    } else {
+      final lines = insert.split('\n');
+      for (int i = 0; i < lines.length; i++) {
+        final part = lines[i];
+        if (part.isNotEmpty) {
+          pendingLine.add(
+            TextSpan(text: part, style: _applyInlineStyle(baseStyle, attrs)),
+          );
+        }
+        if (i < lines.length - 1) flushLine(null);
+      }
+    }
+  }
+
+  if (pendingLine.isNotEmpty) flushLine(null);
+  return result;
+}
+
+TextStyle _applyInlineStyle(TextStyle base, Map<dynamic, dynamic>? attrs) {
+  if (attrs == null) return base;
+  var style = base;
+  if (attrs['bold'] == true)
+    style = style.copyWith(fontWeight: FontWeight.bold);
+  if (attrs['italic'] == true)
+    style = style.copyWith(fontStyle: FontStyle.italic);
+  if (attrs['underline'] == true) {
+    style = style.copyWith(decoration: TextDecoration.underline);
+  }
+  if (attrs['strike'] == true) {
+    style = style.copyWith(decoration: TextDecoration.lineThrough);
+  }
+  return style;
 }

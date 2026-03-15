@@ -200,6 +200,38 @@ void main() {
       );
 
       blocTest<NoteDetailsBloc, NoteDetailsState>(
+        'saves Delta JSON content as-is without trimming',
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
+          isNew: true,
+        ),
+        seed: () => const NoteDetailsState(
+          title: 'T',
+          content: '{"ops":[{"insert":"Hello\\n"}]}',
+        ),
+        act: (bloc) => bloc.add(NoteDetailsSaved()),
+        verify: (bloc) {
+          expect(bloc.state.status, NoteDetailsStatus.saved);
+          expect(bloc.state.note?.content, '{"ops":[{"insert":"Hello\\n"}]}');
+        },
+      );
+
+      blocTest<NoteDetailsBloc, NoteDetailsState>(
+        'does nothing when Delta content is empty',
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          imageService: FakeImageService(),
+          isNew: true,
+        ),
+        seed: () => const NoteDetailsState(
+          content: '{"ops":[{"insert":"\\n"}]}',
+        ),
+        act: (bloc) => bloc.add(NoteDetailsSaved()),
+        expect: () => <NoteDetailsState>[],
+      );
+
+      blocTest<NoteDetailsBloc, NoteDetailsState>(
         'emits failure when createNote throws',
         build: () {
           final r = FakeNoteRepository()..shouldThrow = true;
