@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:component_library/component_library.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:image_service/image_service.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:shared/shared.dart';
@@ -46,20 +49,44 @@ class NoteDetailsView extends StatefulWidget {
 
 class _NoteDetailsViewState extends State<NoteDetailsView> {
   late final TextEditingController _titleController;
-  late final TextEditingController _contentController;
+  late QuillController _quillController;
+  late final FocusNode _quillFocusNode;
+  bool _contentInitialized = false;
 
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController();
-    _contentController = TextEditingController();
+    _quillController = QuillController.basic();
+    _quillFocusNode = FocusNode();
+    _quillController.addListener(_onQuillChanged);
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _contentController.dispose();
+    _quillController.removeListener(_onQuillChanged);
+    _quillController.dispose();
+    _quillFocusNode.dispose();
     super.dispose();
+  }
+
+  void _onQuillChanged() {
+    if (!mounted) return;
+    final json = jsonEncode(_quillController.document.toDelta().toJson());
+    context.read<NoteDetailsBloc>().add(NoteDetailsContentChanged(json));
+  }
+
+  QuillController _controllerFromContent(String content) {
+    final raw = DeltaUtils.isDelta(content)
+        ? content
+        : DeltaUtils.fromPlainText(content);
+    final ops =
+        (jsonDecode(raw) as Map<String, dynamic>)['ops'] as List<dynamic>;
+    return QuillController(
+      document: Document.fromJson(ops),
+      selection: const TextSelection.collapsed(offset: 0),
+    );
   }
 
   void _saveAndPop(BuildContext context) {
@@ -117,7 +144,14 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
 
         if (state.status == NoteDetailsStatus.success) {
           _titleController.text = state.title;
-          _contentController.text = state.content;
+          if (!_contentInitialized) {
+            _contentInitialized = true;
+            final newController = _controllerFromContent(state.content);
+            _quillController.removeListener(_onQuillChanged);
+            _quillController.dispose();
+            _quillController = newController;
+            _quillController.addListener(_onQuillChanged);
+          }
         }
 
         if (state.status == NoteDetailsStatus.saved) {
@@ -209,65 +243,99 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                 ),
               ],
             ),
-            body: CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(
-                    Spacing.mediumLarge,
-                    Spacing.small,
-                    Spacing.mediumLarge,
-                    0,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child: TextField(
-                      controller: _titleController,
-                      onChanged: (v) => context.read<NoteDetailsBloc>().add(
-                        NoteDetailsTitleChanged(v),
-                      ),
-                      style:
-                          Theme.of(
-                            context,
-                          ).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
+            body: Column(
+              children: [
+                Expanded(
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(
+                          Spacing.mediumLarge,
+                          Spacing.small,
+                          Spacing.mediumLarge,
+                          0,
+                        ),
+                        sliver: SliverToBoxAdapter(
+                          child: TextField(
+                            controller: _titleController,
+                            onChanged: (v) =>
+                                context.read<NoteDetailsBloc>().add(
+                                  NoteDetailsTitleChanged(v),
+                                ),
+                            style:
+                                Theme.of(
+                                  context,
+                                ).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                            decoration: InputDecoration(
+                              hintText: l10n.titleHint,
+                              border: InputBorder.none,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                            ),
+                            maxLines: null,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
                           ),
-                      decoration: InputDecoration(
-                        hintText: l10n.titleHint,
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
+                        ),
                       ),
-                      maxLines: null,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                    ),
+                      SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            Spacing.mediumLarge,
+                            Spacing.small,
+                            Spacing.mediumLarge,
+                            Spacing.medium,
+                          ),
+                          child: QuillEditor(
+                            controller: _quillController,
+                            focusNode: _quillFocusNode,
+                            scrollController: ScrollController(),
+                            config: QuillEditorConfig(
+                              placeholder: l10n.contentHint,
+                              scrollable: false,
+                              expands: false,
+                              padding: EdgeInsets.zero,
+                              autoFocus: false,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      Spacing.mediumLarge,
-                      Spacing.small,
-                      Spacing.mediumLarge,
-                      Spacing.medium,
-                    ),
-                    child: TextField(
-                      controller: _contentController,
-                      onChanged: (v) => context.read<NoteDetailsBloc>().add(
-                        NoteDetailsContentChanged(v),
-                      ),
-                      style: Theme.of(context).textTheme.bodyLarge,
-                      decoration: InputDecoration(
-                        hintText: l10n.contentHint,
-                        border: InputBorder.none,
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                      maxLines: null,
-                      expands: false,
-                      textAlignVertical: TextAlignVertical.top,
-                      keyboardType: TextInputType.multiline,
-                    ),
+                QuillSimpleToolbar(
+                  controller: _quillController,
+                  config: const QuillSimpleToolbarConfig(
+                    multiRowsDisplay: false,
+                    showBoldButton: true,
+                    showItalicButton: true,
+                    showUnderLineButton: true,
+                    showStrikeThrough: false,
+                    showInlineCode: false,
+                    showHeaderStyle: false,
+                    showListBullets: true,
+                    showListCheck: true,
+                    showCodeBlock: false,
+                    showQuote: false,
+                    showIndent: false,
+                    showLink: false,
+                    showUndo: true,
+                    showRedo: true,
+                    showSearchButton: false,
+                    showFontFamily: false,
+                    showFontSize: false,
+                    showAlignmentButtons: false,
+                    showDirection: false,
+                    showDividers: true,
+                    showColorButton: false,
+                    showBackgroundColorButton: false,
+                    showClearFormat: false,
+                    showSuperscript: false,
+                    showSubscript: false,
+                    showListNumbers: true,
                   ),
                 ),
               ],

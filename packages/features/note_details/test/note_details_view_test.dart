@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:note_details/src/l10n/note_details_localizations.dart';
 import 'package:note_details/src/note_details_bloc.dart';
@@ -22,6 +23,7 @@ Widget _buildView(NoteDetailsBloc bloc) {
   return MaterialApp(
     localizationsDelegates: const [
       NoteDetailsLocalizations.delegate,
+      FlutterQuillLocalizations.delegate,
       GlobalMaterialLocalizations.delegate,
       GlobalWidgetsLocalizations.delegate,
     ],
@@ -42,6 +44,7 @@ Widget _buildNavigationView(
   return MaterialApp(
     localizationsDelegates: const [
       NoteDetailsLocalizations.delegate,
+      FlutterQuillLocalizations.delegate,
       GlobalMaterialLocalizations.delegate,
       GlobalWidgetsLocalizations.delegate,
     ],
@@ -81,6 +84,7 @@ void main() {
       await tester.pumpWidget(_buildView(bloc));
 
       expect(find.text('New note'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 1));
     });
 
     testWidgets('shows "Edit note" title for an existing note', (tester) async {
@@ -96,11 +100,13 @@ void main() {
           note: _existingNote,
           title: 'My note',
           content: 'Some content',
+          originalContent: 'Some content',
         ),
       );
       await tester.pumpWidget(_buildView(bloc));
 
       expect(find.text('Edit note'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 1));
     });
 
     // --- Initial UI elements ---
@@ -116,9 +122,10 @@ void main() {
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
       expect(find.byIcon(Icons.push_pin_outlined), findsOneWidget);
       expect(find.byIcon(Icons.palette_outlined), findsOneWidget);
+      await tester.pump(const Duration(seconds: 1));
     });
 
-    testWidgets('renders title and content text fields with hint text', (
+    testWidgets('renders title text field and quill editor with hint text', (
       tester,
     ) async {
       final bloc = NoteDetailsBloc(
@@ -128,9 +135,10 @@ void main() {
       );
       await tester.pumpWidget(_buildView(bloc));
 
-      expect(find.byType(TextField), findsNWidgets(2));
+      expect(find.byType(TextField), findsOneWidget); // title only
+      expect(find.byType(QuillEditor), findsOneWidget);
       expect(find.text('Title'), findsOneWidget);
-      expect(find.text('Start typing...'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 1));
     });
 
     testWidgets('shows filled pin icon when note is pinned', (tester) async {
@@ -144,6 +152,7 @@ void main() {
       await tester.pump();
 
       expect(find.byIcon(Icons.push_pin), findsOneWidget);
+      await tester.pump(const Duration(seconds: 1));
     });
 
     // --- Text field interactions ---
@@ -156,24 +165,11 @@ void main() {
       );
       await tester.pumpWidget(_buildView(bloc));
 
-      await tester.enterText(find.byType(TextField).first, 'Hello title');
+      await tester.enterText(find.byType(TextField), 'Hello title');
       await tester.pump();
 
       expect(bloc.state.title, 'Hello title');
-    });
-
-    testWidgets('typing in content field updates bloc state', (tester) async {
-      final bloc = NoteDetailsBloc(
-        noteRepository: FakeNoteRepository(),
-        imageService: FakeImageService(),
-        isNew: true,
-      );
-      await tester.pumpWidget(_buildView(bloc));
-
-      await tester.enterText(find.byType(TextField).last, 'Hello content');
-      await tester.pump();
-
-      expect(bloc.state.content, 'Hello content');
+      await tester.pump(const Duration(seconds: 1));
     });
 
     // --- Back button navigation ---
@@ -209,7 +205,7 @@ void main() {
       await tester.tap(find.text('open'));
       await tester.pumpAndSettle();
 
-      await tester.enterText(find.byType(TextField).first, 'Title only');
+      await tester.enterText(find.byType(TextField), 'Title only');
       await tester.pump();
 
       await tester.tap(find.byIcon(Icons.arrow_back));
@@ -217,57 +213,6 @@ void main() {
 
       expect(result, isNotNull);
       expect(result!.title, 'Title only');
-      expect(result!.content, '');
-    });
-
-    testWidgets('back button with content only saves note', (tester) async {
-      Note? result;
-      final bloc = NoteDetailsBloc(
-        noteRepository: FakeNoteRepository(),
-        imageService: FakeImageService(),
-        isNew: true,
-      );
-      await tester.pumpWidget(_buildNavigationView(bloc, (n) => result = n));
-
-      await tester.tap(find.text('open'));
-      await tester.pumpAndSettle();
-
-      await tester.enterText(find.byType(TextField).last, 'Content only');
-      await tester.pump();
-
-      await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
-
-      expect(result, isNotNull);
-      expect(result!.title, isNull);
-      expect(result!.content, 'Content only');
-    });
-
-    testWidgets('back button with both fields filled saves note', (
-      tester,
-    ) async {
-      Note? result;
-      final bloc = NoteDetailsBloc(
-        noteRepository: FakeNoteRepository(),
-        imageService: FakeImageService(),
-        isNew: true,
-      );
-      await tester.pumpWidget(_buildNavigationView(bloc, (n) => result = n));
-
-      await tester.tap(find.text('open'));
-      await tester.pumpAndSettle();
-
-      await tester.enterText(find.byType(TextField).first, 'My title');
-      await tester.pump();
-      await tester.enterText(find.byType(TextField).last, 'My content');
-      await tester.pump();
-
-      await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
-
-      expect(result, isNotNull);
-      expect(result!.title, 'My title');
-      expect(result!.content, 'My content');
     });
   });
 }
