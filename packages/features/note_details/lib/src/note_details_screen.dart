@@ -305,6 +305,36 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                               expands: false,
                               padding: EdgeInsets.zero,
                               autoFocus: false,
+                              customStyles: DefaultStyles(
+                                paragraph: DefaultTextBlockStyle(
+                                  Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge!.copyWith(
+                                    decoration: TextDecoration.none,
+                                    height: 1.5,
+                                  ),
+                                  const HorizontalSpacing(0, 0),
+                                  const VerticalSpacing(0, 0),
+                                  const VerticalSpacing(0, 0),
+                                  null,
+                                ),
+                                placeHolder: DefaultTextBlockStyle(
+                                  Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge!.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.38),
+                                    decoration: TextDecoration.none,
+                                    height: 1.5,
+                                  ),
+                                  const HorizontalSpacing(0, 0),
+                                  const VerticalSpacing(0, 0),
+                                  const VerticalSpacing(0, 0),
+                                  null,
+                                ),
+                              ),
                             ),
                           ),
                         ),
@@ -312,43 +342,74 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                     ],
                   ),
                 ),
-                QuillSimpleToolbar(
-                  controller: _quillController,
-                  config: const QuillSimpleToolbarConfig(
-                    multiRowsDisplay: false,
-                    showBoldButton: true,
-                    showItalicButton: true,
-                    showUnderLineButton: true,
-                    showStrikeThrough: false,
-                    showInlineCode: false,
-                    showHeaderStyle: false,
-                    showListBullets: true,
-                    showListCheck: true,
-                    showCodeBlock: false,
-                    showQuote: false,
-                    showIndent: false,
-                    showLink: false,
-                    showUndo: true,
-                    showRedo: true,
-                    showSearchButton: false,
-                    showFontFamily: false,
-                    showFontSize: false,
-                    showAlignmentButtons: false,
-                    showDirection: false,
-                    showDividers: true,
-                    showColorButton: false,
-                    showBackgroundColorButton: false,
-                    showClearFormat: false,
-                    showSuperscript: false,
-                    showSubscript: false,
-                    showListNumbers: true,
-                  ),
-                ),
+                _QuillToolbar(controller: _quillController),
               ],
             ),
           ),
         );
       },
+    );
+  }
+}
+
+class _QuillToolbar extends StatelessWidget {
+  const _QuillToolbar({required this.controller});
+
+  final QuillController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border(
+          top: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+          ),
+        ),
+      ),
+      child: QuillSimpleToolbar(
+        controller: controller,
+        config: QuillSimpleToolbarConfig(
+          multiRowsDisplay: false,
+          color: colorScheme.surface,
+          iconTheme: QuillIconTheme(
+            iconButtonUnselectedData: IconButtonData(
+              color: colorScheme.onSurface,
+            ),
+            iconButtonSelectedData: IconButtonData(
+              color: colorScheme.primary,
+            ),
+          ),
+          showBoldButton: true,
+          showItalicButton: true,
+          showUnderLineButton: true,
+          showStrikeThrough: false,
+          showInlineCode: false,
+          showHeaderStyle: false,
+          showListBullets: true,
+          showListCheck: true,
+          showListNumbers: true,
+          showCodeBlock: false,
+          showQuote: false,
+          showIndent: false,
+          showLink: false,
+          showUndo: true,
+          showRedo: true,
+          showSearchButton: false,
+          showFontFamily: false,
+          showFontSize: false,
+          showAlignmentButtons: false,
+          showDirection: false,
+          showDividers: true,
+          showColorButton: false,
+          showBackgroundColorButton: false,
+          showClearFormat: false,
+          showSuperscript: false,
+          showSubscript: false,
+        ),
+      ),
     );
   }
 }
