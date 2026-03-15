@@ -161,126 +161,119 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
             : Theme.of(context).colorScheme.onSurface;
         final hintColor = textColor.withValues(alpha: 0.45);
 
+        final noteColor = hasColor
+            ? state.color.forBrightness(brightness)
+            : null;
+
         return PopScope(
           canPop: false,
           onPopInvokedWithResult: (didPop, _) {
             if (!didPop) _saveAndPop(context);
           },
           child: Scaffold(
-            backgroundColor: hasColor
-                ? state.color.forBrightness(brightness)
-                : null,
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: Spacing.mediumLarge,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Top bar
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(Icons.arrow_back, color: textColor),
-                          onPressed: () => _saveAndPop(context),
-                          padding: EdgeInsets.zero,
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        Expanded(
-                          child: Text(
-                            state.isNew ? l10n.newNote : l10n.editNote,
-                            style: Theme.of(
-                              context,
-                            ).textTheme.titleMedium?.copyWith(color: textColor),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            state.isPinned
-                                ? Icons.push_pin
-                                : Icons.push_pin_outlined,
-                            color: textColor,
-                          ),
-                          onPressed: () => context.read<NoteDetailsBloc>().add(
-                            NoteDetailsPinToggled(),
-                          ),
-                          padding: EdgeInsets.zero,
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: Spacing.small),
-                    // Title row with color dot
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            controller: _titleController,
-                            onChanged: (v) => context
-                                .read<NoteDetailsBloc>()
-                                .add(NoteDetailsTitleChanged(v)),
-                            style: Theme.of(context).textTheme.headlineSmall
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: textColor,
-                                ),
-                            decoration: InputDecoration(
-                              hintText: l10n.titleHint,
-                              hintStyle: TextStyle(color: hintColor),
-                              border: InputBorder.none,
-                              isDense: true,
-                              contentPadding: EdgeInsets.zero,
-                            ),
-                            maxLines: null,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
-                          ),
-                        ),
-                        const SizedBox(width: Spacing.small),
-                        IconButton(
-                          icon: Icon(
-                            state.color == NoteColor.none
-                                ? Icons.palette_outlined
-                                : Icons.palette,
-                            color: textColor,
-                          ),
-                          onPressed: () =>
-                              _showColorPicker(context, state.color),
-                          padding: EdgeInsets.zero,
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: Spacing.small),
-                    // Content
-                    Expanded(
-                      child: TextField(
-                        controller: _contentController,
-                        onChanged: (v) => context.read<NoteDetailsBloc>().add(
-                          NoteDetailsContentChanged(v),
-                        ),
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyLarge?.copyWith(color: textColor),
-                        decoration: InputDecoration(
-                          hintText: l10n.contentHint,
-                          hintStyle: TextStyle(color: hintColor),
-                          border: InputBorder.none,
-                          isDense: true,
-                          contentPadding: EdgeInsets.zero,
-                        ),
-                        maxLines: null,
-                        expands: true,
-                        textAlignVertical: TextAlignVertical.top,
-                        keyboardType: TextInputType.multiline,
-                      ),
-                    ),
-                  ],
-                ),
+            backgroundColor: noteColor,
+            appBar: AppBar(
+              backgroundColor: noteColor,
+              foregroundColor: textColor,
+              surfaceTintColor: Colors.transparent,
+              elevation: 0,
+              scrolledUnderElevation: 8,
+              shadowColor: Colors.black.withValues(alpha: 0.08),
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => _saveAndPop(context),
               ),
+              centerTitle: true,
+              title: Text(
+                state.isNew ? l10n.newNote : l10n.editNote,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              actions: [
+                IconButton(
+                  icon: Icon(
+                    state.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                  ),
+                  onPressed: () => context.read<NoteDetailsBloc>().add(
+                    NoteDetailsPinToggled(),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(
+                    state.color == NoteColor.none
+                        ? Icons.palette_outlined
+                        : Icons.palette,
+                  ),
+                  onPressed: () => _showColorPicker(context, state.color),
+                ),
+              ],
+            ),
+            body: CustomScrollView(
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(
+                    Spacing.mediumLarge,
+                    Spacing.small,
+                    Spacing.mediumLarge,
+                    0,
+                  ),
+                  sliver: SliverToBoxAdapter(
+                    child: TextField(
+                      controller: _titleController,
+                      onChanged: (v) => context.read<NoteDetailsBloc>().add(
+                        NoteDetailsTitleChanged(v),
+                      ),
+                      style:
+                          Theme.of(
+                            context,
+                          ).textTheme.headlineSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: textColor,
+                          ),
+                      decoration: InputDecoration(
+                        hintText: l10n.titleHint,
+                        hintStyle: TextStyle(color: hintColor),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      maxLines: null,
+                      keyboardType: TextInputType.text,
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ),
+                ),
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      Spacing.mediumLarge,
+                      Spacing.small,
+                      Spacing.mediumLarge,
+                      Spacing.medium,
+                    ),
+                    child: TextField(
+                      controller: _contentController,
+                      onChanged: (v) => context.read<NoteDetailsBloc>().add(
+                        NoteDetailsContentChanged(v),
+                      ),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyLarge?.copyWith(color: textColor),
+                      decoration: InputDecoration(
+                        hintText: l10n.contentHint,
+                        hintStyle: TextStyle(color: hintColor),
+                        border: InputBorder.none,
+                        isDense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      maxLines: null,
+                      expands: false,
+                      textAlignVertical: TextAlignVertical.top,
+                      keyboardType: TextInputType.multiline,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         );
