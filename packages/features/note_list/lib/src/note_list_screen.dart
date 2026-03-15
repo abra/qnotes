@@ -387,7 +387,14 @@ class _BottomBarState extends State<_BottomBar> {
                 ),
               ),
             ),
-            const SizedBox(width: Spacing.small),
+            SizedBox(
+              height: 28,
+              child: VerticalDivider(
+                width: Spacing.medium,
+                thickness: 0.5,
+                color: colorScheme.onSurface.withValues(alpha: 0.2),
+              ),
+            ),
             DecoratedBox(
               decoration: BoxDecoration(
                 color: colorScheme.surface,
