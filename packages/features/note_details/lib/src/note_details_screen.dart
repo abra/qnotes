@@ -188,6 +188,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
   void _showColorPicker(BuildContext context, NoteColor selected) {
     showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
       builder: (sheetContext) => _NoteColorPicker(
         selected: selected,
         onSelected: (color) =>
@@ -302,6 +303,18 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                   color: appBarForeground,
                 ),
               ),
+              actions: [
+                if (state.isPinned)
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      right: Spacing.mediumLarge,
+                    ),
+                    child: Icon(
+                      Icons.push_pin,
+                      color: appBarForeground.withValues(alpha: 0.6),
+                    ),
+                  ),
+              ],
             ),
             body: SafeArea(
               top: false,
@@ -561,56 +574,59 @@ class _QuillToolbarState extends State<_QuillToolbar>
                 child: Row(
                   children: [
                     Expanded(
-                      child: QuillSimpleToolbar(
-                        controller: widget.controller,
-                        config: QuillSimpleToolbarConfig(
-                          multiRowsDisplay: false,
-                          toolbarSize: 32,
-                          toolbarSectionSpacing: 0,
-                          color: Colors.transparent,
-                          buttonOptions: QuillSimpleToolbarButtonOptions(
-                            base: QuillToolbarBaseButtonOptions(
-                              iconTheme: QuillIconTheme(
-                                iconButtonUnselectedData: IconButtonData(
-                                  style: _toolbarButtonStyle,
-                                  color: colorScheme.onSurface,
-                                ),
-                                iconButtonSelectedData: IconButtonData(
-                                  style: _toolbarButtonStyle.copyWith(
-                                    backgroundColor:
-                                        const WidgetStatePropertyAll(
-                                          Colors.transparent,
-                                        ),
+                      child: SizedBox(
+                        height: 32,
+                        child: QuillSimpleToolbar(
+                          controller: widget.controller,
+                          config: QuillSimpleToolbarConfig(
+                            multiRowsDisplay: false,
+                            toolbarSize: 32,
+                            toolbarSectionSpacing: 0,
+                            color: Colors.transparent,
+                            buttonOptions: QuillSimpleToolbarButtonOptions(
+                              base: QuillToolbarBaseButtonOptions(
+                                iconTheme: QuillIconTheme(
+                                  iconButtonUnselectedData: IconButtonData(
+                                    style: _toolbarButtonStyle,
+                                    color: colorScheme.onSurface,
                                   ),
-                                  color: colorScheme.primary,
+                                  iconButtonSelectedData: IconButtonData(
+                                    style: _toolbarButtonStyle.copyWith(
+                                      backgroundColor:
+                                          const WidgetStatePropertyAll(
+                                            Colors.transparent,
+                                          ),
+                                    ),
+                                    color: colorScheme.primary,
+                                  ),
                                 ),
                               ),
                             ),
+                            showBoldButton: true,
+                            showItalicButton: true,
+                            showUnderLineButton: true,
+                            showListNumbers: true,
+                            showListBullets: true,
+                            showListCheck: true,
+                            showUndo: true,
+                            showRedo: true,
+                            showDividers: false,
+                            showFontFamily: false,
+                            showFontSize: false,
+                            showStrikeThrough: false,
+                            showInlineCode: false,
+                            showHeaderStyle: false,
+                            showCodeBlock: false,
+                            showQuote: false,
+                            showIndent: false,
+                            showLink: false,
+                            showSearchButton: false,
+                            showColorButton: false,
+                            showBackgroundColorButton: false,
+                            showClearFormat: false,
+                            showSuperscript: false,
+                            showSubscript: false,
                           ),
-                          showBoldButton: true,
-                          showItalicButton: true,
-                          showUnderLineButton: true,
-                          showListNumbers: true,
-                          showListBullets: true,
-                          showListCheck: true,
-                          showUndo: true,
-                          showRedo: true,
-                          showDividers: false,
-                          showFontFamily: false,
-                          showFontSize: false,
-                          showStrikeThrough: false,
-                          showInlineCode: false,
-                          showHeaderStyle: false,
-                          showCodeBlock: false,
-                          showQuote: false,
-                          showIndent: false,
-                          showLink: false,
-                          showSearchButton: false,
-                          showColorButton: false,
-                          showBackgroundColorButton: false,
-                          showClearFormat: false,
-                          showSuperscript: false,
-                          showSubscript: false,
                         ),
                       ),
                     ),

@@ -28,4 +28,7 @@ class NoteDetailsLocalizationsJa extends NoteDetailsLocalizations {
 
   @override
   String get noteSaveFailed => 'Failed to save note';
+
+  @override
+  String get noteColor => 'ノートの色';
 }

@@ -13,5 +13,7 @@
   "noteLoadFailed": "Failed to load note",
   "@noteLoadFailed": {},
   "noteSaveFailed": "Failed to save note",
-  "@noteSaveFailed": {}
+  "@noteSaveFailed": {},
+  "noteColor": "Note color",
+  "@noteColor": {}
 }

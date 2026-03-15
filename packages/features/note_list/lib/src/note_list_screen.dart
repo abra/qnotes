@@ -312,6 +312,11 @@ class _BottomBarState extends State<_BottomBar> {
     Radius.circular(AppRadius.medium),
   );
   static const _iconSize = IconSize.xLarge;
+  static const _buttonStyle = ButtonStyle(
+    fixedSize: WidgetStatePropertyAll(Size(40, 32)),
+    padding: WidgetStatePropertyAll(EdgeInsets.zero),
+    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+  );
 
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
@@ -365,50 +370,54 @@ class _BottomBarState extends State<_BottomBar> {
         child: Row(
           children: [
             Expanded(
-              child: ValueListenableBuilder<TextEditingValue>(
-                valueListenable: _controller,
-                builder: (context, value, _) => TextField(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  onChanged: widget.onQueryChanged,
-                  decoration: InputDecoration(
-                    hintText: l10n.searchHint,
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: colorScheme.onSurfaceVariant,
-                      size: _iconSize,
+              child: SizedBox(
+                height: 32,
+                child: ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _controller,
+                  builder: (context, value, _) => TextField(
+                    controller: _controller,
+                    focusNode: _focusNode,
+                    onChanged: widget.onQueryChanged,
+                    decoration: InputDecoration(
+                      hintText: l10n.searchHint,
+                      prefixIcon: Icon(
+                        Icons.search,
+                        color: colorScheme.onSurfaceVariant,
+                        size: _iconSize,
+                      ),
+                      hintStyle: Theme.of(context).textTheme.bodyMedium
+                          ?.copyWith(
+                            color: colorScheme.onSurfaceVariant,
+                          ),
+                      filled: true,
+                      fillColor: colorScheme.surface,
+                      border: const OutlineInputBorder(
+                        borderRadius: _innerRadius,
+                        borderSide: BorderSide.none,
+                      ),
+                      enabledBorder: const OutlineInputBorder(
+                        borderRadius: _innerRadius,
+                        borderSide: BorderSide.none,
+                      ),
+                      focusedBorder: const OutlineInputBorder(
+                        borderRadius: _innerRadius,
+                        borderSide: BorderSide.none,
+                      ),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: Spacing.small,
+                      ),
+                      suffixIcon: value.text.isNotEmpty
+                          ? IconButton(
+                              icon: Icon(
+                                Icons.close,
+                                size: IconSize.small,
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                              onPressed: _clear,
+                            )
+                          : null,
                     ),
-                    hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurfaceVariant,
-                    ),
-                    filled: true,
-                    fillColor: colorScheme.surface,
-                    border: const OutlineInputBorder(
-                      borderRadius: _innerRadius,
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: const OutlineInputBorder(
-                      borderRadius: _innerRadius,
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderRadius: _innerRadius,
-                      borderSide: BorderSide.none,
-                    ),
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: Spacing.medium,
-                    ),
-                    suffixIcon: value.text.isNotEmpty
-                        ? IconButton(
-                            icon: Icon(
-                              Icons.close,
-                              size: IconSize.small,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                            onPressed: _clear,
-                          )
-                        : null,
                   ),
                 ),
               ),
@@ -427,6 +436,7 @@ class _BottomBarState extends State<_BottomBar> {
                 borderRadius: _innerRadius,
               ),
               child: IconButton(
+                style: _buttonStyle,
                 icon: Icon(
                   Icons.menu,
                   color: colorScheme.onSurfaceVariant,
@@ -444,6 +454,7 @@ class _BottomBarState extends State<_BottomBar> {
                 borderRadius: _innerRadius,
               ),
               child: IconButton(
+                style: _buttonStyle,
                 icon: Icon(
                   Icons.add,
                   color: colorScheme.onPrimary,

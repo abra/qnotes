@@ -28,4 +28,7 @@ class NoteDetailsLocalizationsRu extends NoteDetailsLocalizations {
 
   @override
   String get noteSaveFailed => 'Не удалось сохранить заметку';
+
+  @override
+  String get noteColor => 'Цвет заметки';
 }

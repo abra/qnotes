@@ -151,7 +151,7 @@ void main() {
       await tester.pumpWidget(_buildView(bloc));
       await tester.pump();
 
-      expect(find.byIcon(Icons.push_pin), findsOneWidget);
+      expect(find.byIcon(Icons.push_pin), findsAtLeastNWidgets(1));
       await tester.pump(const Duration(seconds: 1));
     });
 

@@ -158,6 +158,12 @@ abstract class NoteDetailsLocalizations {
   /// In en, this message translates to:
   /// **'Failed to save note'**
   String get noteSaveFailed;
+
+  /// No description provided for @noteColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Note color'**
+  String get noteColor;
 }
 
 class _NoteDetailsLocalizationsDelegate

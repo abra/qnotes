@@ -6,5 +6,6 @@
   "contentHint": "Commencez à écrire...",
   "noteNotFound": "Note not found",
   "noteLoadFailed": "Failed to load note",
-  "noteSaveFailed": "Failed to save note"
+  "noteSaveFailed": "Failed to save note",
+  "noteColor": "Couleur de la note"
 }

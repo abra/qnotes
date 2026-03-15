@@ -6,5 +6,6 @@
   "contentHint": "Начните писать...",
   "noteNotFound": "Заметка не найдена",
   "noteLoadFailed": "Не удалось загрузить заметку",
-  "noteSaveFailed": "Не удалось сохранить заметку"
+  "noteSaveFailed": "Не удалось сохранить заметку",
+  "noteColor": "Цвет заметки"
 }

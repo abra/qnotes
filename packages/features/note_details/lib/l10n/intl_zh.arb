@@ -6,5 +6,6 @@
   "contentHint": "开始输入...",
   "noteNotFound": "Note not found",
   "noteLoadFailed": "Failed to load note",
-  "noteSaveFailed": "Failed to save note"
+  "noteSaveFailed": "Failed to save note",
+  "noteColor": "笔记颜色"
 }
