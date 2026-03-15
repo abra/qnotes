@@ -47,7 +47,7 @@ class _NoteColorPicker extends StatelessWidget {
                 child: color == NoteColor.none
                     ? Icon(
                         Icons.block,
-                        size: 20,
+                        size: IconSize.medium,
                         color: Theme.of(context).colorScheme.onSurface,
                       )
                     : null,

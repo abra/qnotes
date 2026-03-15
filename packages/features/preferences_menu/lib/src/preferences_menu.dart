@@ -241,7 +241,7 @@ class _MainPage extends StatelessWidget {
                   children: [
                     Text(selectedLanguage.name),
                     const SizedBox(width: Spacing.xSmall),
-                    const Icon(Icons.chevron_right, size: 18),
+                    const Icon(Icons.chevron_right, size: IconSize.small),
                   ],
                 ),
               ),
@@ -305,7 +305,7 @@ class _LanguagePage extends StatelessWidget {
               constraints: const BoxConstraints(maxHeight: 300),
               child: Scrollbar(
                 thickness: 4,
-                radius: const Radius.circular(2),
+                radius: const Radius.circular(AppRadius.xSmall),
                 child: ListView.builder(
                   itemCount: supportedLanguages.length,
                   itemBuilder: (context, index) {

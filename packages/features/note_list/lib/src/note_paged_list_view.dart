@@ -26,7 +26,9 @@ class NotePagedListView extends StatelessWidget {
   final ValueChanged<String>? onNoteLongPressed;
   final double bottomPadding;
 
-  static const _dismissRadius = BorderRadius.all(Radius.circular(12));
+  static const _dismissRadius = BorderRadius.all(
+    Radius.circular(AppRadius.small),
+  );
 
   // When a note has no header (no title, not pinned) we give it one extra
   // content line so the card height roughly matches a note that has a title.

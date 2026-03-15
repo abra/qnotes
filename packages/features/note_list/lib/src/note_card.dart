@@ -92,7 +92,7 @@ class NoteCard extends StatelessWidget {
                                   ),
                                   child: Icon(
                                     Icons.push_pin,
-                                    size: 14,
+                                    size: IconSize.xSmall,
                                     color: textColor.withValues(alpha: 0.6),
                                   ),
                                 ),
@@ -126,7 +126,7 @@ class NoteCard extends StatelessWidget {
                     child: Icon(
                       Icons.check_circle,
                       color: Theme.of(context).colorScheme.primary,
-                      size: 20,
+                      size: IconSize.medium,
                     ),
                   ),
                 ),
