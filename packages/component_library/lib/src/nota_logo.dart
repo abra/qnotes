@@ -13,8 +13,8 @@ class NotaLogo extends StatelessWidget {
   static const _colors = [
     NoteColor.blue,
     NoteColor.orange,
-    NoteColor.green,
     NoteColor.pink,
+    NoteColor.green,
   ];
 
   @override
