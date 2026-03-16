@@ -129,7 +129,7 @@ class _MainPage extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
           Spacing.large,
-          Spacing.large,
+          Spacing.mediumLarge,
           Spacing.large,
           Spacing.mediumLarge,
         ),
@@ -159,6 +159,7 @@ class _MainPage extends StatelessWidget {
             _PreferenceRow(
               label: l10n.theme,
               control: SegmentedButton<ThemeMode>(
+                showSelectedIcon: false,
                 segments: const [
                   ButtonSegment(
                     value: ThemeMode.system,
@@ -186,6 +187,7 @@ class _MainPage extends StatelessWidget {
             _PreferenceRow(
               label: l10n.notesView,
               control: SegmentedButton<NoteViewMode>(
+                showSelectedIcon: false,
                 segments: const [
                   ButtonSegment(
                     value: NoteViewMode.grid,
@@ -208,6 +210,7 @@ class _MainPage extends StatelessWidget {
             _PreferenceRow(
               label: l10n.listDensity,
               control: SegmentedButton<NoteListDensity>(
+                showSelectedIcon: false,
                 segments: const [
                   ButtonSegment(
                     value: NoteListDensity.twoLines,
@@ -277,7 +280,7 @@ class _LanguagePage extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
           Spacing.large,
-          Spacing.large,
+          Spacing.mediumLarge,
           Spacing.large,
           Spacing.mediumLarge,
         ),
