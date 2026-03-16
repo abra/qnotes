@@ -34,9 +34,7 @@ class PreferencesRepository {
           map['noteListDensity'] as String? ?? 'threeLines',
         ),
       );
-    } catch (e, st) {
-      // ignore: avoid_print
-      print('[PreferencesRepository] failed to parse preferences: $e\n$st');
+    } catch (_) {
       return const Preferences();
     }
   }
@@ -48,13 +46,7 @@ class PreferencesRepository {
       'noteViewMode': prefs.noteViewMode.name,
       'noteListDensity': prefs.noteListDensity.name,
     };
-    try {
-      await _storage.setString(_key, jsonEncode(map));
-    } catch (e, st) {
-      // ignore: avoid_print
-      print('[PreferencesRepository] failed to save preferences: $e\n$st');
-      rethrow;
-    }
+    await _storage.setString(_key, jsonEncode(map));
   }
 
   static Locale _resolveLocale(String? code, List<String> supportedCodes) {
