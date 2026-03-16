@@ -1,10 +1,13 @@
 # toast_service
 
-Thin wrapper over [toastification](https://pub.dev/packages/toastification) for in-app notifications.
+Thin wrapper over [toastification](https://pub.dev/packages/toastification) for in-app
+notifications.
 
 ## Why this package exists
 
-Feature packages (`note_list`, `note_details`, etc.) should not depend directly on `toastification`. By routing all toast calls through this package, the underlying library can be swapped out in one place without touching any feature code.
+Feature packages (`note_list`, `note_details`, etc.) should not depend directly on
+`toastification`. By routing all toast calls through this package, the underlying library
+can be swapped out in one place without touching any feature code.
 
 ## API
 

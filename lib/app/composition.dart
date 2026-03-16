@@ -82,7 +82,5 @@ Future<DependenciesContainer> createDependenciesContainer(
     preferencesService: preferencesService,
     noteRepository: noteRepository,
     imageService: imageService,
-    supportedLanguages: SupportedLocales.languages,
-    supportedLocales: SupportedLocales.locales,
   );
 }

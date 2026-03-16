@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nota/app/config/supported_locales.dart';
 import 'package:nota/app/dependency_container.dart';
 import 'package:nota/app/router/app_routes.dart';
 import 'package:note_details/note_details.dart';
@@ -31,7 +32,7 @@ GoRouter buildRouter({required DependenciesContainer dependencies}) {
             isScrollControlled: true,
             builder: (_) => PreferencesMenu(
               service: dependencies.preferencesService,
-              supportedLanguages: dependencies.supportedLanguages,
+              supportedLanguages: SupportedLocales.languages,
             ),
           ),
         ),

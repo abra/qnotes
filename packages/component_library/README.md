@@ -112,22 +112,22 @@ For the full guide with code examples see [.docs/THEMING.md](../../.docs/THEMING
 
 ### IconSize
 
-| Constant           | Value |
-|--------------------|-------|
-| `IconSize.xSmall`  | 14    |
-| `IconSize.small`   | 18    |
-| `IconSize.medium`  | 20    |
-| `IconSize.large`   | 24    |
-| `IconSize.xLarge`  | 28    |
+| Constant          | Value |
+|-------------------|-------|
+| `IconSize.xSmall` | 14    |
+| `IconSize.small`  | 18    |
+| `IconSize.medium` | 20    |
+| `IconSize.large`  | 24    |
+| `IconSize.xLarge` | 28    |
 
 ### AppRadius
 
-| Constant            | Value |
-|---------------------|-------|
-| `AppRadius.xSmall`  | 2     |
-| `AppRadius.small`   | 12    |
-| `AppRadius.medium`  | 14    |
-| `AppRadius.large`   | 20    |
+| Constant           | Value |
+|--------------------|-------|
+| `AppRadius.xSmall` | 2     |
+| `AppRadius.small`  | 12    |
+| `AppRadius.medium` | 14    |
+| `AppRadius.large`  | 20    |
 
 Use these constants instead of magic numbers:
 
@@ -155,7 +155,9 @@ BottomSheetHeader(
 
 ### FadeGradientOverlay
 
-Gradient fade pinned to the bottom of a `Stack`. Fades from transparent to scaffold background, sits above scrollable content without blocking taps. Wraps itself in `Positioned` + `IgnorePointer`.
+Gradient fade pinned to the bottom of a `Stack`. Fades from transparent to scaffold
+background, sits above scrollable content without blocking taps. Wraps itself in
+`Positioned` + `IgnorePointer`.
 
 ```dart
 Stack(

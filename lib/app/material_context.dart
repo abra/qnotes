@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nota/app/config/supported_locales.dart';
 import 'package:nota/app/dependency_scope.dart';
 import 'package:nota/app/router/app_router.dart';
 import 'package:note_details/note_details.dart';
@@ -45,7 +46,6 @@ class _MaterialContextState extends State<MaterialContext> {
   @override
   Widget build(BuildContext context) {
     final preferences = PreferencesScope.of(context);
-    final dependencies = DependenciesScope.of(context);
 
     const lightTheme = LightAppThemeData();
     const darkTheme = DarkAppThemeData();
@@ -60,7 +60,7 @@ class _MaterialContextState extends State<MaterialContext> {
           theme: lightTheme.materialThemeData,
           darkTheme: darkTheme.materialThemeData,
           locale: preferences.locale,
-          supportedLocales: dependencies.supportedLocales,
+          supportedLocales: SupportedLocales.locales,
           localizationsDelegates: const [
             NoteListLocalizations.delegate,
             NoteDetailsLocalizations.delegate,
