@@ -39,6 +39,7 @@ dependencies:
   preferences_menu:
     path: packages/features/preferences_menu
 
+  flutter_quill: ^11.5.0
   cupertino_icons: ^1.0.8
   flutter_bloc: ^9.1.1
   package_info_plus: ^9.0.0

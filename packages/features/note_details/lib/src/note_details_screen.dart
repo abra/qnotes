@@ -325,7 +325,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                       SliverPadding(
                         padding: const EdgeInsets.fromLTRB(
                           Spacing.mediumLarge,
-                          Spacing.small,
+                          Spacing.medium,
                           Spacing.mediumLarge,
                           0,
                         ),
@@ -346,7 +346,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                               hintText: l10n.titleHint,
                               border: InputBorder.none,
                               isDense: true,
-                              contentPadding: EdgeInsets.zero,
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: Spacing.xSmall,
+                              ),
                             ),
                             maxLines: null,
                             keyboardType: TextInputType.text,
