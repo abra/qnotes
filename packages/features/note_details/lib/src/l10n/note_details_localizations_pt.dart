@@ -21,13 +21,13 @@ class NoteDetailsLocalizationsPt extends NoteDetailsLocalizations {
   String get contentHint => 'Comece a escrever...';
 
   @override
-  String get noteNotFound => 'Note not found';
+  String get noteNotFound => 'Nota não encontrada';
 
   @override
-  String get noteLoadFailed => 'Failed to load note';
+  String get noteLoadFailed => 'Falha ao carregar nota';
 
   @override
-  String get noteSaveFailed => 'Failed to save note';
+  String get noteSaveFailed => 'Falha ao salvar nota';
 
   @override
   String get noteColor => 'Cor da nota';

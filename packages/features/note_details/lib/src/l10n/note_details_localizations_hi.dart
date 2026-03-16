@@ -21,13 +21,13 @@ class NoteDetailsLocalizationsHi extends NoteDetailsLocalizations {
   String get contentHint => 'टाइप करना शुरू करें...';
 
   @override
-  String get noteNotFound => 'Note not found';
+  String get noteNotFound => 'नोट नहीं मिला';
 
   @override
-  String get noteLoadFailed => 'Failed to load note';
+  String get noteLoadFailed => 'नोट लोड नहीं हो सका';
 
   @override
-  String get noteSaveFailed => 'Failed to save note';
+  String get noteSaveFailed => 'नोट सहेजा नहीं जा सका';
 
   @override
   String get noteColor => 'नोट का रंग';

@@ -31,7 +31,7 @@ class NoteListLocalizationsFr extends NoteListLocalizations {
   String get searchHint => 'Rechercher';
 
   @override
-  String get noteDeleteFailed => 'Failed to delete note';
+  String get noteDeleteFailed => 'Échec de la suppression de la note';
 
   @override
   String get loadFailed => 'Échec du chargement des notes';

@@ -21,13 +21,13 @@ class NoteDetailsLocalizationsZh extends NoteDetailsLocalizations {
   String get contentHint => '开始输入...';
 
   @override
-  String get noteNotFound => 'Note not found';
+  String get noteNotFound => '笔记未找到';
 
   @override
-  String get noteLoadFailed => 'Failed to load note';
+  String get noteLoadFailed => '加载笔记失败';
 
   @override
-  String get noteSaveFailed => 'Failed to save note';
+  String get noteSaveFailed => '保存笔记失败';
 
   @override
   String get noteColor => '笔记颜色';

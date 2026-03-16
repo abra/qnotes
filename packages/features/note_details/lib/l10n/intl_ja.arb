@@ -4,8 +4,8 @@
   "editNote": "メモを編集",
   "titleHint": "タイトル",
   "contentHint": "入力を開始...",
-  "noteNotFound": "Note not found",
-  "noteLoadFailed": "Failed to load note",
-  "noteSaveFailed": "Failed to save note",
+  "noteNotFound": "メモが見つかりません",
+  "noteLoadFailed": "メモの読み込みに失敗しました",
+  "noteSaveFailed": "メモの保存に失敗しました",
   "noteColor": "ノートの色"
 }

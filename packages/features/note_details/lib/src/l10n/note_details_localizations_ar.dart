@@ -21,13 +21,13 @@ class NoteDetailsLocalizationsAr extends NoteDetailsLocalizations {
   String get contentHint => 'ابدأ الكتابة...';
 
   @override
-  String get noteNotFound => 'Note not found';
+  String get noteNotFound => 'الملاحظة غير موجودة';
 
   @override
-  String get noteLoadFailed => 'Failed to load note';
+  String get noteLoadFailed => 'فشل تحميل الملاحظة';
 
   @override
-  String get noteSaveFailed => 'Failed to save note';
+  String get noteSaveFailed => 'فشل حفظ الملاحظة';
 
   @override
   String get noteColor => 'لون الملاحظة';

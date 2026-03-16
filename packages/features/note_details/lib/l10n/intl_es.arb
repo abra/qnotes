@@ -4,8 +4,8 @@
   "editNote": "Editar nota",
   "titleHint": "Título",
   "contentHint": "Empieza a escribir...",
-  "noteNotFound": "Note not found",
-  "noteLoadFailed": "Failed to load note",
-  "noteSaveFailed": "Failed to save note",
+  "noteNotFound": "Nota no encontrada",
+  "noteLoadFailed": "Error al cargar la nota",
+  "noteSaveFailed": "Error al guardar la nota",
   "noteColor": "Color de nota"
 }

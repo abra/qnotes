@@ -4,8 +4,8 @@
   "editNote": "编辑笔记",
   "titleHint": "标题",
   "contentHint": "开始输入...",
-  "noteNotFound": "Note not found",
-  "noteLoadFailed": "Failed to load note",
-  "noteSaveFailed": "Failed to save note",
+  "noteNotFound": "笔记未找到",
+  "noteLoadFailed": "加载笔记失败",
+  "noteSaveFailed": "保存笔记失败",
   "noteColor": "笔记颜色"
 }

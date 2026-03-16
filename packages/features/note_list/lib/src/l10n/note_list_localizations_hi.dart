@@ -31,7 +31,7 @@ class NoteListLocalizationsHi extends NoteListLocalizations {
   String get searchHint => 'खोजें';
 
   @override
-  String get noteDeleteFailed => 'Failed to delete note';
+  String get noteDeleteFailed => 'नोट हटाने में विफल';
 
   @override
   String get loadFailed => 'नोट्स लोड नहीं हो सके';

@@ -31,7 +31,7 @@ class NoteListLocalizationsJa extends NoteListLocalizations {
   String get searchHint => '検索';
 
   @override
-  String get noteDeleteFailed => 'Failed to delete note';
+  String get noteDeleteFailed => 'メモの削除に失敗しました';
 
   @override
   String get loadFailed => 'メモの読み込みに失敗しました';

@@ -21,13 +21,13 @@ class NoteDetailsLocalizationsJa extends NoteDetailsLocalizations {
   String get contentHint => '入力を開始...';
 
   @override
-  String get noteNotFound => 'Note not found';
+  String get noteNotFound => 'メモが見つかりません';
 
   @override
-  String get noteLoadFailed => 'Failed to load note';
+  String get noteLoadFailed => 'メモの読み込みに失敗しました';
 
   @override
-  String get noteSaveFailed => 'Failed to save note';
+  String get noteSaveFailed => 'メモの保存に失敗しました';
 
   @override
   String get noteColor => 'ノートの色';

@@ -31,7 +31,7 @@ class NoteListLocalizationsPt extends NoteListLocalizations {
   String get searchHint => 'Pesquisar';
 
   @override
-  String get noteDeleteFailed => 'Failed to delete note';
+  String get noteDeleteFailed => 'Falha ao excluir nota';
 
   @override
   String get loadFailed => 'Falha ao carregar notas';

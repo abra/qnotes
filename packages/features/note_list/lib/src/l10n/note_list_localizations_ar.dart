@@ -31,7 +31,7 @@ class NoteListLocalizationsAr extends NoteListLocalizations {
   String get searchHint => 'بحث';
 
   @override
-  String get noteDeleteFailed => 'Failed to delete note';
+  String get noteDeleteFailed => 'فشل حذف الملاحظة';
 
   @override
   String get loadFailed => 'فشل تحميل الملاحظات';
