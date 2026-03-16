@@ -139,6 +139,107 @@ void main() {
         act: (bloc) => bloc.add(NoteListNoteDeleted('1')),
         verify: (bloc) => expect(bloc.state.deleteError, isNull),
       );
+
+      blocTest<NoteListBloc, NoteListState>(
+        'emits deleteError when deleteNote throws',
+        build: () => NoteListBloc(
+          noteRepository: FakeNoteRepository(notes: List.of(notes))
+            ..shouldThrow = true,
+          preferencesService: mockPrefs,
+          imageService: FakeImageService(),
+        ),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: List.of(notes),
+        ),
+        act: (bloc) => bloc.add(NoteListNoteDeleted('2')),
+        verify: (bloc) {
+          expect(bloc.state.deleteError, isA<NoteStorageException>());
+          expect(bloc.state.notes, hasLength(3));
+        },
+      );
+
+      blocTest<NoteListBloc, NoteListState>(
+        'removes note and succeeds even when image cleanup throws (non-fatal)',
+        build: () => NoteListBloc(
+          noteRepository: FakeNoteRepository(notes: List.of(notes)),
+          preferencesService: mockPrefs,
+          imageService: FakeImageService()..shouldThrow = true,
+        ),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: List.of(notes),
+        ),
+        act: (bloc) => bloc.add(NoteListNoteDeleted('2')),
+        verify: (bloc) {
+          expect(bloc.state.deleteError, isNull);
+          expect(bloc.state.notes, hasLength(2));
+        },
+      );
+    });
+
+    group('NoteListSelectedDeleted', () {
+      final notes = [_note('1'), _note('2'), _note('3')];
+
+      blocTest<NoteListBloc, NoteListState>(
+        'removes selected notes from state',
+        build: () => NoteListBloc(
+          noteRepository: FakeNoteRepository(notes: List.of(notes)),
+          preferencesService: mockPrefs,
+          imageService: FakeImageService(),
+        ),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: List.of(notes),
+          selectedIds: {'1', '3'},
+        ),
+        act: (bloc) => bloc.add(NoteListSelectedDeleted()),
+        verify: (bloc) {
+          expect(bloc.state.notes.map((n) => n.id), ['2']);
+          expect(bloc.state.selectedIds, isEmpty);
+          expect(bloc.state.deleteError, isNull);
+        },
+      );
+
+      blocTest<NoteListBloc, NoteListState>(
+        'emits deleteError when batch delete throws',
+        build: () => NoteListBloc(
+          noteRepository: FakeNoteRepository(notes: List.of(notes))
+            ..shouldThrow = true,
+          preferencesService: mockPrefs,
+          imageService: FakeImageService(),
+        ),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: List.of(notes),
+          selectedIds: {'1', '2'},
+        ),
+        act: (bloc) => bloc.add(NoteListSelectedDeleted()),
+        verify: (bloc) {
+          expect(bloc.state.deleteError, isA<NoteStorageException>());
+          expect(bloc.state.notes, hasLength(3));
+        },
+      );
+
+      blocTest<NoteListBloc, NoteListState>(
+        'removes notes and succeeds even when image cleanup throws (non-fatal)',
+        build: () => NoteListBloc(
+          noteRepository: FakeNoteRepository(notes: List.of(notes)),
+          preferencesService: mockPrefs,
+          imageService: FakeImageService()..shouldThrow = true,
+        ),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: List.of(notes),
+          selectedIds: {'1', '2'},
+        ),
+        act: (bloc) => bloc.add(NoteListSelectedDeleted()),
+        verify: (bloc) {
+          expect(bloc.state.deleteError, isNull);
+          expect(bloc.state.notes.map((n) => n.id), ['3']);
+          expect(bloc.state.selectedIds, isEmpty);
+        },
+      );
     });
 
     group('NoteListNoteUpdated', () {

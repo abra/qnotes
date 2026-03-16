@@ -383,6 +383,20 @@ void main() {
           expect(bloc.state.saveError, isA<NoteStorageException>());
         },
       );
+
+      blocTest<NoteDetailsBloc, NoteDetailsState>(
+        'emits deleted even when image cleanup throws (non-fatal)',
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(notes: [_existingNote]),
+          imageService: FakeImageService()..shouldThrow = true,
+          isNew: false,
+        ),
+        seed: () => NoteDetailsState(isNew: false, note: _existingNote),
+        act: (bloc) => bloc.add(NoteDetailsDeleteRequested()),
+        verify: (bloc) {
+          expect(bloc.state.status, NoteDetailsStatus.deleted);
+        },
+      );
     });
   });
 }

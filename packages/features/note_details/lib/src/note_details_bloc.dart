@@ -47,8 +47,13 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     Emitter<NoteDetailsState> emit,
   ) async {
     if (event.noteId == null) {
-      final lastColor = await _repository.getLastCreatedNoteColor();
-      emit(state.copyWith(color: _pickColor(lastColor)));
+      try {
+        final lastColor = await _repository.getLastCreatedNoteColor();
+        emit(state.copyWith(color: _pickColor(lastColor)));
+      } on NoteStorageException catch (e, st) {
+        addError(e, st);
+        emit(state.copyWith(color: _pickColor(null)));
+      }
       return;
     }
 
@@ -112,12 +117,17 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     if (note == null) return;
     try {
       await _repository.deleteNote(note.id);
-      await _imageService.deleteImagesFromContent(note.content);
-      emit(state.copyWith(status: NoteDetailsStatus.deleted));
     } on NoteStorageException catch (e, st) {
       addError(e, st);
       emit(state.copyWith(status: NoteDetailsStatus.failure, saveError: e));
+      return;
     }
+    try {
+      await _imageService.deleteImagesFromContent(note.content);
+    } catch (e, st) {
+      addError(e, st);
+    }
+    emit(state.copyWith(status: NoteDetailsStatus.deleted));
   }
 
   Future<void> _onSaved(

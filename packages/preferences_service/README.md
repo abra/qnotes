@@ -44,6 +44,11 @@ await preferencesService.update((p) => p.copyWith(themeMode: ThemeMode.dark));
 Changes are persisted immediately and streamed to all listeners (`PreferencesScope`,
 `NoteListBloc`, etc.).
 
+`update()` is resilient to persistence failures: the new value is applied in-memory and
+emitted to the stream regardless of whether the disk write succeeds. If `save()` fails the
+error is logged and swallowed — the UI stays consistent for the current session, and the
+old value is restored from disk on next launch.
+
 ---
 
 ## Wiring

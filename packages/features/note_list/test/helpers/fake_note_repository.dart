@@ -24,6 +24,9 @@ class FakeNoteRepository implements NoteRepository {
     required String content,
     NoteColor color = NoteColor.none,
   }) async {
+    if (shouldThrow) {
+      throw const NoteStorageException(cause: 'createNote failed');
+    }
     final note = Note(
       id: DateTime.now().microsecondsSinceEpoch.toString(),
       title: title,
@@ -38,6 +41,9 @@ class FakeNoteRepository implements NoteRepository {
 
   @override
   Future<Note> updateNote(Note note) async {
+    if (shouldThrow) {
+      throw const NoteStorageException(cause: 'updateNote failed');
+    }
     _notes = [
       for (final n in _notes)
         if (n.id == note.id) note else n,
@@ -47,6 +53,9 @@ class FakeNoteRepository implements NoteRepository {
 
   @override
   Future<void> deleteNote(String id) async {
+    if (shouldThrow) {
+      throw const NoteStorageException(cause: 'deleteNote failed');
+    }
     _notes.removeWhere((n) => n.id == id);
   }
 

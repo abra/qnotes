@@ -27,6 +27,24 @@ await imageService.deleteImage(imagePath);
 await imageService.deleteImagesFromContent(note.content);
 ```
 
+## Error handling
+
+`saveImage` and `_imagesDir` wrap all IO failures in `ImageServiceException(message, cause, stackTrace)`.
+Callers can catch it explicitly:
+
+```dart
+try {
+  final path = await imageService.saveImage(sourcePath);
+} on ImageServiceException catch (e) {
+  // handle or rethrow
+}
+```
+
+`deleteImage` and `deleteImagesFromContent` are **best-effort**: missing files are silently
+ignored (`existsSync` check). However, unexpected IO errors from the platform will propagate
+as unhandled exceptions — BLoCs catch them with a generic `catch (e, st)` and log via
+`addError`, without changing the success state (the note is already deleted from the DB).
+
 ## Usage
 
 `deleteImagesFromContent` is called by `NoteListBloc` whenever a note (or a batch of

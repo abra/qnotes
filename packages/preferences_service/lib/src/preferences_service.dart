@@ -26,7 +26,12 @@ class PreferencesService {
 
   Future<void> update(Preferences Function(Preferences) transform) async {
     _current = transform(_current);
-    await _repository.save(_current);
+    try {
+      await _repository.save(_current);
+    } catch (_) {
+      // Save failure is non-fatal: in-memory state is updated and emitted
+      // so the UI stays consistent for this session.
+    }
     _controller.add(_current);
   }
 }

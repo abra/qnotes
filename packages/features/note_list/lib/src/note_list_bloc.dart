@@ -64,18 +64,23 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     NoteListNoteDeleted event,
     Emitter<NoteListState> emit,
   ) async {
+    final note = state.notes.where((n) => n.id == event.id).firstOrNull;
     try {
-      final note = state.notes.where((n) => n.id == event.id).firstOrNull;
       await _repository.deleteNote(event.id);
-      if (note != null) {
-        await _imageService.deleteImagesFromContent(note.content);
-      }
-      final notes = state.notes.where((n) => n.id != event.id).toList();
-      emit(state.copyWith(notes: notes, deleteError: null));
     } on NoteStorageException catch (e, st) {
       addError(e, st);
       emit(state.copyWith(deleteError: e));
+      return;
     }
+    if (note != null) {
+      try {
+        await _imageService.deleteImagesFromContent(note.content);
+      } catch (e, st) {
+        addError(e, st);
+      }
+    }
+    final notes = state.notes.where((n) => n.id != event.id).toList();
+    emit(state.copyWith(notes: notes, deleteError: null));
   }
 
   void _onNoteUpdated(NoteListNoteUpdated event, Emitter<NoteListState> emit) {
@@ -138,17 +143,24 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     Emitter<NoteListState> emit,
   ) async {
     final ids = Set<String>.of(state.selectedIds);
+    final toDelete = state.notes.where((n) => ids.contains(n.id)).toList();
     try {
-      final toDelete = state.notes.where((n) => ids.contains(n.id)).toList();
       await Future.wait(ids.map(_repository.deleteNote));
-      await Future.wait(
-        toDelete.map((n) => _imageService.deleteImagesFromContent(n.content)),
-      );
-      final notes = state.notes.where((n) => !ids.contains(n.id)).toList();
-      emit(state.copyWith(notes: notes, selectedIds: {}, deleteError: null));
     } on NoteStorageException catch (e, st) {
       addError(e, st);
       emit(state.copyWith(deleteError: e));
+      return;
     }
+    await Future.wait(
+      toDelete.map((n) async {
+        try {
+          await _imageService.deleteImagesFromContent(n.content);
+        } catch (e, st) {
+          addError(e, st);
+        }
+      }),
+    );
+    final notes = state.notes.where((n) => !ids.contains(n.id)).toList();
+    emit(state.copyWith(notes: notes, selectedIds: {}, deleteError: null));
   }
 }
