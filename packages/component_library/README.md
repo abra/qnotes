@@ -110,11 +110,89 @@ For the full guide with code examples see [.docs/THEMING.md](../../.docs/THEMING
 | `FontSize.xLarge`      | 32    |
 | `FontSize.xxLarge`     | 48    |
 
+### IconSize
+
+| Constant           | Value |
+|--------------------|-------|
+| `IconSize.xSmall`  | 14    |
+| `IconSize.small`   | 18    |
+| `IconSize.medium`  | 20    |
+| `IconSize.large`   | 24    |
+| `IconSize.xLarge`  | 28    |
+
+### AppRadius
+
+| Constant            | Value |
+|---------------------|-------|
+| `AppRadius.xSmall`  | 2     |
+| `AppRadius.small`   | 12    |
+| `AppRadius.medium`  | 14    |
+| `AppRadius.large`   | 20    |
+
 Use these constants instead of magic numbers:
 
 ```dart
 padding: const EdgeInsets.all(Spacing.mediumLarge) // 16
 fontSize: FontSize.medium // 14
+icon: Icon(Icons.close, size: IconSize.medium) // 20
+borderRadius: BorderRadius.circular(AppRadius.small) // 12
+```
+
+---
+
+## Widgets
+
+### BottomSheetHeader
+
+Title + close button row for bottom sheets. Used in preferences menu and color picker.
+
+```dart
+BottomSheetHeader(
+  title: 'Note color',
+  onClose: () => Navigator.of(context).pop(),
+)
+```
+
+### FadeGradientOverlay
+
+Gradient fade pinned to the bottom of a `Stack`. Fades from transparent to scaffold background, sits above scrollable content without blocking taps. Wraps itself in `Positioned` + `IgnorePointer`.
+
+```dart
+Stack(
+  children: [
+    // scrollable content...
+    FadeGradientOverlay(height: 80),
+    // toolbar...
+  ],
+)
+```
+
+### CenteredCircularProgressIndicator
+
+`CircularProgressIndicator` wrapped in `Center`.
+
+```dart
+const CenteredCircularProgressIndicator()
+```
+
+### EmptyState
+
+Centered text message for empty lists.
+
+```dart
+EmptyState(message: l10n.emptyState)
+```
+
+### ErrorState
+
+Centered error message with a retry button.
+
+```dart
+ErrorState(
+  message: l10n.loadFailed,
+  retryLabel: l10n.retry,
+  onRetry: () => bloc.add(SomeEvent()),
+)
 ```
 
 ---
@@ -125,11 +203,19 @@ fontSize: FontSize.medium // 14
 lib/
   component_library.dart          ← barrel export
   src/
+    bottom_sheet_header.dart      ← BottomSheetHeader widget
+    centered_circular_progress_indicator.dart
+    empty_state.dart              ← EmptyState widget
+    error_state.dart              ← ErrorState widget
+    fade_gradient_overlay.dart    ← FadeGradientOverlay widget
+    nota_logo.dart                ← NotaLogo widget
     theme/
+      app_radius.dart             ← AppRadius constants
       app_theme.dart              ← AppTheme (InheritedWidget)
       app_theme_data.dart         ← AppThemeData + LightAppThemeData + DarkAppThemeData
       catppuccin.dart             ← Catppuccin Latte + Frappé color palettes
-      note_color_x.dart           ← NoteColor.forBrightness() extension
-      spacing.dart                ← Spacing constants
       font_size.dart              ← FontSize constants
+      icon_size.dart              ← IconSize constants
+      note_color_x.dart           ← NoteColor → Color extension
+      spacing.dart                ← Spacing constants
 ```

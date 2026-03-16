@@ -26,21 +26,9 @@ class _NoteColorPicker extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  l10n.noteColor,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                Transform.translate(
-                  offset: const Offset(Spacing.small, 0),
-                  child: IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: onDismiss,
-                  ),
-                ),
-              ],
+            BottomSheetHeader(
+              title: l10n.noteColor,
+              onClose: onDismiss,
             ),
             const SizedBox(height: Spacing.large),
             Wrap(

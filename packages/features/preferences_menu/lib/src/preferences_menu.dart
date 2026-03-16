@@ -137,23 +137,9 @@ class _MainPage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  l10n.preferences,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                Transform.translate(
-                  offset: const Offset(Spacing.small, 0),
-                  child: IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.of(context).pop(),
-                    visualDensity: VisualDensity.compact,
-                    padding: EdgeInsets.zero,
-                  ),
-                ),
-              ],
+            BottomSheetHeader(
+              title: l10n.preferences,
+              onClose: () => Navigator.of(context).pop(),
             ),
             const SizedBox(height: Spacing.mediumLarge),
             _PreferenceRow(

@@ -160,7 +160,6 @@ class _NoteListScaffold extends StatelessWidget {
     final bloc = context.read<NoteListBloc>();
     final notes = state.filteredNotes;
     final l10n = NoteListLocalizations.of(context)!;
-    final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
 
     return Scaffold(
       appBar: state.isSelectionMode
@@ -195,24 +194,16 @@ class _NoteListScaffold extends StatelessWidget {
         child: Stack(
           children: [
             if (state.status == NoteListStatus.failure)
-              Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(l10n.loadFailed),
-                    const SizedBox(height: Spacing.medium),
-                    FilledButton(
-                      onPressed: () =>
-                          context.read<NoteListBloc>().add(NoteListStarted()),
-                      child: Text(l10n.retry),
-                    ),
-                  ],
-                ),
+              ErrorState(
+                message: l10n.loadFailed,
+                retryLabel: l10n.retry,
+                onRetry: () =>
+                    context.read<NoteListBloc>().add(NoteListStarted()),
               )
             else if (state.status == NoteListStatus.loading)
-              const Center(child: CircularProgressIndicator())
+              const CenteredCircularProgressIndicator()
             else if (notes.isEmpty && !state.isSelectionMode)
-              Center(child: Text(l10n.emptyState))
+              EmptyState(message: l10n.emptyState)
             else if (viewMode == NoteViewMode.grid)
               NotePagedGridView(
                 notes: notes,
@@ -241,26 +232,7 @@ class _NoteListScaffold extends StatelessWidget {
                     bloc.add(NoteListSelectionToggled(id)),
               ),
             if (!state.isSelectionMode)
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                height: _bottomBarClearance,
-                child: IgnorePointer(
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          scaffoldBg.withValues(alpha: 0),
-                          scaffoldBg,
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              FadeGradientOverlay(height: _bottomBarClearance),
             if (!state.isSelectionMode)
               Positioned(
                 left: Spacing.mediumLarge,
