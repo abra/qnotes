@@ -8,7 +8,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:image_service/image_service.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:shared/shared.dart';
-import 'package:toastification/toastification.dart';
+import 'package:toast_service/toast_service.dart';
 
 import 'l10n/note_details_localizations.dart';
 import 'note_details_bloc.dart';
@@ -242,28 +242,14 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
 
         if (state.status == NoteDetailsStatus.failure) {
           final isNotFound = state.loadError is NoteNotFoundException;
-          toastification.show(
-            context: context,
-            type: ToastificationType.error,
-            style: ToastificationStyle.flat,
-            title: Text(
-              isNotFound
-                  ? l10n.noteNotFound
-                  : state.saveError != null
-                  ? l10n.noteSaveFailed
-                  : l10n.noteLoadFailed,
-            ),
-            autoCloseDuration: const Duration(seconds: 3),
-            alignment: Alignment.topCenter,
-            animationBuilder: (context, animation, alignment, child) {
-              return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(0, -1),
-                  end: Offset.zero,
-                ).animate(animation),
-                child: child,
-              );
-            },
+          showNotification(
+            context,
+            type: NotificationType.error,
+            message: isNotFound
+                ? l10n.noteNotFound
+                : state.saveError != null
+                ? l10n.noteSaveFailed
+                : l10n.noteLoadFailed,
           );
         }
       },

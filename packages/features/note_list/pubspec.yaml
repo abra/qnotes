@@ -24,7 +24,8 @@ dependencies:
     path: ../../preferences_service
   component_library:
     path: ../../component_library
-  toastification: ^3.0.3
+  toast_service:
+    path: ../../toast_service
   image_service:
     path: ../../image_service
 

@@ -5,7 +5,7 @@ import 'package:image_service/image_service.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
-import 'package:toastification/toastification.dart';
+import 'package:toast_service/toast_service.dart';
 
 import 'l10n/note_list_localizations.dart';
 import 'note_list_bloc.dart';
@@ -67,7 +67,11 @@ class NoteListView extends StatelessWidget {
       listener: (context, state) {
         if (state.deleteError != null) {
           final l10n = NoteListLocalizations.of(context)!;
-          _showToast(context, ToastificationType.error, l10n.noteDeleteFailed);
+          showNotification(
+            context,
+            type: NotificationType.error,
+            message: l10n.noteDeleteFailed,
+          );
         }
       },
       buildWhen: (prev, curr) =>
@@ -134,13 +138,21 @@ class _NoteListScaffold extends StatelessWidget {
     final count = state.selectedIds.length;
     final l10n = NoteListLocalizations.of(context)!;
     context.read<NoteListBloc>().add(NoteListSelectedDeleted());
-    _showToast(context, ToastificationType.success, l10n.notesDeleted(count));
+    showNotification(
+      context,
+      type: NotificationType.success,
+      message: l10n.notesDeleted(count),
+    );
   }
 
   void _deleteNote(BuildContext context, String id) {
     final l10n = NoteListLocalizations.of(context)!;
     context.read<NoteListBloc>().add(NoteListNoteDeleted(id));
-    _showToast(context, ToastificationType.success, l10n.notesDeleted(1));
+    showNotification(
+      context,
+      type: NotificationType.success,
+      message: l10n.notesDeleted(1),
+    );
   }
 
   @override
@@ -267,26 +279,6 @@ class _NoteListScaffold extends StatelessWidget {
       ),
     );
   }
-}
-
-void _showToast(BuildContext context, ToastificationType type, String message) {
-  toastification.show(
-    context: context,
-    type: type,
-    style: ToastificationStyle.flat,
-    title: Text(message),
-    autoCloseDuration: const Duration(seconds: 3),
-    alignment: Alignment.topCenter,
-    animationBuilder: (context, animation, alignment, child) {
-      return SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0, -1),
-          end: Offset.zero,
-        ).animate(animation),
-        child: child,
-      );
-    },
-  );
 }
 
 class _BottomBar extends StatefulWidget {

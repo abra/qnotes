@@ -15,7 +15,7 @@ import 'package:note_list/note_list.dart';
 import 'package:preferences_menu/preferences_menu.dart';
 import 'package:preferences_service/preferences_service.dart'
     show PreferencesScope;
-import 'package:toastification/toastification.dart';
+import 'package:toast_service/toast_service.dart';
 
 /// Entry point for the application that creates [MaterialApp.router].
 class MaterialContext extends StatefulWidget {
@@ -53,7 +53,7 @@ class _MaterialContextState extends State<MaterialContext> {
     return AppTheme(
       lightTheme: lightTheme,
       darkTheme: darkTheme,
-      child: ToastificationWrapper(
+      child: ToastWrapper(
         child: MaterialApp.router(
           routerConfig: _router,
           themeMode: preferences.themeMode,

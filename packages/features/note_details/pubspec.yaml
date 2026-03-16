@@ -21,7 +21,8 @@ dependencies:
     path: ../../note_repository
   component_library:
     path: ../../component_library
-  toastification: ^3.0.3
+  toast_service:
+    path: ../../toast_service
   flutter_quill: ^11.5.0
   image_service:
     path: ../../image_service
