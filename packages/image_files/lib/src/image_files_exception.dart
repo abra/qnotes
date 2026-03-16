@@ -1,6 +1,6 @@
 /// Thrown when an image operation fails.
-class ImageServiceException implements Exception {
-  ImageServiceException(this.message, [this.cause, this.stackTrace]);
+class ImageFilesException implements Exception {
+  ImageFilesException(this.message, [this.cause, this.stackTrace]);
 
   final String message;
   final Object? cause;
@@ -8,7 +8,7 @@ class ImageServiceException implements Exception {
 
   @override
   String toString() {
-    final buf = StringBuffer('ImageServiceException: $message');
+    final buf = StringBuffer('ImageFilesException: $message');
     if (cause != null) buf.write('\nCause: $cause');
     return buf.toString();
   }

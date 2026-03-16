@@ -4,7 +4,7 @@
 // composeDependencies() can be called independently in tests
 // with substituted implementations.
 
-import 'package:image_service/image_service.dart';
+import 'package:image_files/image_files.dart';
 import 'package:monitoring/monitoring.dart';
 import 'package:nota/app/config/application_config.dart';
 import 'package:nota/app/config/supported_locales.dart';
@@ -72,7 +72,7 @@ Future<DependenciesContainer> createDependenciesContainer(
     supportedCodes: SupportedLocales.codes,
   );
   final noteRepository = NoteRepository();
-  final imageService = ImageService();
+  final imageFiles = ImageFiles();
 
   return DependenciesContainer(
     logger: logger,
@@ -81,6 +81,6 @@ Future<DependenciesContainer> createDependenciesContainer(
     packageInfo: packageInfo,
     preferencesService: preferencesService,
     noteRepository: noteRepository,
-    imageService: imageService,
+    imageFiles: imageFiles,
   );
 }

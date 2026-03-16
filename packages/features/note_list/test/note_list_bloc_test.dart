@@ -7,7 +7,7 @@ import 'package:note_list/src/note_list_bloc.dart';
 import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 
-import 'helpers/fake_image_service.dart';
+import 'helpers/fake_image_files.dart';
 import 'helpers/fake_note_repository.dart';
 
 class _MockPreferencesService extends Mock implements PreferencesService {}
@@ -47,7 +47,7 @@ void main() {
       final bloc = NoteListBloc(
         noteRepository: repo,
         preferencesService: mockPrefs,
-        imageService: FakeImageService(),
+        imageFiles: FakeImageFiles(),
       );
       expect(bloc.state, const NoteListState());
     });
@@ -60,7 +60,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: notes),
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         act: (bloc) => bloc.add(NoteListStarted()),
         expect: () => [
@@ -76,7 +76,7 @@ void main() {
           return NoteListBloc(
             noteRepository: r,
             preferencesService: mockPrefs,
-            imageService: FakeImageService(),
+            imageFiles: FakeImageFiles(),
           );
         },
         act: (bloc) => bloc.add(NoteListStarted()),
@@ -91,7 +91,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(),
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         act: (bloc) => bloc.add(NoteListStarted()),
         expect: () => [
@@ -109,7 +109,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: List.of(notes)),
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -129,7 +129,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: List.of(notes)),
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -146,7 +146,7 @@ void main() {
           noteRepository: FakeNoteRepository(notes: List.of(notes))
             ..shouldThrow = true,
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -164,7 +164,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: List.of(notes)),
           preferencesService: mockPrefs,
-          imageService: FakeImageService()..shouldThrow = true,
+          imageFiles: FakeImageFiles()..shouldThrow = true,
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -186,7 +186,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: List.of(notes)),
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -207,7 +207,7 @@ void main() {
           noteRepository: FakeNoteRepository(notes: List.of(notes))
             ..shouldThrow = true,
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -226,7 +226,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: List.of(notes)),
           preferencesService: mockPrefs,
-          imageService: FakeImageService()..shouldThrow = true,
+          imageFiles: FakeImageFiles()..shouldThrow = true,
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -250,7 +250,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: repo,
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -275,7 +275,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: repo,
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -291,7 +291,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: repo,
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -313,7 +313,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: repo,
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () =>
             NoteListState(status: NoteListStatus.success, notes: [_note('1')]),
@@ -329,7 +329,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: repo,
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () =>
             NoteListState(status: NoteListStatus.success, notes: [_note('1')]),
@@ -346,7 +346,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: repo,
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -366,7 +366,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: repo,
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         seed: () => NoteListState(
           status: NoteListStatus.success,
@@ -383,7 +383,7 @@ void main() {
         build: () => NoteListBloc(
           noteRepository: repo,
           preferencesService: mockPrefs,
-          imageService: FakeImageService(),
+          imageFiles: FakeImageFiles(),
         ),
         act: (bloc) => bloc.add(NoteListQueryChanged('hello')),
         wait: const Duration(milliseconds: 350),

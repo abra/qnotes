@@ -1,4 +1,4 @@
-name: image_service
+name: image_files
 description: "Image file management: save and delete note images."
 publish_to: none
 version: 0.1.0

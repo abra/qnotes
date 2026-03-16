@@ -8,7 +8,7 @@ import 'package:note_details/src/note_details_bloc.dart';
 import 'package:note_details/src/note_details_screen.dart';
 import 'package:shared/shared.dart';
 
-import 'helpers/fake_image_service.dart';
+import 'helpers/fake_image_files.dart';
 import 'helpers/fake_note_repository.dart';
 
 final _existingNote = Note(
@@ -78,7 +78,7 @@ void main() {
     testWidgets('shows "New note" title for a new note', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        imageService: FakeImageService(),
+        imageFiles: FakeImageFiles(),
         isNew: true,
       );
       await tester.pumpWidget(_buildView(bloc));
@@ -90,7 +90,7 @@ void main() {
     testWidgets('shows "Edit note" title for an existing note', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(notes: [_existingNote]),
-        imageService: FakeImageService(),
+        imageFiles: FakeImageFiles(),
         isNew: false,
       );
       bloc.emit(
@@ -114,7 +114,7 @@ void main() {
     testWidgets('renders back button, pin icon and color icon', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        imageService: FakeImageService(),
+        imageFiles: FakeImageFiles(),
         isNew: true,
       );
       await tester.pumpWidget(_buildView(bloc));
@@ -130,7 +130,7 @@ void main() {
     ) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        imageService: FakeImageService(),
+        imageFiles: FakeImageFiles(),
         isNew: true,
       );
       await tester.pumpWidget(_buildView(bloc));
@@ -144,7 +144,7 @@ void main() {
     testWidgets('shows filled pin icon when note is pinned', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        imageService: FakeImageService(),
+        imageFiles: FakeImageFiles(),
         isNew: true,
       );
       bloc.emit(const NoteDetailsState(isPinned: true));
@@ -160,7 +160,7 @@ void main() {
     testWidgets('typing in title field updates bloc state', (tester) async {
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        imageService: FakeImageService(),
+        imageFiles: FakeImageFiles(),
         isNew: true,
       );
       await tester.pumpWidget(_buildView(bloc));
@@ -180,7 +180,7 @@ void main() {
       Note? result;
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        imageService: FakeImageService(),
+        imageFiles: FakeImageFiles(),
         isNew: true,
       );
       await tester.pumpWidget(_buildNavigationView(bloc, (n) => result = n));
@@ -197,7 +197,7 @@ void main() {
       Note? result;
       final bloc = NoteDetailsBloc(
         noteRepository: FakeNoteRepository(),
-        imageService: FakeImageService(),
+        imageFiles: FakeImageFiles(),
         isNew: true,
       );
       await tester.pumpWidget(_buildNavigationView(bloc, (n) => result = n));

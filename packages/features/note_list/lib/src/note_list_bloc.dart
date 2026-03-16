@@ -1,7 +1,7 @@
 import 'package:bloc_concurrency/bloc_concurrency.dart' show restartable;
 import 'package:equatable/equatable.dart' show Equatable;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_service/image_service.dart';
+import 'package:image_files/image_files.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
@@ -13,9 +13,9 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
   NoteListBloc({
     required NoteRepository noteRepository,
     required PreferencesService preferencesService,
-    required ImageService imageService,
+    required ImageFiles imageFiles,
   }) : _repository = noteRepository,
-       _imageService = imageService,
+       _imageFiles = imageFiles,
        _preferencesStream = preferencesService.stream,
        super(
          NoteListState(
@@ -35,7 +35,7 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
   }
 
   final NoteRepository _repository;
-  final ImageService _imageService;
+  final ImageFiles _imageFiles;
   final Stream<Preferences> _preferencesStream;
 
   Future<void> _onStarted(
@@ -74,7 +74,7 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     }
     if (note != null) {
       try {
-        await _imageService.deleteImagesFromContent(note.content);
+        await _imageFiles.deleteImagesFromContent(note.content);
       } catch (e, st) {
         addError(e, st);
       }
@@ -154,7 +154,7 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     await Future.wait(
       toDelete.map((n) async {
         try {
-          await _imageService.deleteImagesFromContent(n.content);
+          await _imageFiles.deleteImagesFromContent(n.content);
         } catch (e, st) {
           addError(e, st);
         }

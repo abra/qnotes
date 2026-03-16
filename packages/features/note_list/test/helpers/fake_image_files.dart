@@ -1,6 +1,6 @@
-import 'package:image_service/image_service.dart';
+import 'package:image_files/image_files.dart';
 
-class FakeImageService implements ImageService {
+class FakeImageFiles implements ImageFiles {
   final List<String> deletedPaths = [];
   bool shouldThrow = false;
 
@@ -9,13 +9,13 @@ class FakeImageService implements ImageService {
 
   @override
   Future<void> deleteImage(String imagePath) async {
-    if (shouldThrow) throw ImageServiceException('deleteImage failed');
+    if (shouldThrow) throw ImageFilesException('deleteImage failed');
     deletedPaths.add(imagePath);
   }
 
   @override
   Future<void> deleteImagesFromContent(String content) async {
     if (shouldThrow)
-      throw ImageServiceException('deleteImagesFromContent failed');
+      throw ImageFilesException('deleteImagesFromContent failed');
   }
 }

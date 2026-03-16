@@ -11,7 +11,7 @@ import 'package:note_list/src/note_list_screen.dart';
 import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 
-import 'helpers/fake_image_service.dart';
+import 'helpers/fake_image_files.dart';
 import 'helpers/fake_note_repository.dart';
 
 class _MockPreferencesService extends Mock implements PreferencesService {}
@@ -42,7 +42,7 @@ void main() {
     return NoteListBloc(
       noteRepository: FakeNoteRepository(notes: notes),
       preferencesService: mockPrefs,
-      imageService: FakeImageService(),
+      imageFiles: FakeImageFiles(),
     );
   }
 
@@ -361,7 +361,7 @@ void main() {
       final bloc = NoteListBloc(
         noteRepository: FakeNoteRepository(notes: notes),
         preferencesService: mockPrefs,
-        imageService: FakeImageService(),
+        imageFiles: FakeImageFiles(),
       );
       bloc.add(NoteListStarted());
       await tester.pumpWidget(buildView(bloc: bloc));

@@ -27,8 +27,8 @@ dependencies:
   note_repository:
     path: packages/note_repository
 
-  image_service:
-    path: packages/image_service
+  image_files:
+    path: packages/image_files
 
   toast_service:
     path: packages/toast_service

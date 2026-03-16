@@ -24,8 +24,8 @@ dependencies:
   toast_service:
     path: ../../toast_service
   flutter_quill: ^11.5.0
-  image_service:
-    path: ../../image_service
+  image_files:
+    path: ../../image_files
 
 dev_dependencies:
   flutter_test:

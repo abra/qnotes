@@ -2,7 +2,7 @@ import 'dart:math' show Random;
 
 import 'package:equatable/equatable.dart' show Equatable;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_service/image_service.dart';
+import 'package:image_files/image_files.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:shared/shared.dart';
 
@@ -12,10 +12,10 @@ part 'note_details_state.dart';
 class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
   NoteDetailsBloc({
     required NoteRepository noteRepository,
-    required ImageService imageService,
+    required ImageFiles imageFiles,
     required bool isNew,
   }) : _repository = noteRepository,
-       _imageService = imageService,
+       _imageFiles = imageFiles,
        super(NoteDetailsState(isNew: isNew)) {
     on<NoteDetailsStarted>(_onStarted);
     on<NoteDetailsTitleChanged>(_onTitleChanged);
@@ -27,7 +27,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
   }
 
   final NoteRepository _repository;
-  final ImageService _imageService;
+  final ImageFiles _imageFiles;
 
   static final _random = Random();
 
@@ -123,7 +123,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
       return;
     }
     try {
-      await _imageService.deleteImagesFromContent(note.content);
+      await _imageFiles.deleteImagesFromContent(note.content);
     } catch (e, st) {
       addError(e, st);
     }
