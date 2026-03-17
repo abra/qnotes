@@ -161,7 +161,10 @@ class _NoteListScaffold extends StatelessWidget {
     final notes = state.filteredNotes;
     final l10n = NoteListLocalizations.of(context)!;
 
+    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: state.isSelectionMode
           ? AppBar(
               scrolledUnderElevation: 8,
@@ -209,7 +212,9 @@ class _NoteListScaffold extends StatelessWidget {
                 notes: notes,
                 selectedIds: state.selectedIds,
                 isSelectionMode: state.isSelectionMode,
-                bottomPadding: state.isSelectionMode ? 0 : _bottomBarClearance,
+                bottomPadding: state.isSelectionMode
+                    ? 0
+                    : _bottomBarClearance + keyboardInset,
                 onNotePressed: onNotePressed == null
                     ? null
                     : (note) => _openNote(context, note),
@@ -223,7 +228,9 @@ class _NoteListScaffold extends StatelessWidget {
                 density: density,
                 selectedIds: state.selectedIds,
                 isSelectionMode: state.isSelectionMode,
-                bottomPadding: state.isSelectionMode ? 0 : _bottomBarClearance,
+                bottomPadding: state.isSelectionMode
+                    ? 0
+                    : _bottomBarClearance + keyboardInset,
                 onNotePressed: onNotePressed == null
                     ? null
                     : (note) => _openNote(context, note),
@@ -232,12 +239,12 @@ class _NoteListScaffold extends StatelessWidget {
                     bloc.add(NoteListSelectionToggled(id)),
               ),
             if (!state.isSelectionMode)
-              FadeGradientOverlay(height: _bottomBarClearance),
+              FadeGradientOverlay(height: _bottomBarClearance + keyboardInset),
             if (!state.isSelectionMode)
               Positioned(
                 left: Spacing.mediumLarge,
                 right: Spacing.mediumLarge,
-                bottom: Spacing.mediumLarge,
+                bottom: Spacing.mediumLarge + keyboardInset,
                 child: _BottomBar(
                   onAddPressed: onAddPressed == null
                       ? null

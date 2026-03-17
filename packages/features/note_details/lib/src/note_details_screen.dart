@@ -284,6 +284,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
             ? state.color.onColor
             : Theme.of(context).colorScheme.onSurface;
         final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
+        final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
         return PopScope(
           canPop: false,
@@ -291,6 +292,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
             if (!didPop) _saveAndPop(context);
           },
           child: Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               backgroundColor: appBarColor,
               foregroundColor: appBarForeground,
@@ -368,7 +370,8 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
                               Spacing.mediumLarge,
                               _toolbarClearance +
                                   _toolbarAnimation.value *
-                                      (_secondaryPanelHeight + Spacing.small),
+                                      (_secondaryPanelHeight + Spacing.small) +
+                                  keyboardInset,
                             ),
                             child: child,
                           ),
@@ -401,7 +404,8 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
                           height:
                               _toolbarClearance +
                               _toolbarAnimation.value *
-                                  (_secondaryPanelHeight + Spacing.small),
+                                  (_secondaryPanelHeight + Spacing.small) +
+                              keyboardInset,
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.topCenter,
@@ -419,7 +423,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
                   Positioned(
                     left: Spacing.mediumLarge,
                     right: Spacing.mediumLarge,
-                    bottom: Spacing.mediumLarge,
+                    bottom: Spacing.mediumLarge + keyboardInset,
                     child: _NoteToolbar(
                       // Key forces a full rebuild when the controller is replaced
                       // (happens once, on first note load).
