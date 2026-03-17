@@ -66,6 +66,7 @@ class NoteDetailsView extends StatefulWidget {
 class _NoteDetailsViewState extends State<NoteDetailsView>
     with SingleTickerProviderStateMixin {
   late final TextEditingController _titleController;
+
   // non-final: replaced on first note load
   late QuillController _quillController;
   late final FocusNode _quillFocusNode;
@@ -76,6 +77,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
   bool _contentInitialized = false;
   _SecondaryPanelMode _activePanel = _SecondaryPanelMode.formatting;
   bool _isPanelOpen = false;
+  bool _isMicActive = false;
 
   @override
   void initState() {
@@ -433,7 +435,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
                       onToggleColors: () =>
                           _togglePanel(_SecondaryPanelMode.colors),
                       onImagePressed: () {},
-                      onMicPressed: () {},
+                      isMicActive: _isMicActive,
+                      onMicPressed: () =>
+                          setState(() => _isMicActive = !_isMicActive),
                       onPinToggled: () => context.read<NoteDetailsBloc>().add(
                         NoteDetailsPinToggled(),
                       ),
@@ -501,6 +505,7 @@ class _NoteToolbar extends StatelessWidget {
     required this.onToggleFormatting,
     required this.onToggleColors,
     required this.onImagePressed,
+    required this.isMicActive,
     required this.onMicPressed,
     required this.onPinToggled,
     required this.onColorSelected,
@@ -516,6 +521,7 @@ class _NoteToolbar extends StatelessWidget {
   final VoidCallback onToggleFormatting;
   final VoidCallback onToggleColors;
   final VoidCallback onImagePressed;
+  final bool isMicActive;
   final VoidCallback onMicPressed;
   final VoidCallback onPinToggled;
   final ValueChanged<NoteColor> onColorSelected;
@@ -556,8 +562,10 @@ class _NoteToolbar extends StatelessWidget {
               children: [
                 IconButton(
                   icon: Icon(
-                    Icons.mic_none,
-                    color: colorScheme.onSurfaceVariant,
+                    isMicActive ? Icons.mic : Icons.mic_none,
+                    color: isMicActive
+                        ? Colors.green
+                        : colorScheme.onSurfaceVariant,
                   ),
                   style: _toolbarButtonStyle,
                   onPressed: onMicPressed,
@@ -722,7 +730,7 @@ class _FormattingPanel extends StatelessWidget {
                     showDividers: false,
                     showFontFamily: false,
                     showFontSize: false,
-                    showStrikeThrough: false,
+                    showStrikeThrough: true,
                     showInlineCode: false,
                     showHeaderStyle: false,
                     showCodeBlock: false,
