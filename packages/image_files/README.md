@@ -29,7 +29,8 @@ await imageFiles.deleteImagesFromContent(note.content);
 
 ## Error handling
 
-`saveImage` and `_imagesDir` wrap all IO failures in `ImageFilesException(message, cause, stackTrace)`.
+`saveImage` and `_imagesDir` wrap all IO failures in
+`ImageFilesException(message, cause, stackTrace)`.
 Callers can catch it explicitly:
 
 ```dart
@@ -40,8 +41,10 @@ try {
 }
 ```
 
-`deleteImage` and `deleteImagesFromContent` are **best-effort**: missing files are silently
-ignored (`existsSync` check). However, unexpected IO errors from the platform will propagate
+`deleteImage` and `deleteImagesFromContent` are **best-effort**: missing files are
+silently
+ignored (`existsSync` check). However, unexpected IO errors from the platform will
+propagate
 as unhandled exceptions — BLoCs catch them with a generic `catch (e, st)` and log via
 `addError`, without changing the success state (the note is already deleted from the DB).
 
