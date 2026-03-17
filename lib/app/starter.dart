@@ -16,7 +16,7 @@ import 'package:nota/app/bloc/bloc_transformer.dart';
 import 'package:nota/app/composition.dart';
 import 'package:nota/app/config/application_config.dart';
 import 'package:nota/app/root_context.dart';
-import 'package:nota/app/screens/initialization_failed.dart';
+import 'package:nota/app/initialization_failed_screen.dart';
 
 Logger createAppLogger({List<LogObserver> observers = const []}) {
   final logger = Logger();
