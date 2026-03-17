@@ -216,9 +216,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
     });
   }
 
-  static const double _toolbarClearance = 60;
+  static const double _toolbarClearance = 64;
 
-  // Secondary panel: 32px buttons + 8*2 padding + 8 gap below = 56px
+  // Secondary panel height: 32px buttons + 12*2 padding = 56px (matches primary)
   static const double _secondaryPanelHeight = 56;
 
   @override
@@ -368,7 +368,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
                               Spacing.mediumLarge,
                               _toolbarClearance +
                                   _toolbarAnimation.value *
-                                      _secondaryPanelHeight,
+                                      (_secondaryPanelHeight + Spacing.small),
                             ),
                             child: child,
                           ),
@@ -399,7 +399,8 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
                         builder: (context, _) => Container(
                           height:
                               _toolbarClearance +
-                              _toolbarAnimation.value * _secondaryPanelHeight,
+                              _toolbarAnimation.value *
+                                  (_secondaryPanelHeight + Spacing.small),
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               begin: Alignment.topCenter,
@@ -577,7 +578,14 @@ class _NoteToolbar extends StatelessWidget {
                       style: _toolbarButtonStyle,
                       onPressed: onMicPressed,
                     ),
-                    const SizedBox(width: Spacing.xSmall),
+                    SizedBox(
+                      height: 20,
+                      child: VerticalDivider(
+                        width: Spacing.medium,
+                        thickness: 0.5,
+                        color: colorScheme.onSurface.withValues(alpha: 0.3),
+                      ),
+                    ),
                     ListenableBuilder(
                       listenable: controller,
                       builder: (context, _) => Row(
@@ -722,7 +730,10 @@ class _FormattingPanel extends StatelessWidget {
         child: ColoredBox(
           color: colorScheme.surface,
           child: Padding(
-            padding: const EdgeInsets.all(Spacing.small),
+            padding: const EdgeInsets.symmetric(
+              horizontal: Spacing.small,
+              vertical: Spacing.medium,
+            ),
             child: Row(
               children: [
                 Expanded(

@@ -26,7 +26,7 @@ class _InlineColorPanel extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: Spacing.small,
-              vertical: Spacing.small,
+              vertical: Spacing.medium,
             ),
             child: SizedBox(
               height: 32,
