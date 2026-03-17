@@ -81,7 +81,7 @@ Future<void> starter() async {
         // ensuring no failure silently escapes during initialization.
         logger.error('Initialization failed', error: e, stackTrace: stackTrace);
         runApp(
-          InitializationFailedApp(
+          InitializationFailedScreen(
             error: e,
             stackTrace: stackTrace,
             onRetryInitialization: composeAndRun,

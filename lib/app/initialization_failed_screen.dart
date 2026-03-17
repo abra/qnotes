@@ -7,8 +7,8 @@
 import 'package:flutter/material.dart';
 
 /// Screen shown when app initialization fails, with an optional retry button.
-class InitializationFailedApp extends StatefulWidget {
-  const InitializationFailedApp({
+class InitializationFailedScreen extends StatefulWidget {
+  const InitializationFailedScreen({
     required this.error,
     required this.stackTrace,
     this.onRetryInitialization,
@@ -20,11 +20,11 @@ class InitializationFailedApp extends StatefulWidget {
   final Future<void> Function()? onRetryInitialization;
 
   @override
-  State<InitializationFailedApp> createState() =>
-      _InitializationFailedAppState();
+  State<InitializationFailedScreen> createState() =>
+      _InitializationFailedScreenState();
 }
 
-class _InitializationFailedAppState extends State<InitializationFailedApp> {
+class _InitializationFailedScreenState extends State<InitializationFailedScreen> {
   final _inProgress = ValueNotifier<bool>(false);
 
   @override
