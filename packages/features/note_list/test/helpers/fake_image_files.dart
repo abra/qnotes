@@ -15,7 +15,8 @@ class FakeImageFiles implements ImageFiles {
 
   @override
   Future<void> deleteImagesFromContent(String content) async {
-    if (shouldThrow)
+    if (shouldThrow) {
       throw ImageFilesException('deleteImagesFromContent failed');
+    }
   }
 }

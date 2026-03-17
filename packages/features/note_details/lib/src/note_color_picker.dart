@@ -13,60 +13,48 @@ class _InlineColorPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final brightness = Theme.of(context).brightness;
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        color: Color(0x00000000),
-        borderRadius: _toolbarRadius,
-        boxShadow: _toolbarShadows,
-      ),
-      child: ClipRRect(
-        borderRadius: _toolbarRadius,
-        child: ColoredBox(
-          color: colorScheme.surface,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: Spacing.small,
-              vertical: Spacing.medium,
-            ),
-            child: SizedBox(
-              height: 32,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: NoteColor.values.length,
-                separatorBuilder: (_, _) =>
-                    const SizedBox(width: Spacing.small),
-                itemBuilder: (context, index) {
-                  final color = NoteColor.values[index];
-                  final isSelected = color == selected;
-                  return GestureDetector(
-                    onTap: () => onSelected(color),
-                    child: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: color == NoteColor.none
-                            ? colorScheme.surfaceContainerHighest
-                            : color.forBrightness(brightness),
-                        border: isSelected
-                            ? Border.all(
-                                color: colorScheme.primary,
-                                width: 2.5,
-                              )
-                            : Border.all(color: Colors.transparent),
-                      ),
-                      child: color == NoteColor.none
-                          ? Icon(
-                              Icons.block,
-                              size: IconSize.xSmall,
-                              color: colorScheme.onSurface,
-                            )
-                          : null,
-                    ),
-                  );
-                },
-              ),
-            ),
+    return _PanelBox(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: Spacing.small,
+          vertical: Spacing.medium,
+        ),
+        child: SizedBox(
+          height: 32,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: NoteColor.values.length,
+            separatorBuilder: (_, _) => const SizedBox(width: Spacing.small),
+            itemBuilder: (context, index) {
+              final color = NoteColor.values[index];
+              final isSelected = color == selected;
+              return GestureDetector(
+                onTap: () => onSelected(color),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: color == NoteColor.none
+                        ? colorScheme.surfaceContainerHighest
+                        : color.forBrightness(brightness),
+                    border: isSelected
+                        ? Border.all(
+                            color: colorScheme.primary,
+                            width: 2.5,
+                          )
+                        : Border.all(color: Colors.transparent),
+                  ),
+                  child: color == NoteColor.none
+                      ? Icon(
+                          Icons.block,
+                          size: IconSize.xSmall,
+                          color: colorScheme.onSurface,
+                        )
+                      : null,
+                ),
+              );
+            },
           ),
         ),
       ),

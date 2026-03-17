@@ -77,7 +77,7 @@ class NoteCard extends StatelessWidget {
                           child: Image.file(
                             File(firstImage),
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const SizedBox(),
+                            errorBuilder: (_, _, _) => const SizedBox(),
                           ),
                         ),
                       Expanded(
@@ -171,7 +171,7 @@ List<InlineSpan> _buildContentSpans(String content, TextStyle baseStyle) {
   try {
     final decoded = jsonDecode(content);
     if (decoded is Map) ops = decoded['ops'] as List<dynamic>?;
-    if (decoded is List) ops = decoded as List<dynamic>;
+    if (decoded is List) ops = decoded;
   } catch (_) {}
   if (ops == null) return [TextSpan(text: content, style: baseStyle)];
 
@@ -251,10 +251,12 @@ List<InlineSpan> _buildContentSpans(String content, TextStyle baseStyle) {
 TextStyle _applyInlineStyle(TextStyle base, Map<dynamic, dynamic>? attrs) {
   if (attrs == null) return base;
   var style = base;
-  if (attrs['bold'] == true)
+  if (attrs['bold'] == true) {
     style = style.copyWith(fontWeight: FontWeight.bold);
-  if (attrs['italic'] == true)
+  }
+  if (attrs['italic'] == true) {
     style = style.copyWith(fontStyle: FontStyle.italic);
+  }
   if (attrs['underline'] == true) {
     style = style.copyWith(decoration: TextDecoration.underline);
   }
