@@ -146,6 +146,7 @@ class _MainPage extends StatelessWidget {
               label: l10n.theme,
               control: SegmentedButton<ThemeMode>(
                 showSelectedIcon: false,
+                style: _segmentedButtonStyle,
                 segments: const [
                   ButtonSegment(
                     value: ThemeMode.system,
@@ -174,6 +175,7 @@ class _MainPage extends StatelessWidget {
               label: l10n.notesView,
               control: SegmentedButton<NoteViewMode>(
                 showSelectedIcon: false,
+                style: _segmentedButtonStyle,
                 segments: const [
                   ButtonSegment(
                     value: NoteViewMode.grid,
@@ -197,6 +199,7 @@ class _MainPage extends StatelessWidget {
               label: l10n.listDensity,
               control: SegmentedButton<NoteListDensity>(
                 showSelectedIcon: false,
+                style: _segmentedButtonStyle,
                 segments: const [
                   ButtonSegment(
                     value: NoteListDensity.twoLines,
@@ -325,6 +328,11 @@ class _LanguagePage extends StatelessWidget {
   }
 }
 
+const _segmentedButtonStyle = ButtonStyle(
+  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+  visualDensity: VisualDensity.compact,
+);
+
 /// A single row with a label on the left and a control widget on the right.
 class _PreferenceRow extends StatelessWidget {
   const _PreferenceRow({required this.label, required this.control});
@@ -335,9 +343,11 @@ class _PreferenceRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: Theme.of(context).textTheme.bodyLarge),
+        Expanded(
+          child: Text(label, style: Theme.of(context).textTheme.bodyLarge),
+        ),
+        const SizedBox(width: Spacing.small),
         control,
       ],
     );
