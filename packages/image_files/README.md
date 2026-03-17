@@ -1,11 +1,11 @@
-# image_service
+# image_files
 
 Manages image files embedded in Quill notes.
 
 ## Why this package exists
 
 When a user inserts an image into a note, Quill stores the file path as plain text inside
-the Delta JSON content. `ImageService` ensures those files are stored in a stable location
+the Delta JSON content. `ImageFiles` ensures those files are stored in a stable location
 and cleaned up when notes are deleted.
 
 ## Storage
@@ -18,24 +18,24 @@ gallery, temp cache).
 
 ```dart
 // Copy a picked image to permanent storage, returns the stable path
-final path = await imageService.saveImage(sourcePath);
+final path = await imageFiles.saveImage(sourcePath);
 
 // Delete a single image file (silently ignores missing files)
-await imageService.deleteImage(imagePath);
+await imageFiles.deleteImage(imagePath);
 
 // Parse a Quill Delta JSON string and delete all referenced image files
-await imageService.deleteImagesFromContent(note.content);
+await imageFiles.deleteImagesFromContent(note.content);
 ```
 
 ## Error handling
 
-`saveImage` and `_imagesDir` wrap all IO failures in `ImageServiceException(message, cause, stackTrace)`.
+`saveImage` and `_imagesDir` wrap all IO failures in `ImageFilesException(message, cause, stackTrace)`.
 Callers can catch it explicitly:
 
 ```dart
 try {
-  final path = await imageService.saveImage(sourcePath);
-} on ImageServiceException catch (e) {
+  final path = await imageFiles.saveImage(sourcePath);
+} on ImageFilesException catch (e) {
   // handle or rethrow
 }
 ```
