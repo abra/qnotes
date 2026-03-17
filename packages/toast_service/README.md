@@ -13,7 +13,7 @@ can be swapped out in one place without touching any feature code.
 
 ```dart
 // Show a toast
-showNotification(
+showToast(
   context,
   type: NotificationType.success,
   message: 'Note deleted',

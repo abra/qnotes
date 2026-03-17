@@ -10,7 +10,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nota/app/config/supported_locales.dart';
 import 'package:nota/app/dependency_scope.dart';
-import 'package:nota/app/router/app_router.dart';
+import 'package:nota/app/routing.dart';
 import 'package:note_details/note_details.dart';
 import 'package:note_list/note_list.dart';
 import 'package:preferences_menu/preferences_menu.dart';

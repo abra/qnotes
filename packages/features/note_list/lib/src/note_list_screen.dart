@@ -67,7 +67,7 @@ class NoteListView extends StatelessWidget {
       listener: (context, state) {
         if (state.deleteError != null) {
           final l10n = NoteListLocalizations.of(context)!;
-          showNotification(
+          showToast(
             context,
             type: NotificationType.error,
             message: l10n.noteDeleteFailed,
@@ -138,7 +138,7 @@ class _NoteListScaffold extends StatelessWidget {
     final count = state.selectedIds.length;
     final l10n = NoteListLocalizations.of(context)!;
     context.read<NoteListBloc>().add(NoteListSelectedDeleted());
-    showNotification(
+    showToast(
       context,
       type: NotificationType.success,
       message: l10n.notesDeleted(count),
@@ -148,7 +148,7 @@ class _NoteListScaffold extends StatelessWidget {
   void _deleteNote(BuildContext context, String id) {
     final l10n = NoteListLocalizations.of(context)!;
     context.read<NoteListBloc>().add(NoteListNoteDeleted(id));
-    showNotification(
+    showToast(
       context,
       type: NotificationType.success,
       message: l10n.notesDeleted(1),

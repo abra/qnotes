@@ -242,7 +242,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
 
         if (state.status == NoteDetailsStatus.failure) {
           final isNotFound = state.loadError is NoteNotFoundException;
-          showNotification(
+          showToast(
             context,
             type: NotificationType.error,
             message: isNotFound

@@ -3,7 +3,7 @@ import 'package:toastification/toastification.dart';
 
 enum NotificationType { success, error }
 
-void showNotification(
+void showToast(
   BuildContext context, {
   required NotificationType type,
   required String message,
