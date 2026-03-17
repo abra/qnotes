@@ -475,10 +475,8 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
 const _toolbarRadius = BorderRadius.all(Radius.circular(AppRadius.large));
 
 const _toolbarShadows = [
-  BoxShadow(color: Color(0x0D000000), blurRadius: 20, offset: Offset(0, -4)),
-  BoxShadow(color: Color(0x0D000000), blurRadius: 20, offset: Offset(0, 4)),
-  BoxShadow(color: Color(0x0D000000), blurRadius: 6, offset: Offset(0, -1)),
-  BoxShadow(color: Color(0x0D000000), blurRadius: 6, offset: Offset(0, 1)),
+  BoxShadow(color: Color(0x26000000), blurRadius: 8),
+  BoxShadow(color: Color(0x0D000000), blurRadius: 2),
 ];
 
 const _toolbarButtonStyle = ButtonStyle(
