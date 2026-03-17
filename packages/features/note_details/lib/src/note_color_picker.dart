@@ -1,75 +1,73 @@
 part of 'note_details_screen.dart';
 
-class _NoteColorPicker extends StatelessWidget {
-  const _NoteColorPicker({
+class _InlineColorPanel extends StatelessWidget {
+  const _InlineColorPanel({
     required this.selected,
     required this.onSelected,
-    required this.onDismiss,
   });
 
   final NoteColor selected;
   final ValueChanged<NoteColor> onSelected;
-  final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = NoteDetailsLocalizations.of(context)!;
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          Spacing.large,
-          Spacing.large,
-          Spacing.large,
-          Spacing.mediumLarge,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            BottomSheetHeader(
-              title: l10n.noteColor,
-              onClose: onDismiss,
+    final colorScheme = Theme.of(context).colorScheme;
+    final brightness = Theme.of(context).brightness;
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: Color(0x00000000),
+        borderRadius: _toolbarRadius,
+        boxShadow: _toolbarShadows,
+      ),
+      child: ClipRRect(
+        borderRadius: _toolbarRadius,
+        child: ColoredBox(
+          color: colorScheme.surface,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: Spacing.small,
+              vertical: Spacing.small,
             ),
-            const SizedBox(height: Spacing.large),
-            Wrap(
-              spacing: Spacing.mediumLarge,
-              runSpacing: Spacing.mediumLarge,
-              children: NoteColor.values.map((color) {
-                final isSelected = color == selected;
-                return GestureDetector(
-                  onTap: () {
-                    onSelected(color);
-                    onDismiss();
-                  },
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: color == NoteColor.none
-                          ? Theme.of(
-                              context,
-                            ).colorScheme.surfaceContainerHighest
-                          : color.forBrightness(Theme.of(context).brightness),
-                      border: isSelected
-                          ? Border.all(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 3,
+            child: SizedBox(
+              height: 32,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: NoteColor.values.length,
+                separatorBuilder: (_, _) =>
+                    const SizedBox(width: Spacing.small),
+                itemBuilder: (context, index) {
+                  final color = NoteColor.values[index];
+                  final isSelected = color == selected;
+                  return GestureDetector(
+                    onTap: () => onSelected(color),
+                    child: Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: color == NoteColor.none
+                            ? colorScheme.surfaceContainerHighest
+                            : color.forBrightness(brightness),
+                        border: isSelected
+                            ? Border.all(
+                                color: colorScheme.primary,
+                                width: 2.5,
+                              )
+                            : Border.all(color: Colors.transparent),
+                      ),
+                      child: color == NoteColor.none
+                          ? Icon(
+                              Icons.block,
+                              size: IconSize.xSmall,
+                              color: colorScheme.onSurface,
                             )
-                          : Border.all(color: Colors.transparent),
+                          : null,
                     ),
-                    child: color == NoteColor.none
-                        ? Icon(
-                            Icons.block,
-                            size: IconSize.medium,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          )
-                        : null,
-                  ),
-                );
-              }).toList(),
+                  );
+                },
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );

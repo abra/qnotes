@@ -24,7 +24,8 @@ class InitializationFailedScreen extends StatefulWidget {
       _InitializationFailedScreenState();
 }
 
-class _InitializationFailedScreenState extends State<InitializationFailedScreen> {
+class _InitializationFailedScreenState
+    extends State<InitializationFailedScreen> {
   final _inProgress = ValueNotifier<bool>(false);
 
   @override

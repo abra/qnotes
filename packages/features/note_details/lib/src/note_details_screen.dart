@@ -15,6 +15,8 @@ import 'note_details_bloc.dart';
 
 part 'note_color_picker.dart';
 
+enum _SecondaryPanelMode { formatting, colors }
+
 // Parses note content into a Quill ops list.
 // Handles canonical {"ops":[...]} Delta, legacy bare [...] array, and plain text.
 List<dynamic> _opsFromContent(String content) {
@@ -61,14 +63,18 @@ class NoteDetailsView extends StatefulWidget {
   State<NoteDetailsView> createState() => _NoteDetailsViewState();
 }
 
-class _NoteDetailsViewState extends State<NoteDetailsView> {
+class _NoteDetailsViewState extends State<NoteDetailsView>
+    with SingleTickerProviderStateMixin {
   late final TextEditingController _titleController;
   late QuillController _quillController;
   late final FocusNode _quillFocusNode;
   late final ScrollController _quillScrollController;
+  late final AnimationController _toolbarAnimController;
+  late final Animation<double> _toolbarAnimation;
   StreamSubscription<DocChange>? _changesSub;
   bool _contentInitialized = false;
-  bool _secondaryPanelVisible = false;
+  _SecondaryPanelMode _activePanel = _SecondaryPanelMode.formatting;
+  bool _isPanelOpen = false;
 
   @override
   void initState() {
@@ -77,6 +83,15 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     _quillController = QuillController.basic();
     _quillFocusNode = FocusNode();
     _quillScrollController = ScrollController();
+    _toolbarAnimController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _toolbarAnimation = CurvedAnimation(
+      parent: _toolbarAnimController,
+      curve: Curves.easeOut,
+      reverseCurve: Curves.easeIn,
+    );
     _subscribeToChanges();
   }
 
@@ -87,6 +102,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     _quillController.dispose();
     _quillFocusNode.dispose();
     _quillScrollController.dispose();
+    _toolbarAnimController.dispose();
     super.dispose();
   }
 
@@ -185,21 +201,25 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
     );
   }
 
-  void _showColorPicker(BuildContext context, NoteColor selected) {
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      builder: (sheetContext) => _NoteColorPicker(
-        selected: selected,
-        onSelected: (color) =>
-            context.read<NoteDetailsBloc>().add(NoteDetailsColorChanged(color)),
-        onDismiss: () => Navigator.of(sheetContext).pop(),
-      ),
-    );
+  void _togglePanel(_SecondaryPanelMode mode) {
+    setState(() {
+      if (_isPanelOpen && _activePanel == mode) {
+        _isPanelOpen = false;
+        _toolbarAnimController.reverse();
+      } else {
+        _activePanel = mode;
+        if (!_isPanelOpen) {
+          _isPanelOpen = true;
+          _toolbarAnimController.forward();
+        }
+      }
+    });
   }
 
-  static const double _toolbarClearance = 50;
-  static const double _toolbarClearanceExpanded = 115;
+  static const double _toolbarClearance = 60;
+
+  // Secondary panel: 32px buttons + 8*2 padding + 8 gap below = 56px
+  static const double _secondaryPanelHeight = 56;
 
   @override
   Widget build(BuildContext context) {
@@ -318,16 +338,11 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                         sliver: SliverToBoxAdapter(
                           child: TextField(
                             controller: _titleController,
-                            onChanged: (v) =>
-                                context.read<NoteDetailsBloc>().add(
-                                  NoteDetailsTitleChanged(v),
-                                ),
-                            style:
-                                Theme.of(
-                                  context,
-                                ).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            onChanged: (v) => context
+                                .read<NoteDetailsBloc>()
+                                .add(NoteDetailsTitleChanged(v)),
+                            style: Theme.of(context).textTheme.headlineSmall
+                                ?.copyWith(fontWeight: FontWeight.bold),
                             decoration: InputDecoration(
                               hintText: l10n.titleHint,
                               border: InputBorder.none,
@@ -344,14 +359,18 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                       ),
                       SliverFillRemaining(
                         hasScrollBody: false,
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(
-                            Spacing.mediumLarge,
-                            Spacing.small,
-                            Spacing.mediumLarge,
-                            _secondaryPanelVisible
-                                ? _toolbarClearanceExpanded
-                                : _toolbarClearance,
+                        child: AnimatedBuilder(
+                          animation: _toolbarAnimation,
+                          builder: (context, child) => Padding(
+                            padding: EdgeInsets.fromLTRB(
+                              Spacing.mediumLarge,
+                              Spacing.small,
+                              Spacing.mediumLarge,
+                              _toolbarClearance +
+                                  _toolbarAnimation.value *
+                                      _secondaryPanelHeight,
+                            ),
+                            child: child,
                           ),
                           child: QuillEditor(
                             controller: _quillController,
@@ -375,20 +394,21 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                     right: 0,
                     bottom: 0,
                     child: IgnorePointer(
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeOut,
-                        height: _secondaryPanelVisible
-                            ? _toolbarClearanceExpanded
-                            : _toolbarClearance,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              scaffoldBg.withValues(alpha: 0),
-                              scaffoldBg,
-                            ],
+                      child: AnimatedBuilder(
+                        animation: _toolbarAnimation,
+                        builder: (context, _) => Container(
+                          height:
+                              _toolbarClearance +
+                              _toolbarAnimation.value * _secondaryPanelHeight,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                scaffoldBg.withValues(alpha: 0),
+                                scaffoldBg,
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -398,21 +418,36 @@ class _NoteDetailsViewState extends State<NoteDetailsView> {
                     left: Spacing.mediumLarge,
                     right: Spacing.mediumLarge,
                     bottom: Spacing.mediumLarge,
-                    child: _QuillToolbar(
+                    child: _NoteToolbar(
                       key: ObjectKey(_quillController),
                       controller: _quillController,
+                      animation: _toolbarAnimation,
+                      activePanel: _activePanel,
+                      isSecondaryOpen: _isPanelOpen,
                       isPinned: state.isPinned,
                       noteColor: state.color,
-                      isSecondaryVisible: _secondaryPanelVisible,
-                      onToggleSecondary: () => setState(
-                        () => _secondaryPanelVisible = !_secondaryPanelVisible,
-                      ),
+                      onToggleFormatting: () =>
+                          _togglePanel(_SecondaryPanelMode.formatting),
+                      onToggleColors: () =>
+                          _togglePanel(_SecondaryPanelMode.colors),
+                      onImagePressed: () {},
+                      onMicPressed: () {},
                       onPinToggled: () => context.read<NoteDetailsBloc>().add(
                         NoteDetailsPinToggled(),
                       ),
-                      onColorPressed: () =>
-                          _showColorPicker(context, state.color),
-                      onImagePressed: () {},
+                      onColorSelected: (color) =>
+                          context.read<NoteDetailsBloc>().add(
+                            NoteDetailsColorChanged(color),
+                          ),
+                      onNewLine: () {
+                        final offset = _quillController.selection.extentOffset;
+                        _quillController.replaceText(
+                          offset,
+                          0,
+                          '\n',
+                          TextSelection.collapsed(offset: offset + 1),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -456,94 +491,67 @@ const _toolbarButtonStyle = ButtonStyle(
   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
 );
 
-class _QuillToolbar extends StatefulWidget {
-  const _QuillToolbar({
+class _NoteToolbar extends StatelessWidget {
+  const _NoteToolbar({
     super.key,
     required this.controller,
+    required this.animation,
+    required this.activePanel,
+    required this.isSecondaryOpen,
     required this.isPinned,
     required this.noteColor,
-    required this.isSecondaryVisible,
-    required this.onToggleSecondary,
-    required this.onPinToggled,
-    required this.onColorPressed,
+    required this.onToggleFormatting,
+    required this.onToggleColors,
     required this.onImagePressed,
+    required this.onMicPressed,
+    required this.onPinToggled,
+    required this.onColorSelected,
+    required this.onNewLine,
   });
 
   final QuillController controller;
+  final Animation<double> animation;
+  final _SecondaryPanelMode activePanel;
+  final bool isSecondaryOpen;
   final bool isPinned;
   final NoteColor noteColor;
-  final bool isSecondaryVisible;
-  final VoidCallback onToggleSecondary;
-  final VoidCallback onPinToggled;
-  final VoidCallback onColorPressed;
+  final VoidCallback onToggleFormatting;
+  final VoidCallback onToggleColors;
   final VoidCallback onImagePressed;
+  final VoidCallback onMicPressed;
+  final VoidCallback onPinToggled;
+  final ValueChanged<NoteColor> onColorSelected;
+  final VoidCallback onNewLine;
 
-  @override
-  State<_QuillToolbar> createState() => _QuillToolbarState();
-}
-
-class _QuillToolbarState extends State<_QuillToolbar>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _animController;
-  late final Animation<double> _animation;
-
-  @override
-  void initState() {
-    super.initState();
-    _animController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 200),
-      value: widget.isSecondaryVisible ? 1.0 : 0.0,
-    );
-    _animation = CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeOut,
-      reverseCurve: Curves.easeIn,
-    );
-  }
-
-  @override
-  void didUpdateWidget(_QuillToolbar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.isSecondaryVisible != oldWidget.isSecondaryVisible) {
-      if (widget.isSecondaryVisible) {
-        _animController.forward();
-      } else {
-        _animController.reverse();
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _animController.dispose();
-    super.dispose();
-  }
+  Widget _buildSecondaryContent(BuildContext context) => switch (activePanel) {
+    _SecondaryPanelMode.formatting => _FormattingPanel(
+      controller: controller,
+    ),
+    _SecondaryPanelMode.colors => _InlineColorPanel(
+      selected: noteColor,
+      onSelected: onColorSelected,
+    ),
+  };
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final brightness = Theme.of(context).brightness;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         AnimatedBuilder(
-          animation: _animation,
+          animation: animation,
           builder: (context, child) => Align(
             alignment: Alignment.topCenter,
-            heightFactor: _animation.value,
+            heightFactor: animation.value,
             child: child,
           ),
           child: FadeTransition(
-            opacity: _animation,
+            opacity: animation,
             child: Padding(
               padding: const EdgeInsets.only(bottom: Spacing.small),
-              child: _SecondaryToolbar(
-                isPinned: widget.isPinned,
-                noteColor: widget.noteColor,
-                onPinToggled: widget.onPinToggled,
-                onColorPressed: widget.onColorPressed,
-                onImagePressed: widget.onImagePressed,
-              ),
+              child: _buildSecondaryContent(context),
             ),
           ),
         ),
@@ -561,80 +569,126 @@ class _QuillToolbarState extends State<_QuillToolbar>
                 padding: const EdgeInsets.all(Spacing.small),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 32,
-                        child: QuillSimpleToolbar(
-                          controller: widget.controller,
-                          config: QuillSimpleToolbarConfig(
-                            multiRowsDisplay: false,
-                            toolbarSize: 32,
-                            toolbarSectionSpacing: 0,
-                            color: Colors.transparent,
-                            buttonOptions: QuillSimpleToolbarButtonOptions(
-                              base: QuillToolbarBaseButtonOptions(
-                                iconTheme: QuillIconTheme(
-                                  iconButtonUnselectedData: IconButtonData(
-                                    style: _toolbarButtonStyle,
-                                    color: colorScheme.onSurface,
-                                  ),
-                                  iconButtonSelectedData: IconButtonData(
-                                    style: _toolbarButtonStyle.copyWith(
-                                      backgroundColor:
-                                          const WidgetStatePropertyAll(
-                                            Colors.transparent,
-                                          ),
-                                    ),
-                                    color: colorScheme.primary,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            showBoldButton: true,
-                            showItalicButton: true,
-                            showUnderLineButton: true,
-                            showListNumbers: true,
-                            showListBullets: true,
-                            showListCheck: true,
-                            showUndo: true,
-                            showRedo: true,
-                            showDividers: false,
-                            showFontFamily: false,
-                            showFontSize: false,
-                            showStrikeThrough: false,
-                            showInlineCode: false,
-                            showHeaderStyle: false,
-                            showCodeBlock: false,
-                            showQuote: false,
-                            showIndent: false,
-                            showLink: false,
-                            showSearchButton: false,
-                            showColorButton: false,
-                            showBackgroundColorButton: false,
-                            showClearFormat: false,
-                            showSuperscript: false,
-                            showSubscript: false,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 28,
-                      child: VerticalDivider(
-                        width: Spacing.medium,
-                        thickness: 0.5,
-                        color: colorScheme.onSurface.withValues(alpha: 0.2),
-                      ),
-                    ),
                     IconButton(
                       icon: Icon(
-                        Icons.more_vert,
-                        color: widget.isSecondaryVisible
+                        Icons.mic_none,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      style: _toolbarButtonStyle,
+                      onPressed: onMicPressed,
+                    ),
+                    const SizedBox(width: Spacing.xSmall),
+                    ListenableBuilder(
+                      listenable: controller,
+                      builder: (context, _) => Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.undo,
+                              color: controller.hasUndo
+                                  ? colorScheme.onSurfaceVariant
+                                  : colorScheme.onSurfaceVariant.withValues(
+                                      alpha: 0.3,
+                                    ),
+                            ),
+                            style: _toolbarButtonStyle,
+                            onPressed: controller.hasUndo
+                                ? controller.undo
+                                : null,
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.redo,
+                              color: controller.hasRedo
+                                  ? colorScheme.onSurfaceVariant
+                                  : colorScheme.onSurfaceVariant.withValues(
+                                      alpha: 0.3,
+                                    ),
+                            ),
+                            style: _toolbarButtonStyle,
+                            onPressed: controller.hasRedo
+                                ? controller.redo
+                                : null,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: Spacing.xSmall),
+                    IconButton(
+                      icon: Icon(
+                        Icons.text_format,
+                        color:
+                            isSecondaryOpen &&
+                                activePanel == _SecondaryPanelMode.formatting
                             ? colorScheme.primary
                             : colorScheme.onSurfaceVariant,
                       ),
                       style: _toolbarButtonStyle,
-                      onPressed: widget.onToggleSecondary,
+                      onPressed: onToggleFormatting,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.image_outlined,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      style: _toolbarButtonStyle,
+                      onPressed: onImagePressed,
+                    ),
+                    IconButton(
+                      style: _toolbarButtonStyle,
+                      icon: Container(
+                        width: IconSize.medium,
+                        height: IconSize.medium,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: noteColor == NoteColor.none
+                              ? colorScheme.surfaceContainerHighest
+                              : noteColor.forBrightness(brightness),
+                          border:
+                              isSecondaryOpen &&
+                                  activePanel == _SecondaryPanelMode.colors
+                              ? Border.all(
+                                  color: colorScheme.primary,
+                                  width: 2.5,
+                                )
+                              : noteColor == NoteColor.none
+                              ? Border.all(
+                                  color: colorScheme.onSurface.withValues(
+                                    alpha: 0.2,
+                                  ),
+                                  width: 1.5,
+                                )
+                              : null,
+                        ),
+                        child: noteColor == NoteColor.none
+                            ? Icon(
+                                Icons.palette_outlined,
+                                size: IconSize.xSmall,
+                                color: colorScheme.onSurfaceVariant,
+                              )
+                            : null,
+                      ),
+                      onPressed: onToggleColors,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                        color: isPinned
+                            ? colorScheme.primary
+                            : colorScheme.onSurfaceVariant,
+                      ),
+                      style: _toolbarButtonStyle,
+                      onPressed: onPinToggled,
+                    ),
+                    const Spacer(),
+                    IconButton(
+                      icon: Icon(
+                        Icons.keyboard_return,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                      style: _toolbarButtonStyle,
+                      onPressed: onNewLine,
                     ),
                   ],
                 ),
@@ -647,20 +701,12 @@ class _QuillToolbarState extends State<_QuillToolbar>
   }
 }
 
-class _SecondaryToolbar extends StatelessWidget {
-  const _SecondaryToolbar({
-    required this.isPinned,
-    required this.noteColor,
-    required this.onPinToggled,
-    required this.onColorPressed,
-    required this.onImagePressed,
+class _FormattingPanel extends StatelessWidget {
+  const _FormattingPanel({
+    required this.controller,
   });
 
-  final bool isPinned;
-  final NoteColor noteColor;
-  final VoidCallback onPinToggled;
-  final VoidCallback onColorPressed;
-  final VoidCallback onImagePressed;
+  final QuillController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -679,35 +725,61 @@ class _SecondaryToolbar extends StatelessWidget {
             padding: const EdgeInsets.all(Spacing.small),
             child: Row(
               children: [
-                IconButton(
-                  icon: Icon(
-                    isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                    color: isPinned
-                        ? colorScheme.primary
-                        : colorScheme.onSurfaceVariant,
+                Expanded(
+                  child: SizedBox(
+                    height: 32,
+                    child: QuillSimpleToolbar(
+                      controller: controller,
+                      config: QuillSimpleToolbarConfig(
+                        multiRowsDisplay: false,
+                        toolbarSize: 32,
+                        toolbarSectionSpacing: 0,
+                        color: Colors.transparent,
+                        buttonOptions: QuillSimpleToolbarButtonOptions(
+                          base: QuillToolbarBaseButtonOptions(
+                            iconTheme: QuillIconTheme(
+                              iconButtonUnselectedData: IconButtonData(
+                                style: _toolbarButtonStyle,
+                                color: colorScheme.onSurface,
+                              ),
+                              iconButtonSelectedData: IconButtonData(
+                                style: _toolbarButtonStyle.copyWith(
+                                  backgroundColor: const WidgetStatePropertyAll(
+                                    Colors.transparent,
+                                  ),
+                                ),
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+                        showBoldButton: true,
+                        showItalicButton: true,
+                        showUnderLineButton: true,
+                        showListNumbers: true,
+                        showListBullets: true,
+                        showListCheck: true,
+                        showUndo: false,
+                        showRedo: false,
+                        showDividers: false,
+                        showFontFamily: false,
+                        showFontSize: false,
+                        showStrikeThrough: false,
+                        showInlineCode: false,
+                        showHeaderStyle: false,
+                        showCodeBlock: false,
+                        showQuote: false,
+                        showIndent: false,
+                        showLink: false,
+                        showSearchButton: false,
+                        showColorButton: false,
+                        showBackgroundColorButton: false,
+                        showClearFormat: true,
+                        showSuperscript: false,
+                        showSubscript: false,
+                      ),
+                    ),
                   ),
-                  style: _toolbarButtonStyle,
-                  onPressed: onPinToggled,
-                ),
-                IconButton(
-                  icon: Icon(
-                    noteColor == NoteColor.none
-                        ? Icons.palette_outlined
-                        : Icons.palette,
-                    color: noteColor == NoteColor.none
-                        ? colorScheme.onSurfaceVariant
-                        : colorScheme.primary,
-                  ),
-                  style: _toolbarButtonStyle,
-                  onPressed: onColorPressed,
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.image_outlined,
-                    color: colorScheme.onSurfaceVariant,
-                  ),
-                  style: _toolbarButtonStyle,
-                  onPressed: onImagePressed,
                 ),
               ],
             ),
