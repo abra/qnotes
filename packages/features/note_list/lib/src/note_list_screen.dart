@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:component_library/component_library.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_files/image_files.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
+import 'package:smart_keyboard_insets/smart_keyboard_insets.dart';
 import 'package:toast_service/toast_service.dart';
 
 import 'l10n/note_list_localizations.dart';
@@ -99,7 +103,7 @@ class NoteListView extends StatelessWidget {
 // clearance so the last note is not hidden behind the bar.
 const double _bottomBarClearance = 70;
 
-class _NoteListScaffold extends StatelessWidget {
+class _NoteListScaffold extends StatefulWidget {
   const _NoteListScaffold({
     required this.state,
     required this.viewMode,
@@ -115,6 +119,40 @@ class _NoteListScaffold extends StatelessWidget {
   final Future<Note?> Function(Note)? onNotePressed;
   final Future<Note?> Function()? onAddPressed;
   final void Function(BuildContext)? onSettingsPressed;
+
+  @override
+  State<_NoteListScaffold> createState() => _NoteListScaffoldState();
+}
+
+class _NoteListScaffoldState extends State<_NoteListScaffold> {
+  StreamSubscription<KeyboardMetrics>? _keyboardSub;
+  KeyboardMetrics _keyboardMetrics = KeyboardMetrics.hidden;
+
+  @override
+  void initState() {
+    super.initState();
+    _keyboardSub = SmartKeyboardInsets.instance.metricsStream.listen(
+      (metrics) {
+        if (!mounted) return;
+        setState(() => _keyboardMetrics = metrics);
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _keyboardSub?.cancel();
+    super.dispose();
+  }
+
+  // Forwarding getters so build/methods below need no widget. prefix.
+  NoteListState get state => widget.state;
+  NoteViewMode get viewMode => widget.viewMode;
+  NoteListDensity get density => widget.density;
+  Future<Note?> Function(Note)? get onNotePressed => widget.onNotePressed;
+  Future<Note?> Function()? get onAddPressed => widget.onAddPressed;
+  void Function(BuildContext)? get onSettingsPressed =>
+      widget.onSettingsPressed;
 
   Future<void> _openNote(BuildContext context, Note note) async {
     final updated = await onNotePressed!(note);
@@ -161,7 +199,17 @@ class _NoteListScaffold extends StatelessWidget {
     final notes = state.filteredNotes;
     final l10n = NoteListLocalizations.of(context)!;
 
-    final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+    // On Android the plugin reports keyboard height from the physical bottom
+    // (includes nav bar), while viewInsetsOf does not. Subtract safeAreaBottom
+    // to get the correct content inset. On iOS safeAreaBottom is the static
+    // home-indicator height and must NOT be subtracted (it's already accounted
+    // for by SafeArea when the keyboard is hidden).
+    final keyboardInset = _keyboardMetrics.isKeyboardVisible
+        ? (defaultTargetPlatform == TargetPlatform.android
+              ? _keyboardMetrics.keyboardHeight -
+                    _keyboardMetrics.safeAreaBottom
+              : _keyboardMetrics.keyboardHeight)
+        : 0.0;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,

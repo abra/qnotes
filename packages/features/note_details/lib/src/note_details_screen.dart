@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:component_library/component_library.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:image_files/image_files.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:shared/shared.dart';
+import 'package:smart_keyboard_insets/smart_keyboard_insets.dart';
 import 'package:toast_service/toast_service.dart';
 
 import 'l10n/note_details_localizations.dart';
@@ -74,6 +76,8 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
   late final AnimationController _toolbarAnimController;
   late final Animation<double> _toolbarAnimation;
   StreamSubscription<DocChange>? _changesSub;
+  StreamSubscription<KeyboardMetrics>? _keyboardSub;
+  KeyboardMetrics _keyboardMetrics = KeyboardMetrics.hidden;
   bool _contentInitialized = false;
   _SecondaryPanelMode _activePanel = _SecondaryPanelMode.formatting;
   bool _isPanelOpen = false;
@@ -96,11 +100,18 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
       reverseCurve: Curves.easeIn,
     );
     _subscribeToChanges();
+    _keyboardSub = SmartKeyboardInsets.instance.metricsStream.listen(
+      (metrics) {
+        if (!mounted) return;
+        setState(() => _keyboardMetrics = metrics);
+      },
+    );
   }
 
   @override
   void dispose() {
     _titleController.dispose();
+    _keyboardSub?.cancel();
     _changesSub?.cancel();
     _quillController.dispose();
     _quillFocusNode.dispose();
@@ -284,7 +295,12 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
             ? state.color.onColor
             : Theme.of(context).colorScheme.onSurface;
         final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
-        final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+        final keyboardInset = _keyboardMetrics.isKeyboardVisible
+            ? (defaultTargetPlatform == TargetPlatform.android
+                  ? _keyboardMetrics.keyboardHeight -
+                        _keyboardMetrics.safeAreaBottom
+                  : _keyboardMetrics.keyboardHeight)
+            : 0.0;
 
         return PopScope(
           canPop: false,
