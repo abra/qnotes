@@ -176,13 +176,7 @@ class _NoteListScaffold extends StatelessWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: state.isSelectionMode
-          ? _NoteListSelectionAppBar(
-              selectedCount: state.selectedIds.length,
-              onClose: () => bloc.add(NoteListSelectionCleared()),
-              onDelete: () => _deleteSelected(context),
-            )
-          : const _NoteListAppBar(),
+      appBar: const _NoteListAppBar(),
       body: SafeArea(
         child: StreamBuilder<KeyboardMetrics>(
           stream: SmartKeyboardInsets.instance.metricsStream,
@@ -209,9 +203,7 @@ class _NoteListScaffold extends StatelessWidget {
                     notes: notes,
                     selectedIds: state.selectedIds,
                     isSelectionMode: state.isSelectionMode,
-                    bottomPadding: state.isSelectionMode
-                        ? 0
-                        : _bottomBarClearance + keyboardInset,
+                    bottomPadding: _bottomBarClearance + keyboardInset,
                     onNotePressed: onNotePressed == null
                         ? null
                         : (note) => _openNote(context, note),
@@ -225,9 +217,7 @@ class _NoteListScaffold extends StatelessWidget {
                     density: density,
                     selectedIds: state.selectedIds,
                     isSelectionMode: state.isSelectionMode,
-                    bottomPadding: state.isSelectionMode
-                        ? 0
-                        : _bottomBarClearance + keyboardInset,
+                    bottomPadding: _bottomBarClearance + keyboardInset,
                     onNotePressed: onNotePressed == null
                         ? null
                         : (note) => _openNote(context, note),
@@ -235,23 +225,30 @@ class _NoteListScaffold extends StatelessWidget {
                     onNoteLongPressed: (id) =>
                         bloc.add(NoteListSelectionToggled(id)),
                   ),
-                if (!state.isSelectionMode)
-                  FadeGradientOverlay(
-                    height: _bottomBarClearance + keyboardInset,
-                  ),
-                if (!state.isSelectionMode)
-                  Positioned(
-                    left: Spacing.mediumLarge,
-                    right: Spacing.mediumLarge,
-                    bottom: Spacing.mediumLarge + keyboardInset,
-                    child: _BottomBar(
-                      onAddPressed: onAddPressed == null
-                          ? null
-                          : () => _addNote(context),
-                      onQueryChanged: (q) => bloc.add(NoteListQueryChanged(q)),
-                      onSettingsPressed: onSettingsPressed,
-                    ),
-                  ),
+                FadeGradientOverlay(
+                  height: _bottomBarClearance + keyboardInset,
+                ),
+                Positioned(
+                  left: Spacing.mediumLarge,
+                  right: Spacing.mediumLarge,
+                  bottom: Spacing.mediumLarge + keyboardInset,
+                  child: state.isSelectionMode
+                      ? _SelectionBar(
+                          selectedCount: state.selectedIds.length,
+                          onCancel: () => bloc.add(NoteListSelectionCleared()),
+                          onDelete: () => _deleteSelected(context),
+                          onPinToggle: () =>
+                              bloc.add(NoteListSelectedPinToggled()),
+                        )
+                      : _BottomBar(
+                          onAddPressed: onAddPressed == null
+                              ? null
+                              : () => _addNote(context),
+                          onQueryChanged: (q) =>
+                              bloc.add(NoteListQueryChanged(q)),
+                          onSettingsPressed: onSettingsPressed,
+                        ),
+                ),
               ],
             );
           },
@@ -285,39 +282,115 @@ class _NoteListAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-// App bar shown in multi-select mode with a delete action.
-class _NoteListSelectionAppBar extends StatelessWidget
-    implements PreferredSizeWidget {
-  const _NoteListSelectionAppBar({
+class _SelectionBar extends StatelessWidget {
+  const _SelectionBar({
     required this.selectedCount,
-    required this.onClose,
+    required this.onCancel,
     required this.onDelete,
+    required this.onPinToggle,
   });
 
   final int selectedCount;
-  final VoidCallback onClose;
+  final VoidCallback onCancel;
   final VoidCallback onDelete;
+  final VoidCallback onPinToggle;
 
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  static const _outerRadius = BorderRadius.all(
+    Radius.circular(AppRadius.large),
+  );
+  static const _innerRadius = BorderRadius.all(
+    Radius.circular(AppRadius.medium),
+  );
+  static const _iconSize = IconSize.xLarge;
+  static const _buttonStyle = ButtonStyle(
+    fixedSize: WidgetStatePropertyAll(Size(40, 32)),
+    padding: WidgetStatePropertyAll(EdgeInsets.zero),
+    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+  );
 
   @override
   Widget build(BuildContext context) {
     final l10n = NoteListLocalizations.of(context)!;
-    return AppBar(
-      scrolledUnderElevation: 8,
-      shadowColor: Colors.black.withValues(alpha: 0.3),
-      leading: IconButton(
-        icon: const Icon(Icons.close),
-        onPressed: onClose,
+    final colorScheme = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: _outerRadius,
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 8),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 2),
+        ],
       ),
-      title: Text(l10n.selected(selectedCount)),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.delete_outline),
-          onPressed: onDelete,
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.small),
+        child: Row(
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: _innerRadius,
+              ),
+              child: IconButton(
+                style: _buttonStyle,
+                icon: Icon(
+                  Icons.close,
+                  color: colorScheme.onSurfaceVariant,
+                  size: _iconSize,
+                ),
+                onPressed: onCancel,
+              ),
+            ),
+            const SizedBox(width: Spacing.small),
+            Expanded(
+              child: Text(
+                l10n.selected(selectedCount),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.onSurface,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 28,
+              child: VerticalDivider(
+                width: Spacing.medium,
+                thickness: 0.5,
+                color: colorScheme.onSurface.withValues(alpha: 0.3),
+              ),
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: _innerRadius,
+              ),
+              child: IconButton(
+                style: _buttonStyle,
+                icon: Icon(
+                  Icons.push_pin_outlined,
+                  color: colorScheme.onSurfaceVariant,
+                  size: _iconSize,
+                ),
+                onPressed: onPinToggle,
+              ),
+            ),
+            const SizedBox(width: Spacing.small),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: colorScheme.surface,
+                borderRadius: _innerRadius,
+              ),
+              child: IconButton(
+                style: _buttonStyle,
+                icon: Icon(
+                  Icons.delete_outline,
+                  color: colorScheme.onSurfaceVariant,
+                  size: _iconSize,
+                ),
+                onPressed: onDelete,
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

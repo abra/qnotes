@@ -154,7 +154,7 @@ class NoteCard extends StatelessWidget {
                     child: Icon(
                       Icons.check_circle,
                       color: Theme.of(context).colorScheme.primary,
-                      size: IconSize.medium,
+                      size: IconSize.xLarge,
                     ),
                   ),
                 ),

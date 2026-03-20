@@ -44,6 +44,11 @@ class NoteListSelectedDeleted extends NoteListEvent {
   String toString() => 'NoteListSelectedDeleted()';
 }
 
+class NoteListSelectedPinToggled extends NoteListEvent {
+  @override
+  String toString() => 'NoteListSelectedPinToggled()';
+}
+
 class NoteListNoteUpdated extends NoteListEvent {
   NoteListNoteUpdated(this.note);
 

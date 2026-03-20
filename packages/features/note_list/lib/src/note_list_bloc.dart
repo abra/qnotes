@@ -32,6 +32,7 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     on<NoteListSelectionToggled>(_onSelectionToggled);
     on<NoteListSelectionCleared>(_onSelectionCleared);
     on<NoteListSelectedDeleted>(_onSelectedDeleted);
+    on<NoteListSelectedPinToggled>(_onSelectedPinToggled);
   }
 
   final NoteRepository _repository;
@@ -101,6 +102,31 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
   void _onNoteRemoved(NoteListNoteRemoved event, Emitter<NoteListState> emit) {
     final notes = state.notes.where((n) => n.id != event.id).toList();
     emit(state.copyWith(notes: notes));
+  }
+
+  Future<void> _onSelectedPinToggled(
+    NoteListSelectedPinToggled event,
+    Emitter<NoteListState> emit,
+  ) async {
+    final ids = state.selectedIds;
+    final selected = state.notes.where((n) => ids.contains(n.id)).toList();
+    final updated = selected
+        .map((n) => n.copyWith(isPinned: !n.isPinned))
+        .toList();
+    try {
+      await Future.wait(updated.map(_repository.updateNote));
+    } on NoteStorageException catch (e, st) {
+      addError(e, st);
+      emit(state.copyWith(deleteError: e));
+      return;
+    }
+    final updatedMap = {for (final n in updated) n.id: n};
+    final notes = [
+      for (final n in state.notes)
+        if (updatedMap.containsKey(n.id)) updatedMap[n.id]! else n,
+    ];
+    _sortNotes(notes);
+    emit(state.copyWith(notes: notes, selectedIds: {}));
   }
 
   static void _sortNotes(List<Note> notes) {

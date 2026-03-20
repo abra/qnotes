@@ -239,7 +239,10 @@ void main() {
       await tester.pump();
 
       final editor = tester.widget<QuillEditor>(find.byType(QuillEditor));
-      expect(editor.controller.document.toPlainText(), contains('Hello plain text'));
+      expect(
+        editor.controller.document.toPlainText(),
+        contains('Hello plain text'),
+      );
       await tester.pump(const Duration(seconds: 1));
     });
 
@@ -262,32 +265,41 @@ void main() {
       await tester.pump();
 
       final editor = tester.widget<QuillEditor>(find.byType(QuillEditor));
-      expect(editor.controller.document.toPlainText(), contains('Delta content'));
+      expect(
+        editor.controller.document.toPlainText(),
+        contains('Delta content'),
+      );
       await tester.pump(const Duration(seconds: 1));
     });
 
-    testWidgets('loads legacy bare array JSON content into the editor document', (
-      tester,
-    ) async {
-      final bloc = NoteDetailsBloc(
-        noteRepository: FakeNoteRepository(),
-        imageFiles: FakeImageFiles(),
-        isNew: false,
-      );
-      await tester.pumpWidget(_buildView(bloc));
+    testWidgets(
+      'loads legacy bare array JSON content into the editor document',
+      (
+        tester,
+      ) async {
+        final bloc = NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          imageFiles: FakeImageFiles(),
+          isNew: false,
+        );
+        await tester.pumpWidget(_buildView(bloc));
 
-      bloc.emit(
-        const NoteDetailsState(
-          status: NoteDetailsStatus.success,
-          content: '[{"insert":"Legacy content\\n"}]',
-        ),
-      );
-      await tester.pump();
+        bloc.emit(
+          const NoteDetailsState(
+            status: NoteDetailsStatus.success,
+            content: '[{"insert":"Legacy content\\n"}]',
+          ),
+        );
+        await tester.pump();
 
-      final editor = tester.widget<QuillEditor>(find.byType(QuillEditor));
-      expect(editor.controller.document.toPlainText(), contains('Legacy content'));
-      await tester.pump(const Duration(seconds: 1));
-    });
+        final editor = tester.widget<QuillEditor>(find.byType(QuillEditor));
+        expect(
+          editor.controller.document.toPlainText(),
+          contains('Legacy content'),
+        );
+        await tester.pump(const Duration(seconds: 1));
+      },
+    );
 
     // --- Quill controller config ---
 
@@ -308,7 +320,10 @@ void main() {
 
       expect(controllers, isNotEmpty);
       for (final controller in controllers) {
-        final richPasteEnabled = controller.config.clipboardConfig?.enableExternalRichPaste; // ignore: experimental_member_use
+        final richPasteEnabled = controller
+            .config
+            .clipboardConfig
+            ?.enableExternalRichPaste; // ignore: experimental_member_use
         expect(richPasteEnabled, isFalse);
       }
       await tester.pump(const Duration(seconds: 1));
