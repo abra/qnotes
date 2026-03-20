@@ -133,7 +133,7 @@ class _NoteListScaffoldState extends State<_NoteListScaffold> {
     super.initState();
     _keyboardSub = SmartKeyboardInsets.instance.metricsStream.listen(
       (metrics) {
-        if (!mounted) return;
+        if (!mounted || metrics == _keyboardMetrics) return;
         setState(() => _keyboardMetrics = metrics);
       },
     );

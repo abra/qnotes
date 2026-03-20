@@ -102,7 +102,7 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
     _subscribeToChanges();
     _keyboardSub = SmartKeyboardInsets.instance.metricsStream.listen(
       (metrics) {
-        if (!mounted) return;
+        if (!mounted || metrics == _keyboardMetrics) return;
         setState(() => _keyboardMetrics = metrics);
       },
     );
