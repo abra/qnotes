@@ -669,7 +669,7 @@ class _NoteToolbar extends StatelessWidget {
                   onPressed: onMicPressed,
                 ),
                 SizedBox(
-                  height: 20,
+                  height: 28,
                   child: VerticalDivider(
                     width: Spacing.medium,
                     thickness: 0.5,

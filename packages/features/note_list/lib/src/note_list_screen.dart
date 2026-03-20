@@ -101,6 +101,20 @@ class NoteListView extends StatelessWidget {
 // clearance so the last note is not hidden behind the bar.
 const double _bottomBarClearance = 70;
 
+// Shared visual constants for the floating bars (selection and bottom).
+const _barOuterRadius = BorderRadius.all(Radius.circular(AppRadius.large));
+const _barInnerRadius = BorderRadius.all(Radius.circular(AppRadius.medium));
+const _barIconSize = IconSize.xLarge;
+const _barButtonStyle = ButtonStyle(
+  fixedSize: WidgetStatePropertyAll(Size(40, 32)),
+  padding: WidgetStatePropertyAll(EdgeInsets.zero),
+  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+);
+const _barShadows = [
+  BoxShadow(color: Color(0x26000000), blurRadius: 8),
+  BoxShadow(color: Color(0x0D000000), blurRadius: 2),
+];
+
 // Converts KeyboardMetrics into a logical-pixel inset for positioning UI above
 // the keyboard. On Android the plugin measures from the physical screen bottom
 // (includes nav bar), so safeAreaBottom is subtracted. On iOS safeAreaBottom
@@ -295,19 +309,6 @@ class _SelectionBar extends StatelessWidget {
   final VoidCallback onDelete;
   final VoidCallback onPinToggle;
 
-  static const _outerRadius = BorderRadius.all(
-    Radius.circular(AppRadius.large),
-  );
-  static const _innerRadius = BorderRadius.all(
-    Radius.circular(AppRadius.medium),
-  );
-  static const _iconSize = IconSize.xLarge;
-  static const _buttonStyle = ButtonStyle(
-    fixedSize: WidgetStatePropertyAll(Size(40, 32)),
-    padding: WidgetStatePropertyAll(EdgeInsets.zero),
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-  );
-
   @override
   Widget build(BuildContext context) {
     final l10n = NoteListLocalizations.of(context)!;
@@ -315,11 +316,8 @@ class _SelectionBar extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: _outerRadius,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 8),
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 2),
-        ],
+        borderRadius: _barOuterRadius,
+        boxShadow: _barShadows,
       ),
       child: Padding(
         padding: const EdgeInsets.all(Spacing.small),
@@ -328,14 +326,14 @@ class _SelectionBar extends StatelessWidget {
             DecoratedBox(
               decoration: BoxDecoration(
                 color: colorScheme.surface,
-                borderRadius: _innerRadius,
+                borderRadius: _barInnerRadius,
               ),
               child: IconButton(
-                style: _buttonStyle,
+                style: _barButtonStyle,
                 icon: Icon(
                   Icons.close,
                   color: colorScheme.onSurfaceVariant,
-                  size: _iconSize,
+                  size: _barIconSize,
                 ),
                 onPressed: onCancel,
               ),
@@ -360,14 +358,14 @@ class _SelectionBar extends StatelessWidget {
             DecoratedBox(
               decoration: BoxDecoration(
                 color: colorScheme.surface,
-                borderRadius: _innerRadius,
+                borderRadius: _barInnerRadius,
               ),
               child: IconButton(
-                style: _buttonStyle,
+                style: _barButtonStyle,
                 icon: Icon(
                   Icons.push_pin_outlined,
                   color: colorScheme.onSurfaceVariant,
-                  size: _iconSize,
+                  size: _barIconSize,
                 ),
                 onPressed: onPinToggle,
               ),
@@ -376,14 +374,14 @@ class _SelectionBar extends StatelessWidget {
             DecoratedBox(
               decoration: BoxDecoration(
                 color: colorScheme.surface,
-                borderRadius: _innerRadius,
+                borderRadius: _barInnerRadius,
               ),
               child: IconButton(
-                style: _buttonStyle,
+                style: _barButtonStyle,
                 icon: Icon(
                   Icons.delete_outline,
                   color: colorScheme.onSurfaceVariant,
-                  size: _iconSize,
+                  size: _barIconSize,
                 ),
                 onPressed: onDelete,
               ),
@@ -411,19 +409,6 @@ class _BottomBar extends StatefulWidget {
 }
 
 class _BottomBarState extends State<_BottomBar> {
-  static const _outerRadius = BorderRadius.all(
-    Radius.circular(AppRadius.large),
-  );
-  static const _innerRadius = BorderRadius.all(
-    Radius.circular(AppRadius.medium),
-  );
-  static const _iconSize = IconSize.xLarge;
-  static const _buttonStyle = ButtonStyle(
-    fixedSize: WidgetStatePropertyAll(Size(40, 32)),
-    padding: WidgetStatePropertyAll(EdgeInsets.zero),
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-  );
-
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
 
@@ -447,11 +432,8 @@ class _BottomBarState extends State<_BottomBar> {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: colorScheme.surface,
-        borderRadius: _outerRadius,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 8),
-          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 2),
-        ],
+        borderRadius: _barOuterRadius,
+        boxShadow: _barShadows,
       ),
       child: Padding(
         padding: const EdgeInsets.all(Spacing.small),
@@ -471,7 +453,7 @@ class _BottomBarState extends State<_BottomBar> {
                       prefixIcon: Icon(
                         Icons.search,
                         color: colorScheme.onSurfaceVariant,
-                        size: _iconSize,
+                        size: _barIconSize,
                       ),
                       hintStyle: Theme.of(context).textTheme.bodyMedium
                           ?.copyWith(
@@ -480,15 +462,15 @@ class _BottomBarState extends State<_BottomBar> {
                       filled: true,
                       fillColor: colorScheme.surface,
                       border: const OutlineInputBorder(
-                        borderRadius: _innerRadius,
+                        borderRadius: _barInnerRadius,
                         borderSide: BorderSide.none,
                       ),
                       enabledBorder: const OutlineInputBorder(
-                        borderRadius: _innerRadius,
+                        borderRadius: _barInnerRadius,
                         borderSide: BorderSide.none,
                       ),
                       focusedBorder: const OutlineInputBorder(
-                        borderRadius: _innerRadius,
+                        borderRadius: _barInnerRadius,
                         borderSide: BorderSide.none,
                       ),
                       isDense: true,
@@ -521,14 +503,14 @@ class _BottomBarState extends State<_BottomBar> {
             DecoratedBox(
               decoration: BoxDecoration(
                 color: colorScheme.surface,
-                borderRadius: _innerRadius,
+                borderRadius: _barInnerRadius,
               ),
               child: IconButton(
-                style: _buttonStyle,
+                style: _barButtonStyle,
                 icon: Icon(
                   Icons.menu,
                   color: colorScheme.onSurfaceVariant,
-                  size: _iconSize,
+                  size: _barIconSize,
                 ),
                 onPressed: widget.onSettingsPressed == null
                     ? null
@@ -539,14 +521,14 @@ class _BottomBarState extends State<_BottomBar> {
             DecoratedBox(
               decoration: BoxDecoration(
                 color: colorScheme.primary,
-                borderRadius: _innerRadius,
+                borderRadius: _barInnerRadius,
               ),
               child: IconButton(
-                style: _buttonStyle,
+                style: _barButtonStyle,
                 icon: Icon(
                   Icons.add,
                   color: colorScheme.onPrimary,
-                  size: _iconSize,
+                  size: _barIconSize,
                 ),
                 onPressed: widget.onAddPressed,
               ),

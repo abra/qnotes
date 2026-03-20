@@ -122,6 +122,7 @@ class NoteCard extends StatelessWidget {
                                       ),
                                       child: Image.file(
                                         File(firstImage),
+                                        width: double.infinity,
                                         fit: BoxFit.cover,
                                         errorBuilder: (_, _, _) =>
                                             const SizedBox(),
