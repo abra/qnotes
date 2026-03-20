@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:component_library/component_library.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:image_files/image_files.dart';
 import 'package:note_repository/note_repository.dart';
 import 'package:shared/shared.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:smart_keyboard_insets/smart_keyboard_insets.dart';
 import 'package:toast_service/toast_service.dart';
 
@@ -233,7 +235,10 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<NoteDetailsBloc, NoteDetailsState>(
-      listenWhen: (prev, curr) => prev.status != curr.status,
+      listenWhen: (prev, curr) =>
+          prev.status != curr.status ||
+          prev.insertedImagePath != curr.insertedImagePath ||
+          prev.imageInsertError != curr.imageInsertError,
       buildWhen: (prev, curr) =>
           prev.status != curr.status ||
           prev.color != curr.color ||
@@ -241,6 +246,17 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
           prev.isNew != curr.isNew,
       listener: (context, state) {
         final l10n = NoteDetailsLocalizations.of(context)!;
+
+        if (state.insertedImagePath != null) {
+          final path = state.insertedImagePath!;
+          final index = _quillController.selection.extentOffset;
+          _quillController.document.insert(index, BlockEmbed.image(path));
+          _quillController.document.insert(index + 1, '\n');
+          _quillController.updateSelection(
+            TextSelection.collapsed(offset: index + 2),
+            ChangeSource.local,
+          );
+        }
 
         if (state.status == NoteDetailsStatus.success) {
           _titleController.text = state.title;
@@ -267,6 +283,14 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
 
         if (state.status == NoteDetailsStatus.deleted) {
           Navigator.of(context).pop<Note?>(null);
+        }
+
+        if (state.imageInsertError != null) {
+          showToast(
+            context,
+            type: NotificationType.error,
+            message: l10n.imageInsertFailed,
+          );
         }
 
         if (state.status == NoteDetailsStatus.failure) {
@@ -385,6 +409,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
                                   padding: EdgeInsets.zero,
                                   autoFocus: false,
                                   customStyles: _buildEditorStyles(context),
+                                  embedBuilders: const [
+                                    _LocalImageEmbedBuilder(),
+                                  ],
                                 ),
                               ),
                             ),
@@ -438,7 +465,15 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
                               _togglePanel(_SecondaryPanelMode.formatting),
                           onToggleColors: () =>
                               _togglePanel(_SecondaryPanelMode.colors),
-                          onImagePressed: () {},
+                          onImagePressed: () async {
+                            final picked = await ImagePicker().pickImage(
+                              source: ImageSource.gallery,
+                            );
+                            if (picked == null || !context.mounted) return;
+                            context.read<NoteDetailsBloc>().add(
+                              NoteDetailsImageInserted(picked.path),
+                            );
+                          },
                           isMicActive: _isMicActive,
                           onMicPressed: () =>
                               setState(() => _isMicActive = !_isMicActive),
@@ -913,4 +948,85 @@ class _SecondaryPanel extends StatelessWidget {
       onSelected: onColorSelected,
     ),
   };
+}
+
+// ─── Image embed ──────────────────────────────────────────────────────────────
+
+// Renders local file images stored in nota_images/ inside the Quill editor.
+class _LocalImageEmbedBuilder extends EmbedBuilder {
+  const _LocalImageEmbedBuilder();
+
+  @override
+  String get key => BlockEmbed.imageType;
+
+  @override
+  Widget build(BuildContext context, EmbedContext embedContext) {
+    final path = embedContext.node.value.data as String;
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: Spacing.small,
+        horizontal: Spacing.xLarge,
+      ),
+      child: Stack(
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.all(
+              Radius.circular(AppRadius.small),
+            ),
+            child: Image.file(
+              File(path),
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) => const Icon(
+                Icons.broken_image_outlined,
+                size: IconSize.xLarge,
+              ),
+            ),
+          ),
+          Positioned(
+            top: Spacing.xSmall,
+            right: Spacing.xSmall,
+            child: GestureDetector(
+              onTap: () => _removeEmbed(embedContext.controller, path),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.55),
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(Spacing.xSmall),
+                child: const Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: IconSize.xSmall,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _removeEmbed(QuillController controller, String path) {
+    int offset = 0;
+    for (final op in controller.document.toDelta().toList()) {
+      if (op.data is Map && (op.data as Map)['image'] == path) {
+        // Delete the embed (1 char) + the trailing newline (1 char).
+        final docLength = controller.document.length;
+        final deleteLen = (offset + 2 <= docLength) ? 2 : 1;
+        controller.replaceText(offset, deleteLen, '', null);
+        // The tap event propagates to Quill's gesture handler which resets
+        // the cursor to 0 after our replaceText. Restore it in the next frame
+        // using ChangeSource.remote so _changesSub is not triggered.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final target = offset.clamp(0, controller.document.length - 1);
+          controller.updateSelection(
+            TextSelection.collapsed(offset: target),
+            ChangeSource.remote,
+          );
+        });
+        return;
+      }
+      offset += op.length ?? 1;
+    }
+  }
 }

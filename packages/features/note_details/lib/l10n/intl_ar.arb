@@ -7,5 +7,6 @@
   "noteNotFound": "الملاحظة غير موجودة",
   "noteLoadFailed": "فشل تحميل الملاحظة",
   "noteSaveFailed": "فشل حفظ الملاحظة",
-  "noteColor": "لون الملاحظة"
+  "noteColor": "لون الملاحظة",
+  "imageInsertFailed": "فشل إدراج الصورة"
 }

@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'note_details_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -32,4 +31,7 @@ class NoteDetailsLocalizationsZh extends NoteDetailsLocalizations {
 
   @override
   String get noteColor => '笔记颜色';
+
+  @override
+  String get imageInsertFailed => '插入图片失败';
 }

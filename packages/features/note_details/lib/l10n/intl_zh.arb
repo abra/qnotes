@@ -7,5 +7,6 @@
   "noteNotFound": "笔记未找到",
   "noteLoadFailed": "加载笔记失败",
   "noteSaveFailed": "保存笔记失败",
-  "noteColor": "笔记颜色"
+  "noteColor": "笔记颜色",
+  "imageInsertFailed": "插入图片失败"
 }

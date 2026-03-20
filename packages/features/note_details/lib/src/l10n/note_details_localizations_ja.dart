@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'note_details_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -32,4 +31,7 @@ class NoteDetailsLocalizationsJa extends NoteDetailsLocalizations {
 
   @override
   String get noteColor => 'ノートの色';
+
+  @override
+  String get imageInsertFailed => '画像の挿入に失敗しました';
 }

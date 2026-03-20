@@ -53,3 +53,12 @@ class NoteDetailsDeleteRequested extends NoteDetailsEvent {
   @override
   String toString() => 'NoteDetailsDeleteRequested()';
 }
+
+class NoteDetailsImageInserted extends NoteDetailsEvent {
+  NoteDetailsImageInserted(this.sourcePath);
+
+  final String sourcePath;
+
+  @override
+  String toString() => 'NoteDetailsImageInserted()';
+}

@@ -7,5 +7,6 @@
   "noteNotFound": "メモが見つかりません",
   "noteLoadFailed": "メモの読み込みに失敗しました",
   "noteSaveFailed": "メモの保存に失敗しました",
-  "noteColor": "ノートの色"
+  "noteColor": "ノートの色",
+  "imageInsertFailed": "画像の挿入に失敗しました"
 }

@@ -1,11 +1,17 @@
 import 'package:image_files/image_files.dart';
 
 class FakeImageFiles implements ImageFiles {
+  final List<String> savedPaths = [];
   final List<String> deletedPaths = [];
   bool shouldThrow = false;
+  bool saveShouldThrow = false;
 
   @override
-  Future<String> saveImage(String sourcePath) async => sourcePath;
+  Future<String> saveImage(String sourcePath) async {
+    if (saveShouldThrow) throw ImageFilesException('saveImage failed');
+    savedPaths.add(sourcePath);
+    return sourcePath;
+  }
 
   @override
   Future<void> deleteImage(String imagePath) async {

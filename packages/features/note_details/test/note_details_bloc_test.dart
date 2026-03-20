@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image_files/image_files.dart';
 import 'package:note_details/src/note_details_bloc.dart';
 import 'package:shared/shared.dart';
 
@@ -108,6 +109,21 @@ void main() {
         ),
         act: (bloc) => bloc.add(NoteDetailsContentChanged('New content')),
         expect: () => [const NoteDetailsState(content: 'New content')],
+      );
+
+      blocTest<NoteDetailsBloc, NoteDetailsState>(
+        'clears insertedImagePath (one-shot consumption)',
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          imageFiles: FakeImageFiles(),
+          isNew: true,
+        ),
+        seed: () => const NoteDetailsState(insertedImagePath: '/img/a.jpg'),
+        act: (bloc) => bloc.add(NoteDetailsContentChanged('updated')),
+        verify: (bloc) {
+          expect(bloc.state.insertedImagePath, isNull);
+          expect(bloc.state.content, 'updated');
+        },
       );
     });
 
@@ -330,6 +346,93 @@ void main() {
         verify: (bloc) {
           expect(bloc.state.status, NoteDetailsStatus.failure);
           expect(bloc.state.saveError, isA<NoteStorageException>());
+        },
+      );
+
+      test('deletes orphan images removed during editing', () async {
+        final imageFiles = FakeImageFiles();
+        final noteWithImage = _existingNote.copyWith(
+          content:
+              '{"ops":[{"insert":{"image":"/img/old.jpg"}},{"insert":"\\n"}]}',
+        );
+        final bloc = NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(notes: [noteWithImage]),
+          imageFiles: imageFiles,
+          isNew: false,
+        );
+        bloc.add(NoteDetailsStarted(noteId: noteWithImage.id));
+        await bloc.stream.firstWhere(
+          (s) => s.status == NoteDetailsStatus.success,
+        );
+        bloc.add(
+          NoteDetailsContentChanged('{"ops":[{"insert":"hello\\n"}]}'),
+        );
+        bloc.add(NoteDetailsSaved());
+        await bloc.stream.firstWhere(
+          (s) => s.status == NoteDetailsStatus.saved,
+        );
+        expect(imageFiles.deletedPaths, contains('/img/old.jpg'));
+        await bloc.close();
+      });
+
+      test(
+        'emits saved even when orphan image cleanup throws (non-fatal)',
+        () async {
+          final noteWithImage = _existingNote.copyWith(
+            content:
+                '{"ops":[{"insert":{"image":"/img/old.jpg"}},{"insert":"\\n"}]}',
+          );
+          final bloc = NoteDetailsBloc(
+            noteRepository: FakeNoteRepository(notes: [noteWithImage]),
+            imageFiles: FakeImageFiles()..shouldThrow = true,
+            isNew: false,
+          );
+          bloc.add(NoteDetailsStarted(noteId: noteWithImage.id));
+          await bloc.stream.firstWhere(
+            (s) => s.status == NoteDetailsStatus.success,
+          );
+          bloc.add(
+            NoteDetailsContentChanged('{"ops":[{"insert":"hello\\n"}]}'),
+          );
+          bloc.add(NoteDetailsSaved());
+          await bloc.stream.firstWhere(
+            (s) =>
+                s.status == NoteDetailsStatus.saved ||
+                s.status == NoteDetailsStatus.failure,
+          );
+          expect(bloc.state.status, NoteDetailsStatus.saved);
+          await bloc.close();
+        },
+      );
+    });
+
+    group('NoteDetailsImageInserted', () {
+      blocTest<NoteDetailsBloc, NoteDetailsState>(
+        'emits insertedImagePath on success',
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          imageFiles: FakeImageFiles(),
+          isNew: true,
+        ),
+        act: (bloc) => bloc.add(NoteDetailsImageInserted('/tmp/photo.jpg')),
+        verify: (bloc) {
+          expect(bloc.state.insertedImagePath, '/tmp/photo.jpg');
+          expect(bloc.state.imageInsertError, isNull);
+        },
+      );
+
+      blocTest<NoteDetailsBloc, NoteDetailsState>(
+        'emits imageInsertError and no insertedImagePath when saveImage throws',
+        build: () => NoteDetailsBloc(
+          noteRepository: FakeNoteRepository(),
+          imageFiles: FakeImageFiles()..saveShouldThrow = true,
+          isNew: true,
+        ),
+        act: (bloc) => bloc.add(NoteDetailsImageInserted('/tmp/photo.jpg')),
+        verify: (bloc) {
+          expect(bloc.state.imageInsertError, isA<ImageFilesException>());
+          expect(bloc.state.insertedImagePath, isNull);
+          expect(bloc.state.status, NoteDetailsStatus.initial);
         },
       );
     });

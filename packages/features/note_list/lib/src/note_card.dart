@@ -71,68 +71,195 @@ class NoteCard extends StatelessWidget {
                     mainAxisSize: bounded ? MainAxisSize.max : MainAxisSize.min,
                     children: [
                       if (firstImage != null)
-                        SizedBox(
-                          height: 120,
-                          width: double.infinity,
-                          child: Image.file(
-                            File(firstImage),
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => const SizedBox(),
-                          ),
-                        ),
-                      Expanded(
-                        flex: bounded ? 1 : 0,
-                        child: Padding(
-                          padding: const EdgeInsets.all(Spacing.medium),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: bounded
-                                ? MainAxisSize.max
-                                : MainAxisSize.min,
-                            children: [
-                              if (note.title != null || note.isPinned) ...[
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (note.title != null)
-                                      Expanded(
-                                        child: Text(
-                                          note.title!,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleSmall
-                                              ?.copyWith(color: textColor),
-                                          maxLines: titleMaxLines,
-                                          overflow: TextOverflow.ellipsis,
+                        if (bounded)
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (note.title != null || note.isPinned)
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                      Spacing.medium,
+                                      Spacing.medium,
+                                      Spacing.medium,
+                                      0,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        if (note.title != null)
+                                          Expanded(
+                                            child: Text(
+                                              note.title!,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleSmall
+                                                  ?.copyWith(color: textColor),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          )
+                                        else
+                                          const Spacer(),
+                                        if (note.isPinned)
+                                          Icon(
+                                            Icons.push_pin,
+                                            size: IconSize.xSmall,
+                                            color: textColor.withValues(
+                                              alpha: 0.6,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(
+                                      Spacing.medium,
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(AppRadius.small),
+                                      ),
+                                      child: Image.file(
+                                        File(firstImage),
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (_, _, _) =>
+                                            const SizedBox(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          Padding(
+                            padding: const EdgeInsets.all(Spacing.medium),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ClipRRect(
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(AppRadius.small),
+                                  ),
+                                  child: Image.file(
+                                    File(firstImage),
+                                    width: 80,
+                                    height: 80,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, _, _) =>
+                                        const SizedBox(width: 80, height: 80),
+                                  ),
+                                ),
+                                const SizedBox(width: Spacing.medium),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      if (note.title != null ||
+                                          note.isPinned) ...[
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            if (note.title != null)
+                                              Expanded(
+                                                child: Text(
+                                                  note.title!,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .titleSmall
+                                                      ?.copyWith(
+                                                        color: textColor,
+                                                      ),
+                                                  maxLines: titleMaxLines,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              )
+                                            else
+                                              const Spacer(),
+                                            if (note.isPinned)
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                  left: Spacing.xSmall,
+                                                ),
+                                                child: Icon(
+                                                  Icons.push_pin,
+                                                  size: IconSize.xSmall,
+                                                  color: textColor.withValues(
+                                                    alpha: 0.6,
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
                                         ),
-                                      )
-                                    else
-                                      const Spacer(),
-                                    if (note.isPinned)
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: Spacing.xSmall,
-                                        ),
-                                        child: Icon(
-                                          Icons.push_pin,
-                                          size: IconSize.xSmall,
-                                          color: textColor.withValues(
-                                            alpha: 0.6,
+                                        const SizedBox(height: Spacing.xSmall),
+                                      ],
+                                      contentText,
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                      else
+                        Expanded(
+                          flex: bounded ? 1 : 0,
+                          child: Padding(
+                            padding: const EdgeInsets.all(Spacing.medium),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: bounded
+                                  ? MainAxisSize.max
+                                  : MainAxisSize.min,
+                              children: [
+                                if (note.title != null || note.isPinned) ...[
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      if (note.title != null)
+                                        Expanded(
+                                          child: Text(
+                                            note.title!,
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleSmall
+                                                ?.copyWith(color: textColor),
+                                            maxLines: titleMaxLines,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        )
+                                      else
+                                        const Spacer(),
+                                      if (note.isPinned)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: Spacing.xSmall,
+                                          ),
+                                          child: Icon(
+                                            Icons.push_pin,
+                                            size: IconSize.xSmall,
+                                            color: textColor.withValues(
+                                              alpha: 0.6,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(height: Spacing.xSmall),
+                                    ],
+                                  ),
+                                  const SizedBox(height: Spacing.xSmall),
+                                ],
+                                if (bounded)
+                                  Expanded(child: contentText)
+                                else
+                                  contentText,
                               ],
-                              if (bounded)
-                                Expanded(child: contentText)
-                              else
-                                contentText,
-                            ],
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ),

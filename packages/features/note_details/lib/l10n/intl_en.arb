@@ -15,5 +15,7 @@
   "noteSaveFailed": "Failed to save note",
   "@noteSaveFailed": {},
   "noteColor": "Note color",
-  "@noteColor": {}
+  "@noteColor": {},
+  "imageInsertFailed": "Failed to insert image",
+  "@imageInsertFailed": {}
 }

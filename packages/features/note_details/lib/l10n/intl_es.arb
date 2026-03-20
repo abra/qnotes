@@ -7,5 +7,6 @@
   "noteNotFound": "Nota no encontrada",
   "noteLoadFailed": "Error al cargar la nota",
   "noteSaveFailed": "Error al guardar la nota",
-  "noteColor": "Color de nota"
+  "noteColor": "Color de nota",
+  "imageInsertFailed": "Error al insertar la imagen"
 }

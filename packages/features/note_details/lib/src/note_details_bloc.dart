@@ -24,6 +24,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     on<NoteDetailsPinToggled>(_onPinToggled);
     on<NoteDetailsSaved>(_onSaved);
     on<NoteDetailsDeleteRequested>(_onDeleteRequested);
+    on<NoteDetailsImageInserted>(_onImageInserted);
   }
 
   final NoteRepository _repository;
@@ -92,7 +93,22 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     NoteDetailsContentChanged event,
     Emitter<NoteDetailsState> emit,
   ) {
-    emit(state.copyWith(content: event.content));
+    // Clear insertedImagePath: the view has already consumed it to insert the
+    // embed, and the resulting content change is what triggers this handler.
+    emit(state.copyWith(content: event.content, insertedImagePath: null));
+  }
+
+  Future<void> _onImageInserted(
+    NoteDetailsImageInserted event,
+    Emitter<NoteDetailsState> emit,
+  ) async {
+    try {
+      final permanentPath = await _imageFiles.saveImage(event.sourcePath);
+      emit(state.copyWith(insertedImagePath: permanentPath));
+    } catch (e, st) {
+      addError(e, st);
+      emit(state.copyWith(imageInsertError: e));
+    }
   }
 
   void _onColorChanged(
@@ -170,6 +186,17 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
             isPinned: state.isPinned,
           ),
         );
+        // Delete images that were in the original content but removed by the
+        // user during editing. Non-fatal: note is already saved successfully.
+        try {
+          final oldPaths = DeltaUtils.allImagePaths(note.content).toSet();
+          final newPaths = DeltaUtils.allImagePaths(content).toSet();
+          for (final path in oldPaths.difference(newPaths)) {
+            await _imageFiles.deleteImage(path);
+          }
+        } catch (e, st) {
+          addError(e, st);
+        }
       }
       emit(
         state.copyWith(

@@ -1,5 +1,7 @@
 part of 'note_details_bloc.dart';
 
+const Object _kNoInsertedImage = Object();
+
 enum NoteDetailsStatus {
   initial,
   loading,
@@ -22,6 +24,8 @@ class NoteDetailsState extends Equatable {
     this.isPinned = false,
     this.loadError,
     this.saveError,
+    this.imageInsertError,
+    this.insertedImagePath,
   });
 
   final NoteDetailsStatus status;
@@ -38,6 +42,15 @@ class NoteDetailsState extends Equatable {
   final Object? loadError;
   final Object? saveError;
 
+  /// Set to the caught exception when image copy fails in [NoteDetailsImageInserted].
+  /// Each new failure produces a distinct object so the listener always fires.
+  final Object? imageInsertError;
+
+  /// Permanent path of an image just saved by the BLoC, consumed once by the
+  /// view to insert the embed into the Quill editor. Cleared on next content
+  /// change.
+  final String? insertedImagePath;
+
   /// Whether the current content is empty (Delta-aware).
   bool get isContentEmpty => DeltaUtils.isContentEmpty(content);
 
@@ -52,6 +65,8 @@ class NoteDetailsState extends Equatable {
     bool? isPinned,
     Object? loadError,
     Object? saveError,
+    Object? imageInsertError,
+    Object? insertedImagePath = _kNoInsertedImage,
   }) => NoteDetailsState(
     status: status ?? this.status,
     isNew: isNew ?? this.isNew,
@@ -63,6 +78,10 @@ class NoteDetailsState extends Equatable {
     isPinned: isPinned ?? this.isPinned,
     loadError: loadError,
     saveError: saveError,
+    imageInsertError: imageInsertError ?? this.imageInsertError,
+    insertedImagePath: identical(insertedImagePath, _kNoInsertedImage)
+        ? this.insertedImagePath
+        : insertedImagePath as String?,
   );
 
   @override
@@ -77,6 +96,8 @@ class NoteDetailsState extends Equatable {
     isPinned,
     loadError,
     saveError,
+    imageInsertError,
+    insertedImagePath,
   ];
 
   @override

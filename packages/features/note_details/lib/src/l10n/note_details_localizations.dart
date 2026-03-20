@@ -164,6 +164,12 @@ abstract class NoteDetailsLocalizations {
   /// In en, this message translates to:
   /// **'Note color'**
   String get noteColor;
+
+  /// No description provided for @imageInsertFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to insert image'**
+  String get imageInsertFailed;
 }
 
 class _NoteDetailsLocalizationsDelegate

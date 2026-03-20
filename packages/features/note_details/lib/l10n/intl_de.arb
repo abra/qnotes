@@ -7,5 +7,6 @@
   "noteNotFound": "Notiz nicht gefunden",
   "noteLoadFailed": "Notiz konnte nicht geladen werden",
   "noteSaveFailed": "Notiz konnte nicht gespeichert werden",
-  "noteColor": "Notizenfarbe"
+  "noteColor": "Notizenfarbe",
+  "imageInsertFailed": "Bild konnte nicht eingefügt werden"
 }
