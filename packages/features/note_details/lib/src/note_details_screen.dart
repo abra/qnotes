@@ -17,6 +17,17 @@ import 'note_details_bloc.dart';
 
 part 'note_color_picker.dart';
 
+// Converts KeyboardMetrics into a logical-pixel inset for positioning UI above
+// the keyboard. On Android the plugin measures from the physical screen bottom
+// (includes nav bar), so safeAreaBottom is subtracted. On iOS safeAreaBottom
+// is the static home-indicator height that SafeArea already handles.
+double _keyboardInsetFor(KeyboardMetrics metrics) {
+  if (!metrics.isKeyboardVisible) return 0.0;
+  return defaultTargetPlatform == TargetPlatform.android
+      ? metrics.keyboardHeight - metrics.safeAreaBottom
+      : metrics.keyboardHeight;
+}
+
 enum _SecondaryPanelMode { formatting, colors }
 
 // Parses note content into a Quill ops list.
@@ -294,34 +305,12 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
           },
           child: Scaffold(
             resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              backgroundColor: appBarColor,
+            appBar: _NoteDetailsAppBar(
+              color: appBarColor,
               foregroundColor: appBarForeground,
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
-              scrolledUnderElevation: 8,
-              shadowColor: Colors.black.withValues(alpha: 0.3),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => _saveAndPop(context),
-              ),
-              centerTitle: true,
-              title: Text(
-                state.isNew ? l10n.newNote : l10n.editNote,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: appBarForeground,
-                ),
-              ),
-              actions: [
-                if (state.isPinned)
-                  Padding(
-                    padding: const EdgeInsets.only(right: Spacing.mediumLarge),
-                    child: Icon(
-                      Icons.push_pin,
-                      color: appBarForeground.withValues(alpha: 0.6),
-                    ),
-                  ),
-              ],
+              isNew: state.isNew,
+              isPinned: state.isPinned,
+              onBack: () => _saveAndPop(context),
             ),
             body: SafeArea(
               top: false,
@@ -329,18 +318,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
                 stream: SmartKeyboardInsets.instance.metricsStream,
                 initialData: KeyboardMetrics.hidden,
                 builder: (context, snapshot) {
-                  final metrics = snapshot.data ?? KeyboardMetrics.hidden;
-                  // On Android the plugin reports keyboard height from the
-                  // physical bottom (includes nav bar), while viewInsetsOf does
-                  // not. Subtract safeAreaBottom to get the correct content
-                  // inset. On iOS safeAreaBottom is the static home-indicator
-                  // height and must NOT be subtracted (it's already accounted
-                  // for by SafeArea when the keyboard is hidden).
-                  final keyboardInset = metrics.isKeyboardVisible
-                      ? (defaultTargetPlatform == TargetPlatform.android
-                            ? metrics.keyboardHeight - metrics.safeAreaBottom
-                            : metrics.keyboardHeight)
-                      : 0.0;
+                  final keyboardInset = _keyboardInsetFor(
+                    snapshot.data ?? KeyboardMetrics.hidden,
+                  );
                   return Stack(
                     children: [
                       CustomScrollView(
@@ -494,6 +474,63 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
           ),
         );
       },
+    );
+  }
+}
+
+// ─── App bar ──────────────────────────────────────────────────────────────────
+
+// Tinted when the note has a color; otherwise uses the default surface color.
+class _NoteDetailsAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  const _NoteDetailsAppBar({
+    required this.color,
+    required this.foregroundColor,
+    required this.isNew,
+    required this.isPinned,
+    required this.onBack,
+  });
+
+  final Color? color;
+  final Color foregroundColor;
+  final bool isNew;
+  final bool isPinned;
+  final VoidCallback onBack;
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = NoteDetailsLocalizations.of(context)!;
+    return AppBar(
+      backgroundColor: color,
+      foregroundColor: foregroundColor,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 8,
+      shadowColor: Colors.black.withValues(alpha: 0.3),
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: onBack,
+      ),
+      centerTitle: true,
+      title: Text(
+        isNew ? l10n.newNote : l10n.editNote,
+        style: Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(color: foregroundColor),
+      ),
+      actions: [
+        if (isPinned)
+          Padding(
+            padding: const EdgeInsets.only(right: Spacing.mediumLarge),
+            child: Icon(
+              Icons.push_pin,
+              color: foregroundColor.withValues(alpha: 0.6),
+            ),
+          ),
+      ],
     );
   }
 }

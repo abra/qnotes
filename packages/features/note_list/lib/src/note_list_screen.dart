@@ -101,6 +101,17 @@ class NoteListView extends StatelessWidget {
 // clearance so the last note is not hidden behind the bar.
 const double _bottomBarClearance = 70;
 
+// Converts KeyboardMetrics into a logical-pixel inset for positioning UI above
+// the keyboard. On Android the plugin measures from the physical screen bottom
+// (includes nav bar), so safeAreaBottom is subtracted. On iOS safeAreaBottom
+// is the static home-indicator height that SafeArea already handles.
+double _keyboardInsetFor(KeyboardMetrics metrics) {
+  if (!metrics.isKeyboardVisible) return 0.0;
+  return defaultTargetPlatform == TargetPlatform.android
+      ? metrics.keyboardHeight - metrics.safeAreaBottom
+      : metrics.keyboardHeight;
+}
+
 class _NoteListScaffold extends StatelessWidget {
   const _NoteListScaffold({
     required this.state,
@@ -166,50 +177,20 @@ class _NoteListScaffold extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: state.isSelectionMode
-          ? AppBar(
-              scrolledUnderElevation: 8,
-              shadowColor: Colors.black.withValues(alpha: 0.3),
-              leading: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => bloc.add(NoteListSelectionCleared()),
-              ),
-              title: Text(l10n.selected(state.selectedIds.length)),
-              actions: [
-                IconButton(
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () => _deleteSelected(context),
-                ),
-              ],
+          ? _NoteListSelectionAppBar(
+              selectedCount: state.selectedIds.length,
+              onClose: () => bloc.add(NoteListSelectionCleared()),
+              onDelete: () => _deleteSelected(context),
             )
-          : AppBar(
-              scrolledUnderElevation: 8,
-              shadowColor: Colors.black.withValues(alpha: 0.3),
-              title: Row(
-                mainAxisSize: MainAxisSize.min,
-                spacing: Spacing.small,
-                children: const [
-                  NotaLogo(size: 22),
-                  Text('Nota'),
-                ],
-              ),
-            ),
+          : const _NoteListAppBar(),
       body: SafeArea(
         child: StreamBuilder<KeyboardMetrics>(
           stream: SmartKeyboardInsets.instance.metricsStream,
           initialData: KeyboardMetrics.hidden,
           builder: (context, snapshot) {
-            final metrics = snapshot.data ?? KeyboardMetrics.hidden;
-            // On Android the plugin reports keyboard height from the physical
-            // bottom (includes nav bar), while viewInsetsOf does not. Subtract
-            // safeAreaBottom to get the correct content inset. On iOS
-            // safeAreaBottom is the static home-indicator height and must NOT
-            // be subtracted (it's already accounted for by SafeArea when the
-            // keyboard is hidden).
-            final keyboardInset = metrics.isKeyboardVisible
-                ? (defaultTargetPlatform == TargetPlatform.android
-                      ? metrics.keyboardHeight - metrics.safeAreaBottom
-                      : metrics.keyboardHeight)
-                : 0.0;
+            final keyboardInset = _keyboardInsetFor(
+              snapshot.data ?? KeyboardMetrics.hidden,
+            );
             return Stack(
               children: [
                 if (state.status == NoteListStatus.failure)
@@ -276,6 +257,67 @@ class _NoteListScaffold extends StatelessWidget {
           },
         ),
       ),
+    );
+  }
+}
+
+// Default app bar shown when no notes are selected.
+class _NoteListAppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _NoteListAppBar();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      scrolledUnderElevation: 8,
+      shadowColor: Colors.black.withValues(alpha: 0.3),
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        spacing: Spacing.small,
+        children: const [
+          NotaLogo(size: 22),
+          Text('Nota'),
+        ],
+      ),
+    );
+  }
+}
+
+// App bar shown in multi-select mode with a delete action.
+class _NoteListSelectionAppBar extends StatelessWidget
+    implements PreferredSizeWidget {
+  const _NoteListSelectionAppBar({
+    required this.selectedCount,
+    required this.onClose,
+    required this.onDelete,
+  });
+
+  final int selectedCount;
+  final VoidCallback onClose;
+  final VoidCallback onDelete;
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = NoteListLocalizations.of(context)!;
+    return AppBar(
+      scrolledUnderElevation: 8,
+      shadowColor: Colors.black.withValues(alpha: 0.3),
+      leading: IconButton(
+        icon: const Icon(Icons.close),
+        onPressed: onClose,
+      ),
+      title: Text(l10n.selected(selectedCount)),
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.delete_outline),
+          onPressed: onDelete,
+        ),
+      ],
     );
   }
 }
