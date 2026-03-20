@@ -14,6 +14,7 @@ import 'package:toast_service/toast_service.dart';
 
 import 'l10n/note_details_localizations.dart';
 import 'note_details_bloc.dart';
+import 'quill_content.dart';
 
 part 'note_color_picker.dart';
 
@@ -29,19 +30,6 @@ double _keyboardInsetFor(KeyboardMetrics metrics) {
 }
 
 enum _SecondaryPanelMode { formatting, colors }
-
-// Parses note content into a Quill ops list.
-// Handles canonical {"ops":[...]} Delta, legacy bare [...] array, and plain text.
-List<dynamic> _opsFromContent(String content) {
-  try {
-    final decoded = jsonDecode(content);
-    if (decoded is Map) return decoded['ops'] as List<dynamic>;
-    if (decoded is List) return decoded; // legacy bare-array format
-  } catch (_) {}
-  return [
-    {'insert': '$content\n'},
-  ];
-}
 
 class NoteDetailsScreen extends StatelessWidget {
   const NoteDetailsScreen({
@@ -92,11 +80,18 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
   bool _isPanelOpen = false;
   bool _isMicActive = false;
 
+  // Disable rich-text paste from external apps: HTML from the clipboard
+  // brings unwanted styles (background colors, font sizes, etc.).
+  static const _controllerConfig = QuillControllerConfig(
+    // ignore: experimental_member_use
+    clipboardConfig: QuillClipboardConfig(enableExternalRichPaste: false),
+  );
+
   @override
   void initState() {
     super.initState();
     _titleController = TextEditingController();
-    _quillController = QuillController.basic();
+    _quillController = QuillController.basic(config: _controllerConfig);
     _quillFocusNode = FocusNode();
     _quillScrollController = ScrollController();
     _toolbarAnimController = AnimationController(
@@ -136,7 +131,8 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
 
   QuillController _controllerFromContent(String content) {
     return QuillController(
-      document: Document.fromJson(_opsFromContent(content)),
+      config: _controllerConfig,
+      document: Document.fromJson(opsFromContent(content)),
       selection: const TextSelection.collapsed(offset: 0),
     );
   }
