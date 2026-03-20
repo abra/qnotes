@@ -76,8 +76,6 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
   late final AnimationController _toolbarAnimController;
   late final Animation<double> _toolbarAnimation;
   StreamSubscription<DocChange>? _changesSub;
-  StreamSubscription<KeyboardMetrics>? _keyboardSub;
-  KeyboardMetrics _keyboardMetrics = KeyboardMetrics.hidden;
   bool _contentInitialized = false;
   _SecondaryPanelMode _activePanel = _SecondaryPanelMode.formatting;
   bool _isPanelOpen = false;
@@ -100,18 +98,11 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
       reverseCurve: Curves.easeIn,
     );
     _subscribeToChanges();
-    _keyboardSub = SmartKeyboardInsets.instance.metricsStream.listen(
-      (metrics) {
-        if (!mounted || metrics == _keyboardMetrics) return;
-        setState(() => _keyboardMetrics = metrics);
-      },
-    );
   }
 
   @override
   void dispose() {
     _titleController.dispose();
-    _keyboardSub?.cancel();
     _changesSub?.cancel();
     _quillController.dispose();
     _quillFocusNode.dispose();
@@ -295,12 +286,6 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
             ? state.color.onColor
             : Theme.of(context).colorScheme.onSurface;
         final scaffoldBg = Theme.of(context).scaffoldBackgroundColor;
-        final keyboardInset = _keyboardMetrics.isKeyboardVisible
-            ? (defaultTargetPlatform == TargetPlatform.android
-                  ? _keyboardMetrics.keyboardHeight -
-                        _keyboardMetrics.safeAreaBottom
-                  : _keyboardMetrics.keyboardHeight)
-            : 0.0;
 
         return PopScope(
           canPop: false,
@@ -340,143 +325,170 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
             ),
             body: SafeArea(
               top: false,
-              child: Stack(
-                children: [
-                  CustomScrollView(
-                    slivers: [
-                      SliverPadding(
-                        padding: const EdgeInsets.fromLTRB(
-                          Spacing.mediumLarge,
-                          Spacing.medium,
-                          Spacing.mediumLarge,
-                          0,
-                        ),
-                        sliver: SliverToBoxAdapter(
-                          child: TextField(
-                            controller: _titleController,
-                            onChanged: (v) => context
-                                .read<NoteDetailsBloc>()
-                                .add(NoteDetailsTitleChanged(v)),
-                            style: Theme.of(context).textTheme.headlineSmall
-                                ?.copyWith(fontWeight: FontWeight.bold),
-                            decoration: InputDecoration(
-                              hintText: l10n.titleHint,
-                              border: InputBorder.none,
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: Spacing.xSmall,
+              child: StreamBuilder<KeyboardMetrics>(
+                stream: SmartKeyboardInsets.instance.metricsStream,
+                initialData: KeyboardMetrics.hidden,
+                builder: (context, snapshot) {
+                  final metrics = snapshot.data ?? KeyboardMetrics.hidden;
+                  // On Android the plugin reports keyboard height from the
+                  // physical bottom (includes nav bar), while viewInsetsOf does
+                  // not. Subtract safeAreaBottom to get the correct content
+                  // inset. On iOS safeAreaBottom is the static home-indicator
+                  // height and must NOT be subtracted (it's already accounted
+                  // for by SafeArea when the keyboard is hidden).
+                  final keyboardInset = metrics.isKeyboardVisible
+                      ? (defaultTargetPlatform == TargetPlatform.android
+                            ? metrics.keyboardHeight - metrics.safeAreaBottom
+                            : metrics.keyboardHeight)
+                      : 0.0;
+                  return Stack(
+                    children: [
+                      CustomScrollView(
+                        slivers: [
+                          SliverPadding(
+                            padding: const EdgeInsets.fromLTRB(
+                              Spacing.mediumLarge,
+                              Spacing.medium,
+                              Spacing.mediumLarge,
+                              0,
+                            ),
+                            sliver: SliverToBoxAdapter(
+                              child: TextField(
+                                controller: _titleController,
+                                onChanged: (v) => context
+                                    .read<NoteDetailsBloc>()
+                                    .add(NoteDetailsTitleChanged(v)),
+                                style:
+                                    Theme.of(
+                                      context,
+                                    ).textTheme.headlineSmall?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                decoration: InputDecoration(
+                                  hintText: l10n.titleHint,
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: Spacing.xSmall,
+                                  ),
+                                ),
+                                maxLines: null,
+                                keyboardType: TextInputType.text,
+                                textInputAction: TextInputAction.next,
                               ),
                             ),
-                            maxLines: null,
-                            keyboardType: TextInputType.text,
-                            textInputAction: TextInputAction.next,
                           ),
-                        ),
+                          SliverFillRemaining(
+                            hasScrollBody: false,
+                            // Bottom padding grows as the secondary panel slides
+                            // in, keeping the last line of text above the
+                            // toolbar stack.
+                            child: AnimatedBuilder(
+                              animation: _toolbarAnimation,
+                              builder: (context, child) => Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                  Spacing.mediumLarge,
+                                  Spacing.small,
+                                  Spacing.mediumLarge,
+                                  _toolbarClearance +
+                                      _toolbarAnimation.value *
+                                          (_secondaryPanelHeight +
+                                              Spacing.small) +
+                                      keyboardInset,
+                                ),
+                                child: child,
+                              ),
+                              child: QuillEditor(
+                                controller: _quillController,
+                                focusNode: _quillFocusNode,
+                                scrollController: _quillScrollController,
+                                config: QuillEditorConfig(
+                                  placeholder: l10n.contentHint,
+                                  scrollable: false,
+                                  expands: false,
+                                  padding: EdgeInsets.zero,
+                                  autoFocus: false,
+                                  customStyles: _buildEditorStyles(context),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      SliverFillRemaining(
-                        hasScrollBody: false,
-                        // Bottom padding grows as the secondary panel slides in,
-                        // keeping the last line of text above the toolbar stack.
-                        child: AnimatedBuilder(
-                          animation: _toolbarAnimation,
-                          builder: (context, child) => Padding(
-                            padding: EdgeInsets.fromLTRB(
-                              Spacing.mediumLarge,
-                              Spacing.small,
-                              Spacing.mediumLarge,
-                              _toolbarClearance +
+                      // Gradient fade behind the toolbar so content scrolls
+                      // under smoothly.
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: IgnorePointer(
+                          child: AnimatedBuilder(
+                            animation: _toolbarAnimation,
+                            builder: (context, _) => Container(
+                              height:
+                                  _toolbarClearance +
                                   _toolbarAnimation.value *
                                       (_secondaryPanelHeight + Spacing.small) +
                                   keyboardInset,
-                            ),
-                            child: child,
-                          ),
-                          child: QuillEditor(
-                            controller: _quillController,
-                            focusNode: _quillFocusNode,
-                            scrollController: _quillScrollController,
-                            config: QuillEditorConfig(
-                              placeholder: l10n.contentHint,
-                              scrollable: false,
-                              expands: false,
-                              padding: EdgeInsets.zero,
-                              autoFocus: false,
-                              customStyles: _buildEditorStyles(context),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    scaffoldBg.withValues(alpha: 0),
+                                    scaffoldBg,
+                                  ],
+                                ),
+                              ),
                             ),
                           ),
+                        ),
+                      ),
+                      Positioned(
+                        left: Spacing.mediumLarge,
+                        right: Spacing.mediumLarge,
+                        bottom: Spacing.mediumLarge + keyboardInset,
+                        child: _NoteToolbar(
+                          // Key forces a full rebuild when the controller is
+                          // replaced (happens once, on first note load).
+                          key: ObjectKey(_quillController),
+                          controller: _quillController,
+                          animation: _toolbarAnimation,
+                          activePanel: _activePanel,
+                          isSecondaryOpen: _isPanelOpen,
+                          isPinned: state.isPinned,
+                          noteColor: state.color,
+                          onToggleFormatting: () =>
+                              _togglePanel(_SecondaryPanelMode.formatting),
+                          onToggleColors: () =>
+                              _togglePanel(_SecondaryPanelMode.colors),
+                          onImagePressed: () {},
+                          isMicActive: _isMicActive,
+                          onMicPressed: () =>
+                              setState(() => _isMicActive = !_isMicActive),
+                          onPinToggled: () =>
+                              context.read<NoteDetailsBloc>().add(
+                                NoteDetailsPinToggled(),
+                              ),
+                          onColorSelected: (color) =>
+                              context.read<NoteDetailsBloc>().add(
+                                NoteDetailsColorChanged(color),
+                              ),
+                          onNewLine: () {
+                            final offset =
+                                _quillController.selection.extentOffset;
+                            _quillController.replaceText(
+                              offset,
+                              0,
+                              '\n',
+                              TextSelection.collapsed(offset: offset + 1),
+                            );
+                          },
                         ),
                       ),
                     ],
-                  ),
-                  // Gradient fade behind the toolbar so content scrolls under smoothly.
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: IgnorePointer(
-                      child: AnimatedBuilder(
-                        animation: _toolbarAnimation,
-                        builder: (context, _) => Container(
-                          height:
-                              _toolbarClearance +
-                              _toolbarAnimation.value *
-                                  (_secondaryPanelHeight + Spacing.small) +
-                              keyboardInset,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [
-                                scaffoldBg.withValues(alpha: 0),
-                                scaffoldBg,
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    left: Spacing.mediumLarge,
-                    right: Spacing.mediumLarge,
-                    bottom: Spacing.mediumLarge + keyboardInset,
-                    child: _NoteToolbar(
-                      // Key forces a full rebuild when the controller is replaced
-                      // (happens once, on first note load).
-                      key: ObjectKey(_quillController),
-                      controller: _quillController,
-                      animation: _toolbarAnimation,
-                      activePanel: _activePanel,
-                      isSecondaryOpen: _isPanelOpen,
-                      isPinned: state.isPinned,
-                      noteColor: state.color,
-                      onToggleFormatting: () =>
-                          _togglePanel(_SecondaryPanelMode.formatting),
-                      onToggleColors: () =>
-                          _togglePanel(_SecondaryPanelMode.colors),
-                      onImagePressed: () {},
-                      isMicActive: _isMicActive,
-                      onMicPressed: () =>
-                          setState(() => _isMicActive = !_isMicActive),
-                      onPinToggled: () => context.read<NoteDetailsBloc>().add(
-                        NoteDetailsPinToggled(),
-                      ),
-                      onColorSelected: (color) =>
-                          context.read<NoteDetailsBloc>().add(
-                            NoteDetailsColorChanged(color),
-                          ),
-                      onNewLine: () {
-                        final offset = _quillController.selection.extentOffset;
-                        _quillController.replaceText(
-                          offset,
-                          0,
-                          '\n',
-                          TextSelection.collapsed(offset: offset + 1),
-                        );
-                      },
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
           ),

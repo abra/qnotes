@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:component_library/component_library.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -103,7 +101,7 @@ class NoteListView extends StatelessWidget {
 // clearance so the last note is not hidden behind the bar.
 const double _bottomBarClearance = 70;
 
-class _NoteListScaffold extends StatefulWidget {
+class _NoteListScaffold extends StatelessWidget {
   const _NoteListScaffold({
     required this.state,
     required this.viewMode,
@@ -119,40 +117,6 @@ class _NoteListScaffold extends StatefulWidget {
   final Future<Note?> Function(Note)? onNotePressed;
   final Future<Note?> Function()? onAddPressed;
   final void Function(BuildContext)? onSettingsPressed;
-
-  @override
-  State<_NoteListScaffold> createState() => _NoteListScaffoldState();
-}
-
-class _NoteListScaffoldState extends State<_NoteListScaffold> {
-  StreamSubscription<KeyboardMetrics>? _keyboardSub;
-  KeyboardMetrics _keyboardMetrics = KeyboardMetrics.hidden;
-
-  @override
-  void initState() {
-    super.initState();
-    _keyboardSub = SmartKeyboardInsets.instance.metricsStream.listen(
-      (metrics) {
-        if (!mounted || metrics == _keyboardMetrics) return;
-        setState(() => _keyboardMetrics = metrics);
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _keyboardSub?.cancel();
-    super.dispose();
-  }
-
-  // Forwarding getters so build/methods below need no widget. prefix.
-  NoteListState get state => widget.state;
-  NoteViewMode get viewMode => widget.viewMode;
-  NoteListDensity get density => widget.density;
-  Future<Note?> Function(Note)? get onNotePressed => widget.onNotePressed;
-  Future<Note?> Function()? get onAddPressed => widget.onAddPressed;
-  void Function(BuildContext)? get onSettingsPressed =>
-      widget.onSettingsPressed;
 
   Future<void> _openNote(BuildContext context, Note note) async {
     final updated = await onNotePressed!(note);
@@ -199,18 +163,6 @@ class _NoteListScaffoldState extends State<_NoteListScaffold> {
     final notes = state.filteredNotes;
     final l10n = NoteListLocalizations.of(context)!;
 
-    // On Android the plugin reports keyboard height from the physical bottom
-    // (includes nav bar), while viewInsetsOf does not. Subtract safeAreaBottom
-    // to get the correct content inset. On iOS safeAreaBottom is the static
-    // home-indicator height and must NOT be subtracted (it's already accounted
-    // for by SafeArea when the keyboard is hidden).
-    final keyboardInset = _keyboardMetrics.isKeyboardVisible
-        ? (defaultTargetPlatform == TargetPlatform.android
-              ? _keyboardMetrics.keyboardHeight -
-                    _keyboardMetrics.safeAreaBottom
-              : _keyboardMetrics.keyboardHeight)
-        : 0.0;
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: state.isSelectionMode
@@ -242,66 +194,86 @@ class _NoteListScaffoldState extends State<_NoteListScaffold> {
               ),
             ),
       body: SafeArea(
-        child: Stack(
-          children: [
-            if (state.status == NoteListStatus.failure)
-              ErrorState(
-                message: l10n.loadFailed,
-                retryLabel: l10n.retry,
-                onRetry: () =>
-                    context.read<NoteListBloc>().add(NoteListStarted()),
-              )
-            else if (state.status == NoteListStatus.loading)
-              const CenteredCircularProgressIndicator()
-            else if (notes.isEmpty && !state.isSelectionMode)
-              EmptyState(message: l10n.emptyState)
-            else if (viewMode == NoteViewMode.grid)
-              NotePagedGridView(
-                notes: notes,
-                selectedIds: state.selectedIds,
-                isSelectionMode: state.isSelectionMode,
-                bottomPadding: state.isSelectionMode
-                    ? 0
-                    : _bottomBarClearance + keyboardInset,
-                onNotePressed: onNotePressed == null
-                    ? null
-                    : (note) => _openNote(context, note),
-                onNoteDeleted: (id) => _deleteNote(context, id),
-                onNoteLongPressed: (id) =>
-                    bloc.add(NoteListSelectionToggled(id)),
-              )
-            else
-              NotePagedListView(
-                notes: notes,
-                density: density,
-                selectedIds: state.selectedIds,
-                isSelectionMode: state.isSelectionMode,
-                bottomPadding: state.isSelectionMode
-                    ? 0
-                    : _bottomBarClearance + keyboardInset,
-                onNotePressed: onNotePressed == null
-                    ? null
-                    : (note) => _openNote(context, note),
-                onNoteDeleted: (id) => _deleteNote(context, id),
-                onNoteLongPressed: (id) =>
-                    bloc.add(NoteListSelectionToggled(id)),
-              ),
-            if (!state.isSelectionMode)
-              FadeGradientOverlay(height: _bottomBarClearance + keyboardInset),
-            if (!state.isSelectionMode)
-              Positioned(
-                left: Spacing.mediumLarge,
-                right: Spacing.mediumLarge,
-                bottom: Spacing.mediumLarge + keyboardInset,
-                child: _BottomBar(
-                  onAddPressed: onAddPressed == null
-                      ? null
-                      : () => _addNote(context),
-                  onQueryChanged: (q) => bloc.add(NoteListQueryChanged(q)),
-                  onSettingsPressed: onSettingsPressed,
-                ),
-              ),
-          ],
+        child: StreamBuilder<KeyboardMetrics>(
+          stream: SmartKeyboardInsets.instance.metricsStream,
+          initialData: KeyboardMetrics.hidden,
+          builder: (context, snapshot) {
+            final metrics = snapshot.data ?? KeyboardMetrics.hidden;
+            // On Android the plugin reports keyboard height from the physical
+            // bottom (includes nav bar), while viewInsetsOf does not. Subtract
+            // safeAreaBottom to get the correct content inset. On iOS
+            // safeAreaBottom is the static home-indicator height and must NOT
+            // be subtracted (it's already accounted for by SafeArea when the
+            // keyboard is hidden).
+            final keyboardInset = metrics.isKeyboardVisible
+                ? (defaultTargetPlatform == TargetPlatform.android
+                      ? metrics.keyboardHeight - metrics.safeAreaBottom
+                      : metrics.keyboardHeight)
+                : 0.0;
+            return Stack(
+              children: [
+                if (state.status == NoteListStatus.failure)
+                  ErrorState(
+                    message: l10n.loadFailed,
+                    retryLabel: l10n.retry,
+                    onRetry: () =>
+                        context.read<NoteListBloc>().add(NoteListStarted()),
+                  )
+                else if (state.status == NoteListStatus.loading)
+                  const CenteredCircularProgressIndicator()
+                else if (notes.isEmpty && !state.isSelectionMode)
+                  EmptyState(message: l10n.emptyState)
+                else if (viewMode == NoteViewMode.grid)
+                  NotePagedGridView(
+                    notes: notes,
+                    selectedIds: state.selectedIds,
+                    isSelectionMode: state.isSelectionMode,
+                    bottomPadding: state.isSelectionMode
+                        ? 0
+                        : _bottomBarClearance + keyboardInset,
+                    onNotePressed: onNotePressed == null
+                        ? null
+                        : (note) => _openNote(context, note),
+                    onNoteDeleted: (id) => _deleteNote(context, id),
+                    onNoteLongPressed: (id) =>
+                        bloc.add(NoteListSelectionToggled(id)),
+                  )
+                else
+                  NotePagedListView(
+                    notes: notes,
+                    density: density,
+                    selectedIds: state.selectedIds,
+                    isSelectionMode: state.isSelectionMode,
+                    bottomPadding: state.isSelectionMode
+                        ? 0
+                        : _bottomBarClearance + keyboardInset,
+                    onNotePressed: onNotePressed == null
+                        ? null
+                        : (note) => _openNote(context, note),
+                    onNoteDeleted: (id) => _deleteNote(context, id),
+                    onNoteLongPressed: (id) =>
+                        bloc.add(NoteListSelectionToggled(id)),
+                  ),
+                if (!state.isSelectionMode)
+                  FadeGradientOverlay(
+                    height: _bottomBarClearance + keyboardInset,
+                  ),
+                if (!state.isSelectionMode)
+                  Positioned(
+                    left: Spacing.mediumLarge,
+                    right: Spacing.mediumLarge,
+                    bottom: Spacing.mediumLarge + keyboardInset,
+                    child: _BottomBar(
+                      onAddPressed: onAddPressed == null
+                          ? null
+                          : () => _addNote(context),
+                      onQueryChanged: (q) => bloc.add(NoteListQueryChanged(q)),
+                      onSettingsPressed: onSettingsPressed,
+                    ),
+                  ),
+              ],
+            );
+          },
         ),
       ),
     );
