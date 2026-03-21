@@ -5,6 +5,7 @@
   "emptyState": "Keine Notizen",
   "searchHint": "Suchen",
   "noteDeleteFailed": "Notiz konnte nicht gelöscht werden",
+  "noteUpdateFailed": "Notiz konnte nicht aktualisiert werden",
   "loadFailed": "Notizen konnten nicht geladen werden",
   "retry": "Erneut versuchen"
 }

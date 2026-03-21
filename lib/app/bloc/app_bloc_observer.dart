@@ -4,6 +4,7 @@
 // Registered once in starter.dart via Bloc.observer so that individual
 // blocs do not need their own logging logic.
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:monitoring/monitoring.dart';
 import 'package:nota/utils/string_extension.dart';
@@ -24,11 +25,13 @@ class AppBlocObserver extends BlocObserver {
     final logMessage = StringBuffer()
       ..writeln('Bloc: ${bloc.runtimeType}')
       ..writeln('Event: ${transition.event.runtimeType}')
-      ..writeln(
-        'Transition: ${transition.currentState} =>\n'
-        '           ${transition.nextState}',
-      )
-      ..write('New State: ${transition.nextState?.toString().limit(150)}\n');
+      ..write('State: ${transition.nextState.runtimeType}');
+
+    if (kDebugMode) {
+      logMessage.write(
+        '\nDetails: ${transition.nextState?.toString().limit(150)}',
+      );
+    }
 
     logger.info(logMessage.toString());
     super.onTransition(bloc, transition);
@@ -38,8 +41,11 @@ class AppBlocObserver extends BlocObserver {
   void onEvent(Bloc<Object?, Object?> bloc, Object? event) {
     final logMessage = StringBuffer()
       ..writeln('Bloc: ${bloc.runtimeType}')
-      ..writeln('Event: ${event.runtimeType}')
-      ..write('Details: ${event?.toString().limit(200)}');
+      ..write('Event: ${event.runtimeType}');
+
+    if (kDebugMode) {
+      logMessage.write('\nDetails: ${event?.toString().limit(200)}');
+    }
 
     logger.info(logMessage.toString());
     super.onEvent(bloc, event);

@@ -5,6 +5,7 @@
   "emptyState": "メモがありません",
   "searchHint": "検索",
   "noteDeleteFailed": "メモの削除に失敗しました",
+  "noteUpdateFailed": "メモの更新に失敗しました",
   "loadFailed": "メモの読み込みに失敗しました",
   "retry": "再試行"
 }

@@ -65,15 +65,17 @@ class NoteListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<NoteListBloc, NoteListState>(
-      listenWhen: (prev, curr) => prev.deleteError != curr.deleteError,
+      listenWhen: (prev, curr) =>
+          prev.operationFailure != curr.operationFailure,
       listener: (context, state) {
-        if (state.deleteError != null) {
+        final failure = state.operationFailure;
+        if (failure != null) {
           final l10n = NoteListLocalizations.of(context)!;
-          showToast(
-            context,
-            type: NotificationType.error,
-            message: l10n.noteDeleteFailed,
-          );
+          final message = switch (failure.operation) {
+            NoteListFailedOperation.delete => l10n.noteDeleteFailed,
+            NoteListFailedOperation.update => l10n.noteUpdateFailed,
+          };
+          showToast(context, type: NotificationType.error, message: message);
         }
       },
       buildWhen: (prev, curr) =>
@@ -287,9 +289,14 @@ class _NoteListAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Row(
         mainAxisSize: MainAxisSize.min,
         spacing: Spacing.small,
-        children: const [
-          Image(image: AssetImage('assets/nota.png'), width: 24, height: 24),
-          Text('Nota'),
+        children: [
+          Image(
+            image: const AssetImage('assets/nota.png'),
+            width: 24,
+            height: 24,
+            errorBuilder: (_, __, ___) => const SizedBox(width: 24, height: 24),
+          ),
+          const Text('Nota'),
         ],
       ),
     );

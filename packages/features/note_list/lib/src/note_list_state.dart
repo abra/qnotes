@@ -2,7 +2,9 @@ part of 'note_list_bloc.dart';
 
 enum NoteListStatus { initial, loading, success, failure }
 
-const Object _kDeleteErrorAbsent = Object();
+enum NoteListFailedOperation { delete, update }
+
+const Object _kOperationFailureAbsent = Object();
 
 class NoteListState extends Equatable {
   const NoteListState({
@@ -10,7 +12,7 @@ class NoteListState extends Equatable {
     this.notes = const [],
     this.query = '',
     this.selectedIds = const {},
-    this.deleteError,
+    this.operationFailure,
     this.noteViewMode = NoteViewMode.grid,
     this.noteListDensity = NoteListDensity.threeLines,
   });
@@ -19,7 +21,7 @@ class NoteListState extends Equatable {
   final List<Note> notes;
   final String query;
   final Set<String> selectedIds;
-  final Object? deleteError;
+  final ({Object error, NoteListFailedOperation operation})? operationFailure;
   final NoteViewMode noteViewMode;
   final NoteListDensity noteListDensity;
 
@@ -42,7 +44,7 @@ class NoteListState extends Equatable {
     List<Note>? notes,
     String? query,
     Set<String>? selectedIds,
-    Object? deleteError = _kDeleteErrorAbsent,
+    Object? operationFailure = _kOperationFailureAbsent,
     NoteViewMode? noteViewMode,
     NoteListDensity? noteListDensity,
   }) => NoteListState(
@@ -50,9 +52,10 @@ class NoteListState extends Equatable {
     notes: notes ?? this.notes,
     query: query ?? this.query,
     selectedIds: selectedIds ?? this.selectedIds,
-    deleteError: identical(deleteError, _kDeleteErrorAbsent)
-        ? this.deleteError
-        : deleteError,
+    operationFailure: identical(operationFailure, _kOperationFailureAbsent)
+        ? this.operationFailure
+        : operationFailure
+              as ({Object error, NoteListFailedOperation operation})?,
     noteViewMode: noteViewMode ?? this.noteViewMode,
     noteListDensity: noteListDensity ?? this.noteListDensity,
   );
@@ -63,7 +66,7 @@ class NoteListState extends Equatable {
     notes,
     query,
     selectedIds,
-    deleteError,
+    operationFailure,
     noteViewMode,
     noteListDensity,
   ];

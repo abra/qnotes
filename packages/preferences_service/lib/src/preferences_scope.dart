@@ -15,9 +15,18 @@ class PreferencesScope extends StatelessWidget {
   final Widget child;
 
   /// Returns current [Preferences] and subscribes to changes.
-  static Preferences of(BuildContext context) => context
-      .dependOnInheritedWidgetOfExactType<_PreferencesInherited>()!
-      .preferences;
+  static Preferences of(BuildContext context) {
+    final scope = context
+        .dependOnInheritedWidgetOfExactType<_PreferencesInherited>();
+    if (scope == null) {
+      throw FlutterError(
+        'PreferencesScope.of() called with a context that does not contain '
+        'a PreferencesScope.\n'
+        'Ensure the widget tree includes a PreferencesScope ancestor.',
+      );
+    }
+    return scope.preferences;
+  }
 
   @override
   Widget build(BuildContext context) {

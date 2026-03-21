@@ -5,6 +5,7 @@
   "emptyState": "لا توجد ملاحظات",
   "searchHint": "بحث",
   "noteDeleteFailed": "فشل حذف الملاحظة",
+  "noteUpdateFailed": "فشل تحديث الملاحظة",
   "loadFailed": "فشل تحميل الملاحظات",
   "retry": "إعادة المحاولة"
 }

@@ -147,6 +147,12 @@ abstract class NoteListLocalizations {
   /// **'Failed to delete note'**
   String get noteDeleteFailed;
 
+  /// No description provided for @noteUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update note'**
+  String get noteUpdateFailed;
+
   /// No description provided for @loadFailed.
   ///
   /// In en, this message translates to:

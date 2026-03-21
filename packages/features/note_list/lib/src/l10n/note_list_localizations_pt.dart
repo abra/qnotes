@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'note_list_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -33,6 +32,9 @@ class NoteListLocalizationsPt extends NoteListLocalizations {
 
   @override
   String get noteDeleteFailed => 'Falha ao excluir nota';
+
+  @override
+  String get noteUpdateFailed => 'Falha ao atualizar nota';
 
   @override
   String get loadFailed => 'Falha ao carregar notas';

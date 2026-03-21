@@ -71,18 +71,21 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
       await _repository.deleteNote(event.id);
     } on NoteStorageException catch (e, st) {
       addError(e, st);
-      emit(state.copyWith(deleteError: e));
+      emit(
+        state.copyWith(
+          operationFailure: (
+            error: e,
+            operation: NoteListFailedOperation.delete,
+          ),
+        ),
+      );
       return;
     }
     if (note != null) {
-      try {
-        await _imageFiles.deleteImagesFromContent(note.content);
-      } catch (e, st) {
-        addError(e, st);
-      }
+      await _deleteUnreferencedImages(note.content);
     }
     final notes = state.notes.where((n) => n.id != event.id).toList();
-    emit(state.copyWith(notes: notes, deleteError: null));
+    emit(state.copyWith(notes: notes, operationFailure: null));
   }
 
   void _onNoteUpdated(NoteListNoteUpdated event, Emitter<NoteListState> emit) {
@@ -111,14 +114,22 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
   ) async {
     final ids = state.selectedIds;
     final selected = state.notes.where((n) => ids.contains(n.id)).toList();
-    final updated = selected
+    final toggled = selected
         .map((n) => n.copyWith(isPinned: !n.isPinned))
         .toList();
+    List<Note> updated;
     try {
-      await Future.wait(updated.map(_repository.updateNote));
+      updated = await _repository.updateNotes(toggled);
     } on NoteStorageException catch (e, st) {
       addError(e, st);
-      emit(state.copyWith(deleteError: e));
+      emit(
+        state.copyWith(
+          operationFailure: (
+            error: e,
+            operation: NoteListFailedOperation.update,
+          ),
+        ),
+      );
       return;
     }
     final updatedMap = {for (final n in updated) n.id: n};
@@ -133,7 +144,7 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
   static void _sortNotes(List<Note> notes) {
     notes.sort((a, b) {
       if (a.isPinned != b.isPinned) return a.isPinned ? -1 : 1;
-      return b.createdAt.compareTo(a.createdAt);
+      return b.updatedAt.compareTo(a.updatedAt);
     });
   }
 
@@ -172,22 +183,36 @@ class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
     final ids = Set<String>.of(state.selectedIds);
     final toDelete = state.notes.where((n) => ids.contains(n.id)).toList();
     try {
-      await Future.wait(ids.map(_repository.deleteNote));
+      await _repository.deleteNotes(ids.toList());
     } on NoteStorageException catch (e, st) {
       addError(e, st);
-      emit(state.copyWith(deleteError: e));
+      emit(
+        state.copyWith(
+          operationFailure: (
+            error: e,
+            operation: NoteListFailedOperation.delete,
+          ),
+        ),
+      );
       return;
     }
-    await Future.wait(
-      toDelete.map((n) async {
-        try {
-          await _imageFiles.deleteImagesFromContent(n.content);
-        } catch (e, st) {
-          addError(e, st);
-        }
-      }),
-    );
+    for (final n in toDelete) {
+      await _deleteUnreferencedImages(n.content);
+    }
     final notes = state.notes.where((n) => !ids.contains(n.id)).toList();
-    emit(state.copyWith(notes: notes, selectedIds: {}, deleteError: null));
+    emit(state.copyWith(notes: notes, selectedIds: {}, operationFailure: null));
+  }
+
+  /// Deletes image files from [content] only if no other note references them.
+  Future<void> _deleteUnreferencedImages(String content) async {
+    for (final path in DeltaUtils.allImagePaths(content)) {
+      try {
+        if (!await _repository.isImageReferenced(path)) {
+          await _imageFiles.deleteImage(path);
+        }
+      } catch (e, st) {
+        addError(e, st);
+      }
+    }
   }
 }

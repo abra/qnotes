@@ -5,6 +5,7 @@
   "emptyState": "Sem notas",
   "searchHint": "Pesquisar",
   "noteDeleteFailed": "Falha ao excluir nota",
+  "noteUpdateFailed": "Falha ao atualizar nota",
   "loadFailed": "Falha ao carregar notas",
   "retry": "Tentar novamente"
 }

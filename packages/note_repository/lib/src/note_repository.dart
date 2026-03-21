@@ -70,12 +70,39 @@ class NoteRepository {
     }
   }
 
+  Future<void> deleteNotes(List<String> ids) async {
+    try {
+      await _storage.deleteNotes(ids);
+    } on NoteLocalStorageException catch (e) {
+      throw NoteStorageException(cause: e.cause);
+    }
+  }
+
+  Future<List<Note>> updateNotes(List<Note> notes) async {
+    final updated = notes
+        .map((n) => n.copyWith(updatedAt: DateTime.now()))
+        .toList();
+    try {
+      await _storage.updateNotes(updated);
+    } on NoteLocalStorageException catch (e) {
+      throw NoteStorageException(cause: e.cause);
+    }
+    return updated;
+  }
+
+  Future<bool> isImageReferenced(String imagePath) async {
+    try {
+      return await _storage.isImagePathReferenced(imagePath);
+    } on NoteLocalStorageException catch (e) {
+      throw NoteStorageException(cause: e.cause);
+    }
+  }
+
   Future<NoteColor?> getLastCreatedNoteColor() async {
     try {
       final raw = await _storage.lastCreatedNoteColor();
       if (raw == null) return null;
-      final color = NoteColor.from(raw);
-      return color == NoteColor.none ? null : color;
+      return NoteColor.from(raw);
     } on NoteLocalStorageException catch (e) {
       throw NoteStorageException(cause: e.cause);
     }

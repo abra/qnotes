@@ -56,7 +56,7 @@ class NoteLocalStorage extends _$NoteLocalStorage {
       final rows =
           await (select(notesTable)..orderBy([
                 (t) => OrderingTerm.desc(t.isPinned),
-                (t) => OrderingTerm.desc(t.createdAt),
+                (t) => OrderingTerm.desc(t.updatedAt),
               ]))
               .get();
       return rows.map((r) => r.toDomainModel()).toList();
@@ -109,6 +109,45 @@ class NoteLocalStorage extends _$NoteLocalStorage {
   Future<void> deleteNote(String id) async {
     try {
       await (delete(notesTable)..where((t) => t.id.equals(id))).go();
+    } catch (e) {
+      throw NoteLocalStorageException(cause: e);
+    }
+  }
+
+  Future<void> deleteNotes(List<String> ids) async {
+    try {
+      await transaction(() async {
+        for (final id in ids) {
+          await (delete(notesTable)..where((t) => t.id.equals(id))).go();
+        }
+      });
+    } catch (e) {
+      throw NoteLocalStorageException(cause: e);
+    }
+  }
+
+  Future<void> updateNotes(List<Note> notes) async {
+    try {
+      await transaction(() async {
+        for (final note in notes) {
+          await (update(
+            notesTable,
+          )..where((t) => t.id.equals(note.id))).write(note.toStorageModel());
+        }
+      });
+    } catch (e) {
+      throw NoteLocalStorageException(cause: e);
+    }
+  }
+
+  Future<bool> isImagePathReferenced(String path) async {
+    try {
+      final count = countAll();
+      final query = selectOnly(notesTable)
+        ..addColumns([count])
+        ..where(notesTable.content.like('%$path%'));
+      final result = await query.getSingle();
+      return (result.read(count) ?? 0) > 0;
     } catch (e) {
       throw NoteLocalStorageException(cause: e);
     }

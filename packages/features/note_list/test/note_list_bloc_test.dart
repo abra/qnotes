@@ -18,13 +18,14 @@ Note _note(
   String content = 'body',
   bool isPinned = false,
   DateTime? createdAt,
+  DateTime? updatedAt,
 }) => Note(
   id: id,
   title: title,
   content: content,
   isPinned: isPinned,
   createdAt: createdAt ?? DateTime(2024),
-  updatedAt: DateTime(2024),
+  updatedAt: updatedAt ?? DateTime(2024),
 );
 
 void main() {
@@ -125,7 +126,7 @@ void main() {
       );
 
       blocTest<NoteListBloc, NoteListState>(
-        'clears deleteError on success',
+        'clears operationFailure on success',
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: List.of(notes)),
           preferencesService: mockPrefs,
@@ -134,14 +135,17 @@ void main() {
         seed: () => NoteListState(
           status: NoteListStatus.success,
           notes: List.of(notes),
-          deleteError: const NoteStorageException(cause: 'previous error'),
+          operationFailure: (
+            error: const NoteStorageException(cause: 'previous error'),
+            operation: NoteListFailedOperation.delete,
+          ),
         ),
         act: (bloc) => bloc.add(NoteListNoteDeleted('1')),
-        verify: (bloc) => expect(bloc.state.deleteError, isNull),
+        verify: (bloc) => expect(bloc.state.operationFailure, isNull),
       );
 
       blocTest<NoteListBloc, NoteListState>(
-        'emits deleteError when deleteNote throws',
+        'emits operationFailure when deleteNote throws',
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: List.of(notes))
             ..shouldThrow = true,
@@ -154,7 +158,11 @@ void main() {
         ),
         act: (bloc) => bloc.add(NoteListNoteDeleted('2')),
         verify: (bloc) {
-          expect(bloc.state.deleteError, isA<NoteStorageException>());
+          expect(bloc.state.operationFailure, isNotNull);
+          expect(
+            bloc.state.operationFailure!.operation,
+            NoteListFailedOperation.delete,
+          );
           expect(bloc.state.notes, hasLength(3));
         },
       );
@@ -172,7 +180,7 @@ void main() {
         ),
         act: (bloc) => bloc.add(NoteListNoteDeleted('2')),
         verify: (bloc) {
-          expect(bloc.state.deleteError, isNull);
+          expect(bloc.state.operationFailure, isNull);
           expect(bloc.state.notes, hasLength(2));
         },
       );
@@ -197,12 +205,12 @@ void main() {
         verify: (bloc) {
           expect(bloc.state.notes.map((n) => n.id), ['2']);
           expect(bloc.state.selectedIds, isEmpty);
-          expect(bloc.state.deleteError, isNull);
+          expect(bloc.state.operationFailure, isNull);
         },
       );
 
       blocTest<NoteListBloc, NoteListState>(
-        'emits deleteError when batch delete throws',
+        'emits operationFailure when batch delete throws',
         build: () => NoteListBloc(
           noteRepository: FakeNoteRepository(notes: List.of(notes))
             ..shouldThrow = true,
@@ -216,7 +224,11 @@ void main() {
         ),
         act: (bloc) => bloc.add(NoteListSelectedDeleted()),
         verify: (bloc) {
-          expect(bloc.state.deleteError, isA<NoteStorageException>());
+          expect(bloc.state.operationFailure, isNotNull);
+          expect(
+            bloc.state.operationFailure!.operation,
+            NoteListFailedOperation.delete,
+          );
           expect(bloc.state.notes, hasLength(3));
         },
       );
@@ -235,9 +247,58 @@ void main() {
         ),
         act: (bloc) => bloc.add(NoteListSelectedDeleted()),
         verify: (bloc) {
-          expect(bloc.state.deleteError, isNull);
+          expect(bloc.state.operationFailure, isNull);
           expect(bloc.state.notes.map((n) => n.id), ['3']);
           expect(bloc.state.selectedIds, isEmpty);
+        },
+      );
+    });
+
+    group('NoteListSelectedPinToggled', () {
+      final notes = [_note('1'), _note('2'), _note('3')];
+
+      blocTest<NoteListBloc, NoteListState>(
+        'toggles pin for selected notes using batch update',
+        build: () => NoteListBloc(
+          noteRepository: FakeNoteRepository(notes: List.of(notes)),
+          preferencesService: mockPrefs,
+          imageFiles: FakeImageFiles(),
+        ),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: List.of(notes),
+          selectedIds: {'1', '3'},
+        ),
+        act: (bloc) => bloc.add(NoteListSelectedPinToggled()),
+        verify: (bloc) {
+          final n1 = bloc.state.notes.firstWhere((n) => n.id == '1');
+          final n3 = bloc.state.notes.firstWhere((n) => n.id == '3');
+          expect(n1.isPinned, isTrue);
+          expect(n3.isPinned, isTrue);
+          expect(bloc.state.selectedIds, isEmpty);
+        },
+      );
+
+      blocTest<NoteListBloc, NoteListState>(
+        'emits update operationFailure when batch update throws',
+        build: () => NoteListBloc(
+          noteRepository: FakeNoteRepository(notes: List.of(notes))
+            ..shouldThrow = true,
+          preferencesService: mockPrefs,
+          imageFiles: FakeImageFiles(),
+        ),
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: List.of(notes),
+          selectedIds: {'1'},
+        ),
+        act: (bloc) => bloc.add(NoteListSelectedPinToggled()),
+        verify: (bloc) {
+          expect(bloc.state.operationFailure, isNotNull);
+          expect(
+            bloc.state.operationFailure!.operation,
+            NoteListFailedOperation.update,
+          );
         },
       );
     });
@@ -287,7 +348,7 @@ void main() {
       );
 
       blocTest<NoteListBloc, NoteListState>(
-        'sorts by createdAt when both unpinned',
+        'sorts by updatedAt when both unpinned',
         build: () => NoteListBloc(
           noteRepository: repo,
           preferencesService: mockPrefs,
@@ -296,12 +357,12 @@ void main() {
         seed: () => NoteListState(
           status: NoteListStatus.success,
           notes: [
-            _note('1', createdAt: DateTime(2024, 1, 1)),
-            _note('2', createdAt: DateTime(2024, 1, 2)),
+            _note('1', updatedAt: DateTime(2024, 1, 1)),
+            _note('2', updatedAt: DateTime(2024, 1, 2)),
           ],
         ),
         act: (bloc) => bloc.add(
-          NoteListNoteUpdated(_note('1', createdAt: DateTime(2024, 1, 3))),
+          NoteListNoteUpdated(_note('1', updatedAt: DateTime(2024, 1, 3))),
         ),
         verify: (bloc) => expect(bloc.state.notes.first.id, '1'),
       );
@@ -441,6 +502,51 @@ void main() {
         );
         expect(state.filteredNotes, isEmpty);
       });
+    });
+
+    group('image reference safety', () {
+      blocTest<NoteListBloc, NoteListState>(
+        'does not delete image still referenced by another note',
+        build: () {
+          final noteWithImage = _note(
+            '1',
+            content:
+                '{"ops":[{"insert":{"image":"/img/shared.jpg"}},{"insert":"\\n"}]}',
+          );
+          final otherNoteWithSameImage = _note(
+            '2',
+            content:
+                '{"ops":[{"insert":{"image":"/img/shared.jpg"}},{"insert":"\\n"}]}',
+          );
+          return NoteListBloc(
+            noteRepository: FakeNoteRepository(
+              notes: [noteWithImage, otherNoteWithSameImage],
+            ),
+            preferencesService: mockPrefs,
+            imageFiles: FakeImageFiles(),
+          );
+        },
+        seed: () => NoteListState(
+          status: NoteListStatus.success,
+          notes: [
+            _note(
+              '1',
+              content:
+                  '{"ops":[{"insert":{"image":"/img/shared.jpg"}},{"insert":"\\n"}]}',
+            ),
+            _note(
+              '2',
+              content:
+                  '{"ops":[{"insert":{"image":"/img/shared.jpg"}},{"insert":"\\n"}]}',
+            ),
+          ],
+        ),
+        act: (bloc) => bloc.add(NoteListNoteDeleted('1')),
+        verify: (bloc) {
+          expect(bloc.state.notes, hasLength(1));
+          expect(bloc.state.notes.first.id, '2');
+        },
+      );
     });
   });
 }

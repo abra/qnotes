@@ -5,6 +5,7 @@
   "emptyState": "暂无笔记",
   "searchHint": "搜索",
   "noteDeleteFailed": "删除笔记失败",
+  "noteUpdateFailed": "更新笔记失败",
   "loadFailed": "加载笔记失败",
   "retry": "重试"
 }

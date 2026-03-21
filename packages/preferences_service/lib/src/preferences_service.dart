@@ -1,4 +1,5 @@
 import 'dart:async' show StreamController;
+import 'dart:developer' as developer;
 
 import 'preferences.dart';
 import 'preferences_repository.dart';
@@ -28,9 +29,16 @@ class PreferencesService {
     _current = transform(_current);
     try {
       await _repository.save(_current);
-    } catch (_) {
+    } catch (e, st) {
       // Save failure is non-fatal: in-memory state is updated and emitted
-      // so the UI stays consistent for this session.
+      // so the UI stays consistent for this session. On next launch the old
+      // value is restored from disk.
+      developer.log(
+        'Failed to persist preferences',
+        error: e,
+        stackTrace: st,
+        name: 'PreferencesService',
+      );
     }
     _controller.add(_current);
   }

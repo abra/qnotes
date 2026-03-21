@@ -125,6 +125,19 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
     emit(state.copyWith(isPinned: !state.isPinned));
   }
 
+  /// Deletes image files from [content] only if no other note references them.
+  Future<void> _deleteUnreferencedImages(String content) async {
+    for (final path in DeltaUtils.allImagePaths(content)) {
+      try {
+        if (!await _repository.isImageReferenced(path)) {
+          await _imageFiles.deleteImage(path);
+        }
+      } catch (e, st) {
+        addError(e, st);
+      }
+    }
+  }
+
   Future<void> _onDeleteRequested(
     NoteDetailsDeleteRequested event,
     Emitter<NoteDetailsState> emit,
@@ -138,11 +151,7 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
       emit(state.copyWith(status: NoteDetailsStatus.failure, saveError: e));
       return;
     }
-    try {
-      await _imageFiles.deleteImagesFromContent(note.content);
-    } catch (e, st) {
-      addError(e, st);
-    }
+    await _deleteUnreferencedImages(note.content);
     emit(state.copyWith(status: NoteDetailsStatus.deleted));
   }
 
@@ -188,14 +197,16 @@ class NoteDetailsBloc extends Bloc<NoteDetailsEvent, NoteDetailsState> {
         );
         // Delete images that were in the original content but removed by the
         // user during editing. Non-fatal: note is already saved successfully.
-        try {
-          final oldPaths = DeltaUtils.allImagePaths(note.content).toSet();
-          final newPaths = DeltaUtils.allImagePaths(content).toSet();
-          for (final path in oldPaths.difference(newPaths)) {
-            await _imageFiles.deleteImage(path);
+        final oldPaths = DeltaUtils.allImagePaths(note.content).toSet();
+        final newPaths = DeltaUtils.allImagePaths(content).toSet();
+        for (final path in oldPaths.difference(newPaths)) {
+          try {
+            if (!await _repository.isImageReferenced(path)) {
+              await _imageFiles.deleteImage(path);
+            }
+          } catch (e, st) {
+            addError(e, st);
           }
-        } catch (e, st) {
-          addError(e, st);
         }
       }
       emit(

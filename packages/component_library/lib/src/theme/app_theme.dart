@@ -27,9 +27,14 @@ class AppTheme extends InheritedWidget {
   /// Returns the [AppThemeData] matching the current brightness.
   static AppThemeData of(BuildContext context) {
     final theme = context.dependOnInheritedWidgetOfExactType<AppTheme>();
-    assert(theme != null, 'No AppTheme found in context');
+    if (theme == null) {
+      throw FlutterError(
+        'AppTheme.of() called with a context that does not contain an AppTheme.\n'
+        'Ensure the widget tree includes an AppTheme ancestor.',
+      );
+    }
     final brightness = Theme.of(context).brightness;
-    return brightness == Brightness.dark ? theme!.darkTheme : theme!.lightTheme;
+    return brightness == Brightness.dark ? theme.darkTheme : theme.lightTheme;
   }
 
   @override

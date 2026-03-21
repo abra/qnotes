@@ -52,6 +52,19 @@ class FakeNoteRepository implements NoteRepository {
   }
 
   @override
+  Future<List<Note>> updateNotes(List<Note> notes) async {
+    if (shouldThrow) {
+      throw const NoteStorageException(cause: 'updateNotes failed');
+    }
+    final updatedMap = {for (final n in notes) n.id: n};
+    _notes = [
+      for (final n in _notes)
+        if (updatedMap.containsKey(n.id)) updatedMap[n.id]! else n,
+    ];
+    return notes;
+  }
+
+  @override
   Future<void> deleteNote(String id) async {
     if (shouldThrow) {
       throw const NoteStorageException(cause: 'deleteNote failed');
@@ -60,11 +73,24 @@ class FakeNoteRepository implements NoteRepository {
   }
 
   @override
+  Future<void> deleteNotes(List<String> ids) async {
+    if (shouldThrow) {
+      throw const NoteStorageException(cause: 'deleteNotes failed');
+    }
+    _notes.removeWhere((n) => ids.contains(n.id));
+  }
+
+  @override
+  Future<bool> isImageReferenced(String imagePath) async {
+    return _notes.any((n) => n.content.contains(imagePath));
+  }
+
+  @override
   Future<NoteColor?> getLastCreatedNoteColor() async {
     if (_notes.isEmpty) return null;
     final last = _notes.reduce(
       (a, b) => a.createdAt.isAfter(b.createdAt) ? a : b,
     );
-    return last.color == NoteColor.none ? null : last.color;
+    return last.color;
   }
 }

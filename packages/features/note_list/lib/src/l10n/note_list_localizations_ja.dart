@@ -1,6 +1,5 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
-
 import 'note_list_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -33,6 +32,9 @@ class NoteListLocalizationsJa extends NoteListLocalizations {
 
   @override
   String get noteDeleteFailed => 'メモの削除に失敗しました';
+
+  @override
+  String get noteUpdateFailed => 'メモの更新に失敗しました';
 
   @override
   String get loadFailed => 'メモの読み込みに失敗しました';
