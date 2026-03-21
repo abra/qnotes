@@ -55,6 +55,7 @@ class _MaterialContextState extends State<MaterialContext> {
       darkTheme: darkTheme,
       child: ToastWrapper(
         child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
           routerConfig: _router,
           themeMode: preferences.themeMode,
           theme: lightTheme.materialThemeData,

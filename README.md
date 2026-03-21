@@ -1,13 +1,89 @@
 <h1 align="center">
-  <img width="200" height="200" alt="Logo" src="https://github.com/user-attachments/assets/48423cfe-b8b9-4c53-9eab-b47be2deb330">
+  <img width="120" height="120" alt="Logo" src="assets/nota.png">
   <br/>Nota
 </h1>
 
-Simple note-taking mobile app.
+<p align="center">A minimalist, local-first note-taking app for iOS and Android.</p>
+
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><b>Note list · Light</b></td>
+    <td align="center"><b>Note list · Dark</b></td>
+    <td align="center"><b>Rich text editor</b></td>
+    <td align="center"><b>Color picker</b></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/note_list_light.png" width="180"/></td>
+    <td><img src="screenshots/note_list_dark.png" width="180"/></td>
+    <td><img src="screenshots/editor_checklist.png" width="180"/></td>
+    <td><img src="screenshots/editor_colors.png" width="180"/></td>
+  </tr>
+  <tr>
+    <td align="center"><b>Bullet lists</b></td>
+    <td align="center"><b>Preferences</b></td>
+    <td align="center"><b>10 languages</b></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/editor_bullets.png" width="180"/></td>
+    <td><img src="screenshots/preferences.png" width="180"/></td>
+    <td><img src="screenshots/language.png" width="180"/></td>
+    <td></td>
+  </tr>
+</table>
+
+## Features
+
+**Notes**
+- Rich text editor — bold, italic, underline, strikethrough
+- Ordered lists, bullet lists, checklists
+- Embed images from the gallery
+- 16 note colors
+- Pin important notes to the top
+- Search across all notes
+
+**Note list**
+- Grid and list view modes
+- Adjustable list density (2 / 3 / 4 lines of preview)
+- Multi-select and batch delete
+
+**Customization**
+- Light, dark, and system theme (Nord palette)
+- 10 interface languages: English, Russian, Spanish, French, German, Portuguese, Japanese, Chinese, Hindi, Arabic
+
+**Privacy**
+- Fully local — no account, no cloud, no analytics
+- Works completely offline
+
+## Tech stack
+
+| Layer | Technology |
+|---|---|
+| UI | Flutter, flutter_quill |
+| State | flutter_bloc (BLoC / Cubit) |
+| Navigation | go_router |
+| Storage | Drift (SQLite) |
+| Architecture | Feature-based monorepo |
+
+## Project structure
+
+```
+lib/                        # App shell, routing, DI
+packages/
+  shared/                   # Domain models, repository interfaces
+  note_repository/          # SQLite persistence (Drift)
+  preferences_service/      # User preferences
+  component_library/        # Theme, design tokens, shared widgets
+  image_files/              # Note image file management
+  features/
+    note_list/              # Note list screen
+    note_details/           # Note editor screen
+    preferences_menu/       # Settings bottom sheet
+```
 
 ## Requirements
 
-
 - Flutter 3.41+
 - Dart 3.11+
-
