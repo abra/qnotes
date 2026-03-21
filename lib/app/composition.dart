@@ -13,6 +13,29 @@ import 'package:note_repository/note_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:preferences_service/preferences_service.dart';
 
+/// Creates the [Logger] instance and attaches any provided observers.
+Logger createAppLogger({List<LogObserver> observers = const []}) {
+  final logger = Logger();
+  for (final observer in observers) {
+    logger.addObserver(observer);
+  }
+  return logger;
+}
+
+/// Creates the [ErrorReportingService] instance.
+///
+/// Replace [NoopErrorReporter] with a real implementation (e.g. Crashlytics)
+/// from packages/monitoring when ready.
+Future<ErrorReportingService> createErrorReporter(
+  ApplicationConfig config,
+) async {
+  const errorReporter = NoopErrorReporter();
+  if (config.enableSentry) {
+    await errorReporter.initialize();
+  }
+  return errorReporter;
+}
+
 /// A place where Application-Wide dependencies are initialized.
 ///
 /// Application-Wide dependencies are dependencies that have a global scope,

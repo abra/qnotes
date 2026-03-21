@@ -18,26 +18,6 @@ import 'package:nota/app/config/application_config.dart';
 import 'package:nota/app/initialization_failed_screen.dart';
 import 'package:nota/app/root_context.dart';
 
-Logger createAppLogger({List<LogObserver> observers = const []}) {
-  final logger = Logger();
-  for (final observer in observers) {
-    logger.addObserver(observer);
-  }
-  return logger;
-}
-
-/// Replace [NoopErrorReporter] with a real implementation (e.g. Crashlytics)
-/// from packages/monitoring when ready.
-Future<ErrorReportingService> createErrorReporter(
-  ApplicationConfig config,
-) async {
-  const errorReporter = NoopErrorReporter();
-  if (config.enableSentry) {
-    await errorReporter.initialize();
-  }
-  return errorReporter;
-}
-
 /// Initializes dependencies and runs app.
 Future<void> starter() async {
   const config = ApplicationConfig();
