@@ -975,6 +975,7 @@ class _LocalImageEmbedBuilder extends EmbedBuilder {
             ),
             child: Image.file(
               File(path),
+              width: double.infinity,
               fit: BoxFit.contain,
               errorBuilder: (_, _, _) => const Icon(
                 Icons.broken_image_outlined,

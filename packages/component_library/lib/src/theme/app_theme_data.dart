@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'catppuccin.dart';
+import 'nord.dart';
 
 // M3 default sizes + 2pt, Geist typeface.
 const _textTheme = TextTheme(
@@ -35,7 +35,7 @@ abstract class AppThemeData {
   ThemeData get materialThemeData;
 }
 
-/// Light variant of [AppThemeData] — Catppuccin Latte, Mauve accent.
+/// Light variant of [AppThemeData] — Nord, Frost blue accent.
 final class LightAppThemeData extends AppThemeData {
   const LightAppThemeData();
 
@@ -44,36 +44,36 @@ final class LightAppThemeData extends AppThemeData {
     brightness: Brightness.light,
     fontFamily: 'Geist',
     textTheme: _textTheme,
-    scaffoldBackgroundColor: CatppuccinLatte.base,
+    scaffoldBackgroundColor: NordSnowStorm.nord6,
     colorScheme: const ColorScheme.light(
-      primary: CatppuccinLatte.mauve,
+      primary: NordFrost.nord10,
       onPrimary: Colors.white,
-      primaryContainer: Color(0xFFEECDFF),
-      onPrimaryContainer: CatppuccinLatte.mauve,
-      secondary: CatppuccinLatte.lavender,
+      primaryContainer: NordSnowStorm.nord4,
+      onPrimaryContainer: NordFrost.nord10,
+      secondary: NordFrost.nord9,
       onSecondary: Colors.white,
-      surface: CatppuccinLatte.base,
-      onSurface: CatppuccinLatte.text,
-      onSurfaceVariant: CatppuccinLatte.subtext1,
-      outline: CatppuccinLatte.overlay1,
-      outlineVariant: CatppuccinLatte.surface1,
-      error: CatppuccinLatte.red,
+      surface: NordSnowStorm.nord6,
+      onSurface: NordPolarNight.nord0,
+      onSurfaceVariant: NordPolarNight.nord3,
+      outline: NordPolarNight.nord3,
+      outlineVariant: NordSnowStorm.nord4,
+      error: NordAurora.nord11,
       onError: Colors.white,
-      surfaceContainerHighest: CatppuccinLatte.surface0,
-      surfaceContainerHigh: CatppuccinLatte.surface1,
-      surfaceContainer: CatppuccinLatte.mantle,
-      surfaceContainerLow: CatppuccinLatte.crust,
+      surfaceContainerHighest: NordSnowStorm.nord4,
+      surfaceContainerHigh: NordSnowStorm.nord4,
+      surfaceContainer: NordSnowStorm.nord5,
+      surfaceContainerLow: NordSnowStorm.nord5,
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: CatppuccinLatte.base,
+      backgroundColor: NordSnowStorm.nord6,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0,
-      foregroundColor: CatppuccinLatte.text,
+      foregroundColor: NordPolarNight.nord0,
     ),
   );
 }
 
-/// Dark variant of [AppThemeData] — Catppuccin Frappé, Mauve accent.
+/// Dark variant of [AppThemeData] — Nord, Frost blue accent.
 final class DarkAppThemeData extends AppThemeData {
   const DarkAppThemeData();
 
@@ -82,31 +82,31 @@ final class DarkAppThemeData extends AppThemeData {
     brightness: Brightness.dark,
     fontFamily: 'Geist',
     textTheme: _textTheme,
-    scaffoldBackgroundColor: CatppuccinFrappe.base,
+    scaffoldBackgroundColor: NordPolarNight.nord0,
     colorScheme: const ColorScheme.dark(
-      primary: CatppuccinFrappe.mauve,
-      onPrimary: CatppuccinFrappe.base,
-      primaryContainer: CatppuccinFrappe.surface1,
-      onPrimaryContainer: CatppuccinFrappe.mauve,
-      secondary: CatppuccinFrappe.lavender,
-      onSecondary: CatppuccinFrappe.base,
-      surface: CatppuccinFrappe.base,
-      onSurface: CatppuccinFrappe.text,
-      onSurfaceVariant: CatppuccinFrappe.subtext1,
-      outline: CatppuccinFrappe.overlay1,
-      outlineVariant: CatppuccinFrappe.surface1,
-      error: CatppuccinFrappe.red,
-      onError: CatppuccinFrappe.base,
-      surfaceContainerHighest: CatppuccinFrappe.surface0,
-      surfaceContainerHigh: CatppuccinFrappe.surface1,
-      surfaceContainer: CatppuccinFrappe.surface0,
-      surfaceContainerLow: CatppuccinFrappe.mantle,
+      primary: NordFrost.nord9,
+      onPrimary: NordPolarNight.nord0,
+      primaryContainer: NordPolarNight.nord2,
+      onPrimaryContainer: NordFrost.nord9,
+      secondary: NordFrost.nord8,
+      onSecondary: NordPolarNight.nord0,
+      surface: NordPolarNight.nord0,
+      onSurface: NordSnowStorm.nord6,
+      onSurfaceVariant: NordSnowStorm.nord4,
+      outline: NordPolarNight.nord3,
+      outlineVariant: NordPolarNight.nord2,
+      error: NordAurora.nord11,
+      onError: NordPolarNight.nord0,
+      surfaceContainerHighest: NordPolarNight.nord3,
+      surfaceContainerHigh: NordPolarNight.nord2,
+      surfaceContainer: NordPolarNight.nord1,
+      surfaceContainerLow: NordPolarNight.nord1,
     ),
     appBarTheme: const AppBarTheme(
-      backgroundColor: CatppuccinFrappe.base,
+      backgroundColor: NordPolarNight.nord0,
       surfaceTintColor: Colors.transparent,
       scrolledUnderElevation: 0,
-      foregroundColor: CatppuccinFrappe.text,
+      foregroundColor: NordSnowStorm.nord6,
     ),
   );
 }
