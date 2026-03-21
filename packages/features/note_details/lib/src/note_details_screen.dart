@@ -80,7 +80,6 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
   bool _contentInitialized = false;
   _SecondaryPanelMode _activePanel = _SecondaryPanelMode.formatting;
   bool _isPanelOpen = false;
-  bool _isMicActive = false;
 
   // Disable rich-text paste from external apps: HTML from the clipboard
   // brings unwanted styles (background colors, font sizes, etc.).
@@ -247,7 +246,9 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
       listener: (context, state) {
         final l10n = NoteDetailsLocalizations.of(context)!;
 
-        if (state.insertedImagePath != null) {
+        if (state.insertedImagePath != null &&
+            state.status != NoteDetailsStatus.saved &&
+            state.status != NoteDetailsStatus.deleted) {
           final path = state.insertedImagePath!;
           final index = _quillController.selection.extentOffset;
           _quillController.document.insert(index, BlockEmbed.image(path));
@@ -474,9 +475,6 @@ class _NoteDetailsViewState extends State<NoteDetailsView>
                               NoteDetailsImageInserted(picked.path),
                             );
                           },
-                          isMicActive: _isMicActive,
-                          onMicPressed: () =>
-                              setState(() => _isMicActive = !_isMicActive),
                           onPinToggled: () =>
                               context.read<NoteDetailsBloc>().add(
                                 NoteDetailsPinToggled(),
@@ -603,8 +601,6 @@ class _NoteToolbar extends StatelessWidget {
     required this.onToggleFormatting,
     required this.onToggleColors,
     required this.onImagePressed,
-    required this.isMicActive,
-    required this.onMicPressed,
     required this.onPinToggled,
     required this.onColorSelected,
     required this.onNewLine,
@@ -619,8 +615,6 @@ class _NoteToolbar extends StatelessWidget {
   final VoidCallback onToggleFormatting;
   final VoidCallback onToggleColors;
   final VoidCallback onImagePressed;
-  final bool isMicActive;
-  final VoidCallback onMicPressed;
   final VoidCallback onPinToggled;
   final ValueChanged<NoteColor> onColorSelected;
   final VoidCallback onNewLine;
@@ -658,24 +652,6 @@ class _NoteToolbar extends StatelessWidget {
             padding: const EdgeInsets.all(Spacing.small),
             child: Row(
               children: [
-                IconButton(
-                  icon: Icon(
-                    isMicActive ? Icons.mic : Icons.mic_none,
-                    color: isMicActive
-                        ? Colors.green
-                        : colorScheme.onSurfaceVariant,
-                  ),
-                  style: _toolbarButtonStyle,
-                  onPressed: onMicPressed,
-                ),
-                SizedBox(
-                  height: 28,
-                  child: VerticalDivider(
-                    width: Spacing.medium,
-                    thickness: 0.5,
-                    color: colorScheme.onSurface.withValues(alpha: 0.3),
-                  ),
-                ),
                 // Undo / redo rebuild on every controller history change.
                 ListenableBuilder(
                   listenable: controller,

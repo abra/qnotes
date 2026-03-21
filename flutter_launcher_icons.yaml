@@ -1,0 +1,6 @@
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/nota_original.png"
+  adaptive_icon_background: "#ECEFF4"
+  adaptive_icon_foreground: "assets/nota_original.png"

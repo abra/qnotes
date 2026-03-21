@@ -288,7 +288,7 @@ class _NoteListAppBar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisSize: MainAxisSize.min,
         spacing: Spacing.small,
         children: const [
-          NotaLogo(size: 22),
+          Image(image: AssetImage('assets/nota.png'), width: 24, height: 24),
           Text('Nota'),
         ],
       ),

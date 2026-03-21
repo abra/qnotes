@@ -7,6 +7,7 @@ import 'package:preferences_service/preferences_service.dart';
 import 'package:shared/shared.dart';
 
 part 'note_list_event.dart';
+
 part 'note_list_state.dart';
 
 class NoteListBloc extends Bloc<NoteListEvent, NoteListState> {
