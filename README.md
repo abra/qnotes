@@ -21,16 +21,16 @@
     <td><img src="screenshots/editor_colors.png" width="180"/></td>
   </tr>
   <tr>
+    <td align="center"><b>List view</b></td>
     <td align="center"><b>Bullet lists</b></td>
     <td align="center"><b>Preferences</b></td>
     <td align="center"><b>10 languages</b></td>
-    <td></td>
   </tr>
   <tr>
+    <td><img src="screenshots/note_list_list_view.png" width="180"/></td>
     <td><img src="screenshots/editor_bullets.png" width="180"/></td>
     <td><img src="screenshots/preferences.png" width="180"/></td>
     <td><img src="screenshots/language.png" width="180"/></td>
-    <td></td>
   </tr>
 </table>
 
