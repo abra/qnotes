@@ -69,23 +69,23 @@
 
 ## Dependencies
 
-| Package | Version | Purpose |
-|---|---|---|
-| [flutter_quill](https://pub.dev/packages/flutter_quill) | ^11.5.0 | Rich text editor |
-| [flutter_bloc](https://pub.dev/packages/flutter_bloc) | ^9.1.1 | State management |
-| [go_router](https://pub.dev/packages/go_router) | ^17.1.0 | Navigation |
-| [drift](https://pub.dev/packages/drift) | ^2.23.1 | SQLite ORM |
-| [sqlite3_flutter_libs](https://pub.dev/packages/sqlite3_flutter_libs) | ^0.5.0 | SQLite native binaries |
-| [shared_preferences](https://pub.dev/packages/shared_preferences) | ^2.0.0 | Persistent key-value storage |
-| [toastification](https://pub.dev/packages/toastification) | ^3.0.3 | In-app toast notifications |
-| [image_picker](https://pub.dev/packages/image_picker) | ^1.1.2 | Pick images from gallery |
-| [smart_keyboard_insets](https://pub.dev/packages/smart_keyboard_insets) | ^0.0.1 | Smooth keyboard inset handling |
-| [path_provider](https://pub.dev/packages/path_provider) | ^2.0.0 | App document directory |
-| [package_info_plus](https://pub.dev/packages/package_info_plus) | ^9.0.0 | App version info |
-| [equatable](https://pub.dev/packages/equatable) | ^2.0.8 | Value equality |
-| [bloc_concurrency](https://pub.dev/packages/bloc_concurrency) | ^0.3.0 | Event transformers |
-| [uuid](https://pub.dev/packages/uuid) | ^4.5.1 | UUID generation |
-| [intl](https://pub.dev/packages/intl) | any | Localizations |
+| Package | Purpose |
+|---|---|
+| [flutter_quill](https://pub.dev/packages/flutter_quill) | Rich text editor |
+| [flutter_bloc](https://pub.dev/packages/flutter_bloc) | State management |
+| [go_router](https://pub.dev/packages/go_router) | Navigation |
+| [drift](https://pub.dev/packages/drift) | SQLite ORM |
+| [sqlite3_flutter_libs](https://pub.dev/packages/sqlite3_flutter_libs) | SQLite native binaries |
+| [shared_preferences](https://pub.dev/packages/shared_preferences) | Persistent key-value storage |
+| [toastification](https://pub.dev/packages/toastification) | In-app toast notifications |
+| [image_picker](https://pub.dev/packages/image_picker) | Pick images from gallery |
+| [smart_keyboard_insets](https://pub.dev/packages/smart_keyboard_insets) | Smooth keyboard inset handling |
+| [path_provider](https://pub.dev/packages/path_provider) | App document directory |
+| [package_info_plus](https://pub.dev/packages/package_info_plus) | App version info |
+| [equatable](https://pub.dev/packages/equatable) | Value equality |
+| [bloc_concurrency](https://pub.dev/packages/bloc_concurrency) | Event transformers |
+| [uuid](https://pub.dev/packages/uuid) | UUID generation |
+| [intl](https://pub.dev/packages/intl) | Localizations |
 
 ## Project structure
 
